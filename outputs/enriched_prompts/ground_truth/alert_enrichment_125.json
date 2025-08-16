@@ -1,0 +1,62 @@
+{
+  "alert": {
+    "signature": "ET JA3 Hash - [Abuse.ch] Possible Adware",
+    "category": "Unknown Traffic",
+    "timestamp": "2025-06-05T11:55:08.502Z"
+  },
+  "connection": {
+    "identity": {
+      "source_ip": "192.168.10.5",
+      "source_port": "59692",
+      "destination_ip": "199.244.51.60",
+      "destination_port": "443",
+      "traffic_direction": "Egress",
+      "service": "ssl",
+      "transport_protocol": "tcp"
+    },
+    "statistics": {
+      "duration_sec": 0.023,
+      "sent_bytes": 1237,
+      "received_bytes": 434
+    },
+    "analysis": {
+      "connection_state": "Normal Connection (SF)",
+      "history_analysis": {
+        "label": "Unrecognized Pattern",
+        "summary": "Requires manual review: 'ShADdaFRf'.",
+        "severity": "Informational"
+      },
+      "flow_analysis": {
+        "direction": "Symmetrical"
+      }
+    }
+  },
+  "evidence": {
+    "reference": {
+      "ssl": {
+        "identity": {
+          "server_name": "live.sekindo.com"
+        },
+        "analysis": {
+          "server_reputation": "Unknown Reputation",
+          "certificate_status": "Trusted",
+          "encryption_strength": "Strong (Using TLSv12)",
+          "ja3_threat_match": "JA3 Not in Watchlist",
+          "ja3s_threat_match": "JA3S Not in Watchlist",
+          "handshake_status": "Successful"
+        },
+        "statistics": {
+          "connection_duration_sec": 0.0
+        },
+        "evidence": {
+          "ja3_hash": "46efd49abcca8ea9baa932da68fdb529",
+          "ja3s_hash": "364ff14b04ef93c3b4cfa429d729c0d9",
+          "tls_version": "TLSv12",
+          "tls_cipher": "TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384",
+          "raw_validation_statuses": [],
+          "certificate_chain_fingerprints": null
+        }
+      }
+    }
+  }
+}

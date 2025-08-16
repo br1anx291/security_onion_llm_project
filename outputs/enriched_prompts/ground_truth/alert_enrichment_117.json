@@ -1,0 +1,68 @@
+{
+  "alert": {
+    "signature": "ET INFO Pastebin-like Service Domain in DNS Lookup (jsfiddle .net)",
+    "category": "Misc activity",
+    "timestamp": "2025-07-02T02:23:25.254Z"
+  },
+  "connection": {
+    "identity": {
+      "source_ip": "192.168.10.8",
+      "source_port": "54860",
+      "destination_ip": "192.168.10.3",
+      "destination_port": "53",
+      "traffic_direction": "Lateral",
+      "service": "dns",
+      "transport_protocol": "udp"
+    },
+    "statistics": {
+      "duration_sec": 0.0001,
+      "sent_bytes": 60,
+      "received_bytes": 92
+    },
+    "analysis": {
+      "connection_state": "Normal Connection (SF)",
+      "history_analysis": {
+        "label": "Unrecognized Pattern",
+        "summary": "Requires manual review: 'Dd'.",
+        "severity": "Informational"
+      },
+      "flow_analysis": {
+        "direction": "Symmetrical"
+      }
+    }
+  },
+  "evidence": {
+    "low": {
+      "dns": {
+        "analysis": {
+          "query_pattern": "Normal Patterns",
+          "query_integrity": "Normal",
+          "tld_risk": "Normal TLDs",
+          "ttl_behavior": "Low TTL Detected"
+        },
+        "evidence": {
+          "connection_context": {
+            "source_ip": "192.168.10.8",
+            "destination_dns_server": "192.168.10.3"
+          },
+          "findings": [
+            {
+              "type": "AttributeFinding",
+              "source": "answer_record",
+              "content": 50,
+              "reasons": [
+                "Low TTL (50 < 60)"
+              ]
+            }
+          ]
+        },
+        "statistics": {
+          "total_queries": 2,
+          "distinct_queries": 1,
+          "failed_queries_ratio": 0.0,
+          "distinct_answers": 1
+        }
+      }
+    }
+  }
+}

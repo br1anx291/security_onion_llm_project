@@ -1,0 +1,62 @@
+{
+  "alert": {
+    "signature": "ET JA3 Hash - [Abuse.ch] Possible Adware",
+    "category": "Unknown Traffic",
+    "timestamp": "2025-06-05T11:52:12.736Z"
+  },
+  "connection": {
+    "identity": {
+      "source_ip": "192.168.10.5",
+      "source_port": "51525",
+      "destination_ip": "69.172.216.111",
+      "destination_port": "443",
+      "traffic_direction": "Egress",
+      "service": "ssl",
+      "transport_protocol": "tcp"
+    },
+    "statistics": {
+      "duration_sec": 3.1264,
+      "sent_bytes": 643,
+      "received_bytes": 3007
+    },
+    "analysis": {
+      "connection_state": "Reset by Originator (RSTO)",
+      "history_analysis": {
+        "label": "Unrecognized Pattern",
+        "summary": "Requires manual review: 'ShADagdFR'.",
+        "severity": "Informational"
+      },
+      "flow_analysis": {
+        "direction": "Symmetrical"
+      }
+    }
+  },
+  "evidence": {
+    "low": {
+      "ssl": {
+        "identity": {
+          "server_name": "dt.adsafeprotected.com"
+        },
+        "analysis": {
+          "server_reputation": "Unknown Reputation",
+          "certificate_status": "Trusted",
+          "encryption_strength": "Strong (Using None)",
+          "ja3_threat_match": "JA3 Not in Watchlist",
+          "ja3s_threat_match": "JA3S Not in Watchlist",
+          "handshake_status": "Failed"
+        },
+        "statistics": {
+          "connection_duration_sec": 0.0
+        },
+        "evidence": {
+          "ja3_hash": "46efd49abcca8ea9baa932da68fdb529",
+          "ja3s_hash": null,
+          "tls_version": null,
+          "tls_cipher": null,
+          "raw_validation_statuses": [],
+          "certificate_chain_fingerprints": null
+        }
+      }
+    }
+  }
+}

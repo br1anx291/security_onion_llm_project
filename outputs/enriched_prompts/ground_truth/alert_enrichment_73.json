@@ -1,0 +1,103 @@
+{
+  "alert": {
+    "signature": "ET HUNTING [TW] Likely Javascript-Obfuscator Usage Observed M1",
+    "category": "Misc activity",
+    "timestamp": "2025-07-02T02:28:16.991Z"
+  },
+  "connection": {
+    "identity": {
+      "source_ip": "192.168.10.14",
+      "source_port": "50490",
+      "destination_ip": "104.25.71.103",
+      "destination_port": "80",
+      "traffic_direction": "Egress",
+      "service": "http",
+      "transport_protocol": "tcp"
+    },
+    "statistics": {
+      "duration_sec": 0.756,
+      "sent_bytes": 2560,
+      "received_bytes": 37592
+    },
+    "analysis": {
+      "connection_state": "Normal Connection (SF)",
+      "history_analysis": {
+        "label": "Unrecognized Pattern",
+        "summary": "Requires manual review: 'ShADadgTfF'.",
+        "severity": "Informational"
+      },
+      "flow_analysis": {
+        "direction": "download",
+        "ratio": 15
+      }
+    }
+  },
+  "evidence": {
+    "reference": {
+      "http": {
+        "analysis": {
+          "user_agent_category": "Normal Browser",
+          "destination_analysis": "Domain Name Connection",
+          "transfer_volume": "Normal",
+          "content_risk": "No Suspicious Content",
+          "file_transfer_risk": "Benign Download Detected"
+        },
+        "evidence": {
+          "connection_context": {
+            "methods_used": [
+              "GET"
+            ],
+            "user_agent_string": "Mozilla/5.0 (Windows NT 10.0; rv:54.0) Gecko/20100101 Firefox/54.0"
+          },
+          "findings": []
+        },
+        "statistics": {
+          "total_requests": 6,
+          "request_bytes": 0,
+          "response_bytes": 17416,
+          "client_error_ratio": 0.0
+        }
+      },
+      "files": {
+        "analysis": {
+          "session_risk_summary": "No suspicious file activity detected",
+          "highest_threat_level": "Informational",
+          "evasion_techniques_detected": "No",
+          "suspicious_content_summary": "No suspicious content identified."
+        },
+        "statistics": {
+          "total_files_analyzed": 2,
+          "suspicious_files_count": 0,
+          "total_bytes_transferred_kb": 17.01
+        },
+        "evidence": {
+          "findings": [
+            {
+              "type": "FileAnalysisFinding",
+              "fuid": "FseQQtnXZbPx06Aba",
+              "filename": null,
+              "direction": "Download",
+              "severity": "Informational",
+              "risk_score": 5,
+              "size_bytes": 17416,
+              "reasons": [],
+              "file_type_reported": "text/html",
+              "transfer_status": "Incomplete (Missing Bytes)"
+            },
+            {
+              "type": "FileAnalysisFinding",
+              "fuid": "FseQQtnXZbPx06Aba",
+              "filename": null,
+              "direction": "Download",
+              "severity": "Informational",
+              "risk_score": 5,
+              "size_bytes": 0,
+              "reasons": [],
+              "transfer_status": "Incomplete (Timed Out, Missing Bytes)"
+            }
+          ]
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,62 @@
+{
+  "alert": {
+    "signature": "ET INFO TLS Handshake Failure",
+    "category": "Potentially Bad Traffic",
+    "timestamp": "2025-05-08T10:43:23.705Z"
+  },
+  "connection": {
+    "identity": {
+      "source_ip": "10.0.0.45",
+      "source_port": "49241",
+      "destination_ip": "192.150.19.174",
+      "destination_port": "443",
+      "traffic_direction": "Egress",
+      "service": null,
+      "transport_protocol": "tcp"
+    },
+    "statistics": {
+      "duration_sec": 0.0,
+      "sent_bytes": 33,
+      "received_bytes": 7
+    },
+    "analysis": {
+      "connection_state": "Normal Connection (SF)",
+      "history_analysis": {
+        "label": "Normal Full Connection",
+        "summary": "A standard TCP session...",
+        "severity": "Informational"
+      },
+      "flow_analysis": {
+        "direction": "Symmetrical"
+      }
+    }
+  },
+  "evidence": {
+    "low": {
+      "ssl": {
+        "identity": {
+          "server_name": null
+        },
+        "analysis": {
+          "server_reputation": "Unknown",
+          "certificate_status": "Trusted",
+          "encryption_strength": "Strong (Using None)",
+          "ja3_threat_match": "JA3 Not in Watchlist",
+          "ja3s_threat_match": "JA3S Not in Watchlist",
+          "handshake_status": "Failed"
+        },
+        "statistics": {
+          "connection_duration_sec": 0.0
+        },
+        "evidence": {
+          "ja3_hash": "a17d1ea5bf2da044c09cae5bbd17a39f",
+          "ja3s_hash": null,
+          "tls_version": null,
+          "tls_cipher": null,
+          "raw_validation_statuses": [],
+          "certificate_chain_fingerprints": null
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "alert": {
+    "signature": "ET INFO Observed DNS Query to .biz TLD",
+    "category": "Potentially Bad Traffic",
+    "timestamp": "2025-05-25T09:55:47.236Z"
+  },
+  "connection": {
+    "identity": {
+      "source_ip": "192.168.10.19",
+      "source_port": "24801",
+      "destination_ip": "192.168.10.3",
+      "destination_port": "53",
+      "traffic_direction": "Lateral",
+      "service": "dns",
+      "transport_protocol": "udp"
+    },
+    "statistics": {
+      "duration_sec": 0.0003,
+      "sent_bytes": 58,
+      "received_bytes": 180
+    },
+    "analysis": {
+      "connection_state": "Normal Connection (SF)",
+      "history_analysis": {
+        "label": "Unrecognized Pattern",
+        "summary": "Requires manual review: 'Dd'.",
+        "severity": "Informational"
+      },
+      "flow_analysis": {
+        "direction": "Symmetrical"
+      }
+    }
+  }
+}

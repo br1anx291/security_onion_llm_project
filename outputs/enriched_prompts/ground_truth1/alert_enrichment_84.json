@@ -1,0 +1,64 @@
+{
+  "alert": {
+    "signature": "ET MALWARE Spoofed MSIE 7 User-Agent Likely Ponmocup",
+    "category": "A Network Trojan was detected",
+    "timestamp": "2025-05-25T09:26:24.007Z"
+  },
+  "connection": {
+    "identity": {
+      "source_ip": "172.16.0.1",
+      "source_port": "51790",
+      "destination_ip": "192.168.10.50",
+      "destination_port": "80",
+      "traffic_direction": "Lateral",
+      "service": "http",
+      "transport_protocol": "tcp"
+    },
+    "statistics": {
+      "duration_sec": 0.5274,
+      "sent_bytes": 323,
+      "received_bytes": 11595
+    },
+    "analysis": {
+      "connection_state": "Reset by Originator (RSTO)",
+      "history_analysis": {
+        "label": "Unrecognized Pattern",
+        "summary": "Requires manual review: 'ShADTafgR'.",
+        "severity": "Informational"
+      },
+      "flow_analysis": {
+        "direction": "download",
+        "ratio": 36
+      }
+    }
+  },
+  "evidence": {
+    "high": {
+      "http": {
+        "analysis": {
+          "user_agent_category": "Outdated Browser",
+          "destination_analysis": "Direct-to-IP Connection",
+          "transfer_volume": "Normal",
+          "content_risk": "No Suspicious Content",
+          "file_transfer_risk": "No File Transfer"
+        },
+        "evidence": {
+          "connection_context": {
+            "methods_used": [
+              "GET"
+            ],
+            "user_agent_string": "Mozilla/5.0 (Windows; U; MSIE 7.0; Windows NT 6.0; en-US)",
+            "destination_ip": "205.174.165.68"
+          },
+          "findings": []
+        },
+        "statistics": {
+          "total_requests": 1,
+          "request_bytes": 0,
+          "response_bytes": 0,
+          "client_error_ratio": 0.0
+        }
+      }
+    }
+  }
+}

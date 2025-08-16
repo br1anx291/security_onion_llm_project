@@ -1,0 +1,97 @@
+{
+  "alert": {
+    "signature": "ET SCAN Nmap Scripting Engine User-Agent Detected (Nmap Scripting Engine)",
+    "category": "Web Application Attack",
+    "timestamp": "2025-07-02T02:28:16.123Z"
+  },
+  "connection": {
+    "identity": {
+      "source_ip": "192.168.10.8",
+      "source_port": "1531",
+      "destination_ip": "192.168.10.50",
+      "destination_port": "80",
+      "traffic_direction": "Lateral",
+      "service": "http",
+      "transport_protocol": "tcp"
+    },
+    "statistics": {
+      "duration_sec": 0.0105,
+      "sent_bytes": 617,
+      "received_bytes": 460
+    },
+    "analysis": {
+      "connection_state": "Normal Connection (SF)",
+      "history_analysis": {
+        "label": "Unrecognized Pattern",
+        "summary": "Requires manual review: 'ShADTagdftF'.",
+        "severity": "Informational"
+      },
+      "flow_analysis": {
+        "direction": "Symmetrical"
+      }
+    }
+  },
+  "evidence": {
+    "high": {
+      "http": {
+        "analysis": {
+          "user_agent_category": "Normal Browser",
+          "destination_analysis": "Direct-to-IP Connection",
+          "transfer_volume": "Normal",
+          "content_risk": "No Suspicious Content",
+          "file_transfer_risk": "Benign Upload Detected"
+        },
+        "evidence": {
+          "connection_context": {
+            "methods_used": [
+              "POST"
+            ],
+            "user_agent_string": "Mozilla/5.0 (compatible; Nmap Scripting Engine; https://nmap.org/book/nse.html)",
+            "destination_ip": "192.168.10.50"
+          },
+          "findings": []
+        },
+        "statistics": {
+          "total_requests": 1,
+          "request_bytes": 441,
+          "response_bytes": 0,
+          "client_error_ratio": 0.0
+        }
+      }
+    },
+    "reference": {
+      "files": {
+        "analysis": {
+          "session_risk_summary": "No suspicious file activity detected",
+          "highest_threat_level": "Informational",
+          "evasion_techniques_detected": "No",
+          "suspicious_content_summary": "No suspicious content identified."
+        },
+        "statistics": {
+          "total_files_analyzed": 1,
+          "suspicious_files_count": 0,
+          "total_bytes_transferred_kb": 0.43
+        },
+        "evidence": {
+          "findings": [
+            {
+              "type": "FileAnalysisFinding",
+              "fuid": "F2s9ea1bVxqs6Q7qc",
+              "filename": null,
+              "direction": "Upload",
+              "severity": "Informational",
+              "risk_score": 5,
+              "size_bytes": 441,
+              "reasons": [],
+              "hashes": {
+                "md5": "04016c73cddb3dae5d72034cf31a9d9d",
+                "sha1": "314da1645f864c9eccd33e926e61c116ca002bd6"
+              },
+              "file_type_reported": "application/soap+xml"
+            }
+          ]
+        }
+      }
+    }
+  }
+}

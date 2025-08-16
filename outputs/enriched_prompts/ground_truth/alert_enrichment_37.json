@@ -1,0 +1,128 @@
+{
+  "alert": {
+    "signature": "ET MALWARE Terse alphanumeric executable downloader high likelihood of being hostile",
+    "category": "Potentially Bad Traffic",
+    "timestamp": "2025-06-30T08:40:04.800Z"
+  },
+  "connection": {
+    "identity": {
+      "source_ip": "192.168.3.65",
+      "source_port": "1033",
+      "destination_ip": "188.72.243.72",
+      "destination_port": "80",
+      "traffic_direction": "Egress",
+      "service": "http",
+      "transport_protocol": "tcp"
+    },
+    "statistics": {
+      "duration_sec": 0.0112,
+      "sent_bytes": 645,
+      "received_bytes": 120163
+    },
+    "analysis": {
+      "connection_state": "Normal Connection (SF)",
+      "history_analysis": {
+        "label": "Unrecognized Pattern",
+        "summary": "Requires manual review: 'ShADadtfF'.",
+        "severity": "Informational"
+      },
+      "flow_analysis": {
+        "direction": "download",
+        "ratio": 186
+      }
+    }
+  },
+  "evidence": {
+    "medium": {
+      "http": {
+        "analysis": {
+          "user_agent_category": "Outdated Browser",
+          "destination_analysis": "Domain Name Connection",
+          "transfer_volume": "Normal",
+          "content_risk": "No Suspicious Content",
+          "file_transfer_risk": "Benign Upload and Suspicious Download Detected"
+        },
+        "evidence": {
+          "connection_context": {
+            "methods_used": [
+              "GET",
+              "POST"
+            ],
+            "user_agent_string": "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1)"
+          },
+          "findings": []
+        },
+        "statistics": {
+          "total_requests": 2,
+          "request_bytes": 271,
+          "response_bytes": 119465,
+          "client_error_ratio": 0.0
+        }
+      }
+    },
+    "reference": {
+      "files": {
+        "analysis": {
+          "session_risk_summary": "No suspicious file activity detected",
+          "highest_threat_level": "Informational",
+          "evasion_techniques_detected": "No",
+          "suspicious_content_summary": "No suspicious content identified."
+        },
+        "statistics": {
+          "total_files_analyzed": 3,
+          "suspicious_files_count": 0,
+          "total_bytes_transferred_kb": 116.93
+        },
+        "evidence": {
+          "findings": [
+            {
+              "type": "FileAnalysisFinding",
+              "fuid": "FlC2Et4YuR6uhs9Xk4",
+              "filename": null,
+              "direction": "Upload",
+              "severity": "Informational",
+              "risk_score": 5,
+              "size_bytes": 271,
+              "reasons": [],
+              "hashes": {
+                "md5": "3302025782e01b0b798b79f0ba739c32",
+                "sha1": "217456eed32c6d2bbbdcca71123787f91177b482"
+              }
+            },
+            {
+              "type": "FileAnalysisFinding",
+              "fuid": "Fo6c4z14kaiWUiN0ka",
+              "filename": null,
+              "direction": "Download",
+              "severity": "Informational",
+              "risk_score": 5,
+              "size_bytes": 169,
+              "reasons": [],
+              "hashes": {
+                "md5": "90f3d04cc74fe3d102ced4a8ff5dc583",
+                "sha1": "ee0f080a1f110f771b1187e0c007fd8da368e74b"
+              }
+            },
+            {
+              "type": "FileAnalysisFinding",
+              "fuid": "FXBHDZ3YWt0sMUWHGd",
+              "filename": null,
+              "direction": "Download",
+              "severity": "Informational",
+              "risk_score": 25,
+              "size_bytes": 119296,
+              "reasons": [
+                "SUSPICIOUS_MIME"
+              ],
+              "hashes": {
+                "md5": "e759743ea7967ccccee0d27b9bfcbaa1",
+                "sha1": "73603c37609d862509a777cb5d2c25e6a9582036"
+              },
+              "file_type_reported": "application/x-dosexec"
+            }
+          ]
+        }
+      }
+    }
+  }
+}

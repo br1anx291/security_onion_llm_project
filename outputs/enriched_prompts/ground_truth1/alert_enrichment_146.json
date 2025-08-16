@@ -1,0 +1,100 @@
+{
+  "alert": {
+    "signature": "ET INFO Suspicious Domain (polyfill .io) in DNS Lookup",
+    "category": "Potentially Bad Traffic",
+    "timestamp": "2025-05-25T06:30:38.208Z"
+  },
+  "connection": {
+    "identity": {
+      "source_ip": "192.168.10.3",
+      "source_port": "62385",
+      "destination_ip": "192.168.10.1",
+      "destination_port": "53",
+      "traffic_direction": "Lateral",
+      "service": "dns",
+      "transport_protocol": "udp"
+    },
+    "statistics": {
+      "duration_sec": 70.1844,
+      "sent_bytes": 580,
+      "received_bytes": 1508
+    },
+    "analysis": {
+      "connection_state": "Normal Connection (SF)",
+      "history_analysis": {
+        "label": "Unrecognized Pattern",
+        "summary": "Requires manual review: 'Dd'.",
+        "severity": "Informational"
+      },
+      "flow_analysis": {
+        "direction": "Symmetrical"
+      }
+    }
+  },
+  "evidence": {
+    "high": {
+      "dns": {
+        "analysis": {
+          "query_pattern": "DGA Detected",
+          "query_integrity": "Normal",
+          "tld_risk": "Normal TLDs",
+          "ttl_behavior": "Low TTL Detected"
+        },
+        "evidence": {
+          "connection_context": {
+            "source_ip": "192.168.10.3",
+            "destination_dns_server": "192.168.10.1"
+          },
+          "findings": [
+            {
+              "type": "AttributeFinding",
+              "source": "query_subdomain",
+              "content": "amplifypixel.outbrain.com",
+              "reasons": [
+                "High Shannon Entropy (3.08 > 3.0)"
+              ]
+            },
+            {
+              "type": "AttributeFinding",
+              "source": "answer_record",
+              "content": 11,
+              "reasons": [
+                "Low TTL (11 < 60)"
+              ]
+            },
+            {
+              "type": "AttributeFinding",
+              "source": "query_subdomain",
+              "content": "d2zah9y47r7bi2.cloudfront.net",
+              "reasons": [
+                "High Shannon Entropy (3.52 > 3.0)"
+              ]
+            },
+            {
+              "type": "AttributeFinding",
+              "source": "query_length",
+              "content": "dcs-edge-usw2-620097651.us-west-2.elb.amazonaws.com",
+              "reasons": [
+                "Long Query (51 > 50)"
+              ]
+            },
+            {
+              "type": "AttributeFinding",
+              "source": "query_subdomain",
+              "content": "dcs-edge-usw2-620097651.us-west-2.elb.amazonaws.com",
+              "reasons": [
+                "High Shannon Entropy (3.88 > 3.0)"
+              ]
+            }
+          ]
+        },
+        "statistics": {
+          "total_queries": 11,
+          "distinct_queries": 11,
+          "failed_queries_ratio": 0.0,
+          "distinct_answers": 25
+        }
+      }
+    }
+  }
+}

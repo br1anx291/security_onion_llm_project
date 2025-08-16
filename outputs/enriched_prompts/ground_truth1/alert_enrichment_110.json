@@ -1,0 +1,62 @@
+{
+  "alert": {
+    "signature": "ET INFO Outdated Flash Version M2",
+    "category": "Potential Corporate Privacy Violation",
+    "timestamp": "2025-05-24T07:27:07.304Z"
+  },
+  "connection": {
+    "identity": {
+      "source_ip": "10.0.0.45",
+      "source_port": "51161",
+      "destination_ip": "23.62.237.88",
+      "destination_port": "80",
+      "traffic_direction": "Egress",
+      "service": "http",
+      "transport_protocol": "tcp"
+    },
+    "statistics": {
+      "duration_sec": 2.5147,
+      "sent_bytes": 537,
+      "received_bytes": 252
+    },
+    "analysis": {
+      "connection_state": "Normal Connection (SF)",
+      "history_analysis": {
+        "label": "Normal Full Connection",
+        "summary": "A standard TCP session...",
+        "severity": "Informational"
+      },
+      "flow_analysis": {
+        "direction": "Symmetrical"
+      }
+    }
+  },
+  "evidence": {
+    "reference": {
+      "http": {
+        "analysis": {
+          "user_agent_category": "Normal Browser",
+          "destination_analysis": "Domain Name Connection",
+          "transfer_volume": "Normal",
+          "content_risk": "No Suspicious Content",
+          "file_transfer_risk": "No File Transfer"
+        },
+        "evidence": {
+          "connection_context": {
+            "methods_used": [
+              "GET"
+            ],
+            "user_agent_string": "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/44.0.2403.107 Safari/537.36"
+          },
+          "findings": []
+        },
+        "statistics": {
+          "total_requests": 1,
+          "request_bytes": 0,
+          "response_bytes": 0,
+          "client_error_ratio": 0.0
+        }
+      }
+    }
+  }
+}

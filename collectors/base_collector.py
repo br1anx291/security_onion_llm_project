@@ -1,6 +1,7 @@
 # security_onion_llm_project/collectors/base_collector.py
 
 from abc import ABC, abstractmethod
+from typing import List, Dict, Any
 
 class BaseCollector(ABC):
     """
@@ -32,18 +33,18 @@ class BaseCollector(ABC):
         pass
 
     @abstractmethod
-    def collect(self, uid: str, alert_timestamp: float) -> dict | None:
+    def collect(self, log_lines: List[str]) -> Dict[str, Any] | None:
         """
-        Phương thức trừu tượng (abstract method) để thu thập và tóm tắt dữ liệu.
+        Phương thức trừu tượng để thu thập và tóm tắt dữ liệu từ các dòng log.
         Mỗi lớp con BẮT BUỘC phải triển khai (implement) phương thức này.
         
         Args:
-            uid (str): UID của kết nối Zeek cần điều tra.
-            alert_timestamp (float): Thời điểm của cảnh báo, dùng để tìm file log.
+            log_lines (List[str]): Một danh sách các dòng log (dưới dạng chuỗi JSON)
+                                   đã được EnrichmentManager lọc sẵn cho collector này.
 
         Returns:
-            dict | None: 
+            Dict[str, Any] | None: 
                 - Một dictionary chứa dữ liệu đã được tóm tắt nếu tìm thấy.
-                - None nếu không tìm thấy thông tin liên quan.
+                - None nếu không có thông tin liên quan hoặc không có gì để báo cáo.
         """
         pass

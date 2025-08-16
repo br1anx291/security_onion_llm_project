@@ -1,0 +1,108 @@
+{
+  "alert": {
+    "signature": "ET MALWARE Ursnif Variant CnC Data Exfil",
+    "category": "Malware Command and Control Activity Detected",
+    "timestamp": "2025-05-11T08:55:26.937Z"
+  },
+  "connection": {
+    "identity": {
+      "source_ip": "10.41.245.114",
+      "source_port": "49297",
+      "destination_ip": "185.86.77.12",
+      "destination_port": "80",
+      "traffic_direction": "Egress",
+      "service": "http",
+      "transport_protocol": "tcp"
+    },
+    "statistics": {
+      "duration_sec": 0.0469,
+      "sent_bytes": 1254,
+      "received_bytes": 308
+    },
+    "analysis": {
+      "connection_state": "Normal Connection (SF)",
+      "history_analysis": {
+        "label": "Normal Full Connection",
+        "summary": "A standard TCP session...",
+        "severity": "Informational"
+      },
+      "flow_analysis": {
+        "direction": "Symmetrical"
+      }
+    }
+  },
+  "evidence": {
+    "critical": {
+      "http": {
+        "analysis": {
+          "user_agent_category": "Outdated Browser",
+          "destination_analysis": "Domain Name Connection",
+          "transfer_volume": "Normal",
+          "content_risk": "No Suspicious Content",
+          "file_transfer_risk": "Suspicious Upload Detected"
+        },
+        "evidence": {
+          "connection_context": {
+            "methods_used": [
+              "GET",
+              "POST"
+            ],
+            "user_agent_string": "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.1)"
+          },
+          "findings": [
+            {
+              "type": "File Finding",
+              "direction": "upload",
+              "fuid": "FR2OuX3m4QumbHZoNf",
+              "filename": "6D45.bin",
+              "mime_type": "application/vnd.ms-cab-compressed"
+            }
+          ]
+        },
+        "statistics": {
+          "total_requests": 2,
+          "request_bytes": 430,
+          "response_bytes": 0,
+          "client_error_ratio": 0.0
+        }
+      }
+    },
+    "medium": {
+      "files": {
+        "analysis": {
+          "session_risk_summary": "Suspicious file activity detected",
+          "highest_threat_level": "Medium",
+          "evasion_techniques_detected": "No",
+          "suspicious_content_summary": "1 file(s) flagged with Medium or higher severity."
+        },
+        "statistics": {
+          "total_files_analyzed": 1,
+          "suspicious_files_count": 1,
+          "total_bytes_transferred_kb": 0.22
+        },
+        "evidence": {
+          "findings": [
+            {
+              "type": "FileAnalysisFinding",
+              "fuid": "FR2OuX3m4QumbHZoNf",
+              "filename": "6D45.bin",
+              "direction": "Upload",
+              "severity": "Medium",
+              "risk_score": 45,
+              "size_bytes": 221,
+              "reasons": [
+                "SUSPICIOUS_EXTENSION",
+                "SUSPICIOUS_MIME"
+              ],
+              "hashes": {
+                "md5": "59f9481e6bcf97684ded7de9f6a34e6a",
+                "sha1": "ab66d1db35e1d57c8fbc9d555ab799d959b50f96"
+              },
+              "file_type_reported": "application/vnd.ms-cab-compressed"
+            }
+          ]
+        }
+      }
+    }
+  }
+}

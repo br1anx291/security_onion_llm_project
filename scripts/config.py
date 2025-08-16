@@ -25,10 +25,9 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(me
 
 # --- CẤU HÌNH ---
 # Thay thế bằng thông tin của máy chủ Security Onion
-remote_host = '192.168.26.101'  # <<< THAY ĐỔI IP Ở ĐÂY
-remote_username = 'soc_admin'      # <<< THAY ĐỔI USERNAME Ở ĐÂY
-
-
+remote_username = 'soc_admin'
+remote_password = 'admin'
+remote_host = '192.168.26.101'
 ssh_tunnel_remote_port = 9200
 ssh_tunnel_local_port = 9200
 

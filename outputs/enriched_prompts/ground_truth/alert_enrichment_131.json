@@ -1,0 +1,99 @@
+{
+  "alert": {
+    "signature": "ET INFO Executable served from Amazon S3",
+    "category": "Potentially Bad Traffic",
+    "timestamp": "2025-05-24T10:03:44.262Z"
+  },
+  "connection": {
+    "identity": {
+      "source_ip": "10.0.0.45",
+      "source_port": "56583",
+      "destination_ip": "54.240.166.83",
+      "destination_port": "80",
+      "traffic_direction": "Egress",
+      "service": "http",
+      "transport_protocol": "tcp"
+    },
+    "statistics": {
+      "duration_sec": 1.3331,
+      "sent_bytes": 178,
+      "received_bytes": 6916572
+    },
+    "analysis": {
+      "connection_state": "Reset by Originator (RSTO)",
+      "history_analysis": {
+        "label": "Unrecognized Pattern",
+        "summary": "Requires manual review: 'ShADadttR'.",
+        "severity": "Informational"
+      },
+      "flow_analysis": {
+        "direction": "download",
+        "ratio": 38857
+      }
+    }
+  },
+  "evidence": {
+    "high": {
+      "http": {
+        "analysis": {
+          "user_agent_category": "Normal Browser",
+          "destination_analysis": "Domain Name Connection",
+          "transfer_volume": "Large",
+          "content_risk": "No Suspicious Content",
+          "file_transfer_risk": "Suspicious Download Detected"
+        },
+        "evidence": {
+          "connection_context": {
+            "methods_used": [
+              "GET"
+            ],
+            "user_agent_string": "NSIS_Inetc (Mozilla)"
+          },
+          "findings": []
+        },
+        "statistics": {
+          "total_requests": 1,
+          "request_bytes": 0,
+          "response_bytes": 6916112,
+          "client_error_ratio": 0.0
+        }
+      }
+    },
+    "reference": {
+      "files": {
+        "analysis": {
+          "session_risk_summary": "No suspicious file activity detected",
+          "highest_threat_level": "Informational",
+          "evasion_techniques_detected": "No",
+          "suspicious_content_summary": "No suspicious content identified."
+        },
+        "statistics": {
+          "total_files_analyzed": 1,
+          "suspicious_files_count": 0,
+          "total_bytes_transferred_kb": 6754.02
+        },
+        "evidence": {
+          "findings": [
+            {
+              "type": "FileAnalysisFinding",
+              "fuid": "FYJ5BO1Ruix6uSzzhg",
+              "filename": null,
+              "direction": "Download",
+              "severity": "Informational",
+              "risk_score": 25,
+              "size_bytes": 6916112,
+              "reasons": [
+                "SUSPICIOUS_MIME"
+              ],
+              "hashes": {
+                "md5": "6cfc89e105878e4d0a6e1532dcbb0b46",
+                "sha1": "1f0f9a64110c3dcf1fd3203c35b8de9c8d366ac7"
+              },
+              "file_type_reported": "application/x-dosexec"
+            }
+          ]
+        }
+      }
+    }
+  }
+}

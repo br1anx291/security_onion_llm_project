@@ -1,0 +1,108 @@
+{
+  "alert": {
+    "signature": "ET SCAN Nmap Scripting Engine User-Agent Detected (Nmap Scripting Engine)",
+    "category": "Web Application Attack",
+    "timestamp": "2025-05-25T06:37:32.589Z"
+  },
+  "connection": {
+    "identity": {
+      "source_ip": "192.168.10.8",
+      "source_port": "2103",
+      "destination_ip": "192.168.10.50",
+      "destination_port": "80",
+      "traffic_direction": "Lateral",
+      "service": "http",
+      "transport_protocol": "tcp"
+    },
+    "statistics": {
+      "duration_sec": 0.0002,
+      "sent_bytes": 185,
+      "received_bytes": 535
+    },
+    "analysis": {
+      "connection_state": "Suspicious Connection (S2)",
+      "history_analysis": {
+        "label": "Unrecognized Pattern",
+        "summary": "Requires manual review: 'ShADTadgF'.",
+        "severity": "Informational"
+      },
+      "flow_analysis": {
+        "direction": "Symmetrical"
+      }
+    }
+  },
+  "evidence": {
+    "high": {
+      "http": {
+        "analysis": {
+          "user_agent_category": "Normal Browser",
+          "destination_analysis": "Direct-to-IP Connection",
+          "transfer_volume": "Normal",
+          "content_risk": "No Suspicious Content",
+          "file_transfer_risk": "Benign Download Detected"
+        },
+        "evidence": {
+          "connection_context": {
+            "methods_used": [
+              "PROPFIND"
+            ],
+            "user_agent_string": "Mozilla/5.0 (compatible; Nmap Scripting Engine; https://nmap.org/book/nse.html)",
+            "destination_ip": "192.168.10.50"
+          },
+          "findings": []
+        },
+        "statistics": {
+          "total_requests": 1,
+          "request_bytes": 0,
+          "response_bytes": 315,
+          "client_error_ratio": 1.0
+        }
+      }
+    },
+    "reference": {
+      "files": {
+        "analysis": {
+          "session_risk_summary": "No suspicious file activity detected",
+          "highest_threat_level": "Informational",
+          "evasion_techniques_detected": "No",
+          "suspicious_content_summary": "No suspicious content identified."
+        },
+        "statistics": {
+          "total_files_analyzed": 2,
+          "suspicious_files_count": 0,
+          "total_bytes_transferred_kb": 0.31
+        },
+        "evidence": {
+          "findings": [
+            {
+              "type": "FileAnalysisFinding",
+              "fuid": "FlfAtB4z3KA5t8fCi1",
+              "filename": null,
+              "direction": "Download",
+              "severity": "Informational",
+              "risk_score": 5,
+              "size_bytes": 315,
+              "reasons": [],
+              "hashes": {
+                "md5": "4b0555484632fca89783912e37c61e1d",
+                "sha1": "74e77672770c1d0614e3be5f7a8a44322441d8fe"
+              },
+              "file_type_reported": "text/html"
+            },
+            {
+              "type": "FileAnalysisFinding",
+              "fuid": "FlfAtB4z3KA5t8fCi1",
+              "filename": null,
+              "direction": "Download",
+              "severity": "Informational",
+              "risk_score": 5,
+              "size_bytes": 0,
+              "reasons": [],
+              "transfer_status": "Incomplete (Timed Out, Missing Bytes)"
+            }
+          ]
+        }
+      }
+    }
+  }
+}

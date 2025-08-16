@@ -1,0 +1,70 @@
+{
+  "alert": {
+    "signature": "GPL NETBIOS SMB-DS IPC$ unicode share access",
+    "category": "Generic Protocol Command Decode",
+    "timestamp": "2025-04-22T08:55:58.924Z"
+  },
+  "connection": {
+    "identity": {
+      "source_ip": "192.168.10.126",
+      "source_port": "1178",
+      "destination_ip": "192.168.10.101",
+      "destination_port": "445",
+      "traffic_direction": "Lateral",
+      "service": "smb,gssapi,krb",
+      "transport_protocol": "tcp"
+    },
+    "statistics": {
+      "duration_sec": 0.0114,
+      "sent_bytes": 6597,
+      "received_bytes": 1968
+    },
+    "analysis": {
+      "connection_state": "Normal Connection (SF)",
+      "history_analysis": {
+        "label": "Unrecognized Pattern",
+        "summary": "Requires manual review: 'ShADdaFf'.",
+        "severity": "Informational"
+      },
+      "flow_analysis": {
+        "direction": "Symmetrical"
+      }
+    }
+  },
+  "evidence": {
+    "reference": {
+      "files": {
+        "analysis": {
+          "session_risk_summary": "No suspicious file activity detected",
+          "highest_threat_level": "Informational",
+          "evasion_techniques_detected": "No",
+          "suspicious_content_summary": "No suspicious content identified."
+        },
+        "statistics": {
+          "total_files_analyzed": 1,
+          "suspicious_files_count": 0,
+          "total_bytes_transferred_kb": 0.03
+        },
+        "evidence": {
+          "findings": [
+            {
+              "type": "FileAnalysisFinding",
+              "fuid": "FkPZv33Zlq4NDmL4z",
+              "filename": "\\example.com\\Policies\\{31B2F340-016D-11D2-945F-00C04FB984F9}\\gpt.ini",
+              "direction": "Download",
+              "severity": "Informational",
+              "risk_score": 5,
+              "size_bytes": 26,
+              "reasons": [],
+              "hashes": {
+                "md5": "b4dfe1f1e56430eeae0e2a6bb17e45da",
+                "sha1": "6674065ddf264348874f5590347affd898496f7b"
+              },
+              "file_type_reported": "text/ini"
+            }
+          ]
+        }
+      }
+    }
+  }
+}

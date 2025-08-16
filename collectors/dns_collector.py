@@ -1,216 +1,188 @@
+# FILE: collectors/dns_collector_final.py
 
-        
-# collectors/dns_collector.py
-
-import subprocess
 import json
 import math
 from collections import Counter
-from .base_collector import BaseCollector
-from log_helper import find_log_files
+from typing import List, Dict, Any
 
+# Cần cài đặt: pip install tldextract
+import tldextract
 
+# Lớp BaseCollector giả định
+class BaseCollector:
+    def __init__(self, zeek_logs_dir: str = None):
+        self.zeek_logs_dir = zeek_logs_dir
+    @property
+    def collector_name(self) -> str: raise NotImplementedError
+    def collect(self, log_lines: List[str]) -> Dict[str, Any] | None: raise NotImplementedError
 
 class DnsCollector(BaseCollector):
     
-        # --- Các hằng số để tinh chỉnh ---
-    SUSPICIOUS_QTYPES = {'*', 'TXT'}
-    FAILURE_RCODES = {'NXDOMAIN', 'SERVFAIL'}
-    LOW_TTL_THRESHOLD = 60  # Dưới 60 giây được coi là thấp
-    HIGH_ENTROPY_THRESHOLD = 2.8 # Ngưỡng entropy để phát hiện DGA  https://arxiv.org/pdf/2304.07943
-    # 
+    # --- CÁC NGƯỠNG VÀ DANH SÁCH (CÓ THỂ CẤU HÌNH) ---
+    SUSPICIOUS_QTYPES = {'*', 'TXT', 'ANY'}
+    FAILURE_RCODES = {'NXDOMAIN', 'SERVFAIL', 'REFUSED'}
+    SUSPICIOUS_TLDS = {'.xyz', '.icu', '.cn', '.tk', '.pw', '.sbs', '.club', '.top', '.ru', '.online'}
+    
+    LOW_TTL_THRESHOLD = 60
+    HIGH_ENTROPY_THRESHOLD = 3.0
+    LONG_QUERY_THRESHOLD = 50
+    MIN_QUERIES_FOR_STAT_SIGNIFICANCE = 10
+    REPETITIVE_QUERY_THRESHOLD = 20
+    HIGH_FAILURE_RATIO_THRESHOLD = 0.5
     
     @property
     def collector_name(self) -> str:
         return "dns"
     
     def _calculate_shannon_entropy(self, text: str) -> float:
-        """Tính toán entropy Shannon cho một chuỗi. Entropy cao cho thấy sự ngẫu nhiên."""
-        if not text:
-            return 0.0
-        
-        # Đếm số lần xuất hiện của mỗi ký tự
-        counts = Counter(text)
-        text_len = len(text)
-        
-        # Tính toán entropy
-        entropy = 0.0
-        for count in counts.values():
-            p_x = count / text_len
-            entropy -= p_x * math.log2(p_x)
-            
-        return entropy
-    
-    
-    def collect(self, uid: str, alert_timestamp: float) -> dict | None:
-        list_of_log_files = find_log_files(
-            self.zeek_logs_dir, "dns", alert_timestamp
-        )
-        if not list_of_log_files:
-            return None
+        if not text: return 0.0
+        text = ''.join(filter(str.isalnum, text))
+        if not text: return 0.0
+        counts = Counter(text); text_len = len(text)
+        return -sum((count / text_len) * math.log2(count / text_len) for count in counts.values())
 
-        all_matching_lines = []
-        
-        # THAY ĐỔI: Lặp qua danh sách đường dẫn (string)
-        # và lệnh grep luôn được gán là "grep"
-        command = "grep" 
-        for log_file in list_of_log_files:
-            try:
-                result = subprocess.run(
-                    [command, uid, log_file],
-                    capture_output=True, text=True, check=False
-                )
-                if result.returncode <= 1 and result.stdout:
-                    all_matching_lines.extend(result.stdout.strip().split('\n'))
-            except (subprocess.CalledProcessError, FileNotFoundError):
-                continue
+    def collect(self, log_lines: List[str]) -> Dict[str, Any] | None:
+        if not log_lines: return None
 
-        if not all_matching_lines:
-            return None
+        # --- PHẦN 1: THU THẬP DỮ LIỆU THÔ VÀ TẠO "FINDINGS" ---
         
- # --- KHỞI TẠO CÁC BIẾN ĐỂ TÍNH TOÁN TÍN HIỆU ---
-        distinct_queries = set()
-        distinct_answers = set()
+        # Biến lưu trữ chính cho các phát hiện
+        findings: List[Dict[str, Any]] = []
         
-        total_queries = 0
-        failed_queries_count = 0
-        suspicious_qtypes_present = False
-        low_ttl_detected = False
-        high_entropy_domain_detected = False
+        # Các biến thống kê và ngữ cảnh
+        uid, source_ip, dns_server_ip = None, None, None
+        total_queries, failed_queries_count = 0, 0
+        distinct_queries, distinct_answers = set(), set()
+        query_counts = Counter()
+        last_failure_rcode: str | None = None
+        
+        # Cờ để đảm bảo một số loại finding chỉ được thêm một lần
+        low_ttl_finding_added = False
 
-        # --- BẮT ĐẦU VÒNG LẶP PHÂN TÍCH ---
-        for line in all_matching_lines:
-            if not line: continue
+        for line in log_lines:
             try:
                 log_entry = json.loads(line)
-                
-                # Chỉ xử lý các log khớp chính xác UID
-                if log_entry.get('uid') != uid:
-                    continue
-
                 total_queries += 1
 
-                # 1. Kiểm tra failed_queries_ratio
-                if log_entry.get('rcode_name') in self.FAILURE_RCODES:
-                    failed_queries_count += 1
+                # Lấy thông tin ngữ cảnh chung
+                if not source_ip: source_ip = log_entry.get("id.orig_h")
+                if not dns_server_ip: dns_server_ip = log_entry.get("id.resp_h")
+                
+                # Đếm các truy vấn thất bại
+                if rcode := log_entry.get('rcode_name'):
+                    if rcode in self.FAILURE_RCODES:
+                        failed_queries_count += 1
+                        last_failure_rcode = rcode
+                
+                # Xử lý các thông tin liên quan đến từng truy vấn
+                if query := log_entry.get('query'):
+                    distinct_queries.add(query)
+                    query_counts[query] += 1
 
-                # 2. Kiểm tra suspicious_qtypes_present
-                if log_entry.get('qtype_name') in self.SUSPICIOUS_QTYPES:
-                    suspicious_qtypes_present = True
+                    # Finding: TLD đáng ngờ
+                    extracted_tld = tldextract.extract(query).suffix
+                    if extracted_tld and f".{extracted_tld}" in self.SUSPICIOUS_TLDS:
+                        findings.append({
+                            "type": "AttributeFinding", "source": "query_tld",
+                            "content": query, "reasons": [f"Suspicious TLD (.{extracted_tld})"]
+                        })
 
-                # 3. Kiểm tra low_ttl_detected
-                if not low_ttl_detected: # Chỉ kiểm tra nếu chưa phát hiện
-                    ttls = log_entry.get('TTLs', [])
-                    if ttls:
-                        for ttl in ttls:
-                            if ttl < self.LOW_TTL_THRESHOLD:
-                                low_ttl_detected = True
-                                break # Thoát khỏi vòng lặp TTL khi đã phát hiện
+                    # Finding: Truy vấn dài
+                    if len(query) > self.LONG_QUERY_THRESHOLD:
+                        findings.append({
+                            "type": "AttributeFinding", "source": "query_length",
+                            "content": query, "reasons": [f"Long Query ({len(query)} > {self.LONG_QUERY_THRESHOLD})"]
+                        })
+                    
+                    # Finding: Entropy cao (DGA)
+                    if '.arpa' not in query and (parts := query.split('.')) and len(parts) > 2:
+                        subdomain_part = '.'.join(parts[:-2])
+                        entropy_score = self._calculate_shannon_entropy(subdomain_part)
+                        if entropy_score > self.HIGH_ENTROPY_THRESHOLD:
+                            findings.append({
+                                "type": "AttributeFinding", "source": "query_subdomain", "content": query,
+                                "reasons": [f"High Shannon Entropy ({entropy_score:.2f} > {self.HIGH_ENTROPY_THRESHOLD})"]
+                            })
+                    
+                    # Finding: Loại truy vấn đáng ngờ
+                    if (qtype := log_entry.get('qtype_name')) and qtype in self.SUSPICIOUS_QTYPES:
+                        findings.append({
+                            "type": "AttributeFinding", "source": "query_type", "content": query,
+                            "reasons": [f"Suspicious QTYPE ({qtype})"]
+                        })
 
-                # # 4. Kiểm tra high_entropy_domain_detected
-                # query = log_entry.get('query')
-                # if query and not high_entropy_domain_detected:
-                #     distinct_queries.add(query)
-                #     entropy = self._calculate_shannon_entropy(query.split('.')[0]) # Chỉ tính entropy cho subdomain
-                #     if entropy > self.HIGH_ENTROPY_THRESHOLD:
-                #         high_entropy_domain_detected = True
-                        
-                query = log_entry.get('query')
-                if query:
-                    distinct_queries.add(query)     
-                               
-                # Thu thập câu trả lời để lấy mẫu
-                if 'answers' in log_entry and log_entry['answers']:
-                    distinct_answers.update(log_entry['answers'])
+                # Finding: TTL thấp
+                if not low_ttl_finding_added:
+                    for ttl in log_entry.get('TTLs', []):
+                        if ttl < self.LOW_TTL_THRESHOLD:
+                            findings.append({
+                                "type": "AttributeFinding", "source": "answer_record", "content": int(ttl),
+                                "reasons": [f"Low TTL ({int(ttl)} < {self.LOW_TTL_THRESHOLD})"]
+                            })
+                            low_ttl_finding_added = True # Chỉ thêm finding này một lần
+                            break
+                
+                # Thu thập các câu trả lời
+                if answers := log_entry.get('answers'): distinct_answers.update(answers)
 
             except (json.JSONDecodeError, KeyError):
                 continue
-
-        if total_queries == 0:
-            return None
         
-        # --- TÍNH TOÁN KẾT QUẢ CUỐI CÙNG ---
-        failed_ratio = (failed_queries_count / total_queries) if total_queries > 0 else 0.0
+        # --- PHẦN 2: TẠO CÁC "FINDINGS" DỰA TRÊN PHÂN TÍCH TỔNG HỢP ---
+        if not total_queries: return None
 
-        # --- TRẢ VỀ BẢN TÓM TẮT THÔNG MINH ---
-        return {
-            "total_queries": total_queries,
-            "distinct_queries_count": len(distinct_queries),
-            "distinct_queries": sorted(list(distinct_queries)),
-            
-            "distinct_answers_count": len(distinct_answers),
-            "distinct_answers": sorted(list(distinct_answers)),
-            # # === 4 TÍN HIỆU QUAN TRỌNG ===
-            # "failed_queries_ratio": round(failed_ratio, 2),
-            # "suspicious_qtypes_present": suspicious_qtypes_present,
-            # "low_ttl_detected": low_ttl_detected,
-            # "high_entropy_domain_detected": high_entropy_domain_detected
+        # Finding: Truy vấn lặp lại
+        for query, count in query_counts.items():
+            if count >= self.REPETITIVE_QUERY_THRESHOLD:
+                findings.append({
+                    "type": "PatternFinding", "source": "query_stream", "content": query,
+                    "reasons": [f"Repetitive Query ({count} >= {self.REPETITIVE_QUERY_THRESHOLD})"]
+                })
+        
+        # Finding: Tỷ lệ lỗi cao
+        failed_ratio = failed_queries_count / total_queries
+        if total_queries >= self.MIN_QUERIES_FOR_STAT_SIGNIFICANCE and failed_ratio >= self.HIGH_FAILURE_RATIO_THRESHOLD:
+            findings.append({
+                "type": "PatternFinding", "source": "query_stream",
+                "content": f"rcode_name: {last_failure_rcode}",
+                "reasons": [f"High Failure Ratio ({failed_ratio:.0%} >= {self.HIGH_FAILURE_RATIO_THRESHOLD:.0%})"]
+            })
+
+        # --- PHẦN 3: XÂY DỰNG OUTPUT CUỐI CÙNG THEO FORMAT MỚI ---
+        if not findings: return None # Không có gì đáng ngờ, không cần trả về output
+
+        # Xây dựng phần tóm tắt "analysis" dựa trên các "findings" đã có
+        analysis_summary = {
+            "query_pattern": "Normal Patterns", "query_integrity": "Normal",
+            "tld_risk": "Normal TLDs", "ttl_behavior": "Normal TTLs"
         }
+        has_dga = False
+        has_beaconing = False
+        for f in findings:
+            if f['type'] == 'PatternFinding' and 'Repetitive' in f['reasons'][0]: has_beaconing = True
+            if f['type'] == 'AttributeFinding' and 'Entropy' in f['reasons'][0]: has_dga = True
+            if f['type'] == 'PatternFinding' and 'Failure' in f['reasons'][0]: analysis_summary['query_integrity'] = "High Failure Ratio"
+            if f['type'] == 'AttributeFinding' and 'TLD' in f['reasons'][0]: analysis_summary['tld_risk'] = "Suspicious TLDs Used"
+            if f['type'] == 'AttributeFinding' and 'TTL' in f['reasons'][0]: analysis_summary['ttl_behavior'] = "Low TTL Detected"
         
-        
-        
-"""
+        if has_dga and has_beaconing: analysis_summary['query_pattern'] = "Repetitive Beaconing & DGA Detected"
+        elif has_dga: analysis_summary['query_pattern'] = "DGA Detected"
+        elif has_beaconing: analysis_summary['query_pattern'] = "Repetitive Beaconing Detected"
 
-### **Mô tả các Giá trị Đầu ra của `DnsCollector`**
-
-Lớp `DnsCollector` phân tích các bản ghi `dns.log` liên quan đến một kết nối và trả về một dictionary chứa các thông số thống kê và các tín hiệu an ninh đã được xử lý. Các giá trị này được chia thành hai nhóm chính:
-
-#### **A. Các tham số Thống kê Tổng quan**
-
-Nhóm này cung cấp một cái nhìn tổng thể về quy mô và nội dung của các hoạt động DNS.
-
-* **`total_queries`**
-    * **Mô tả:** Tổng số lượng bản ghi `dns.log` được tìm thấy và phân tích cho kết nối này.
-    * **Kiểu dữ liệu:** `Integer`.
-    * **Ý nghĩa trong Phân tích An ninh:** Cho biết mật độ của hoạt động DNS. Một con số cao bất thường có thể chỉ ra các hành vi như "DNS storm" hoặc DGA brute-forcing.
-
-* **`distinct_queries_count`**
-    * **Mô tả:** Số lượng các tên miền (domain name) **duy nhất** đã được truy vấn.
-    * **Kiểu dữ liệu:** `Integer`.
-    * **Ý nghĩa trong Phân tích An ninh:** So sánh với `total_queries`. Nếu `total_queries` rất cao nhưng `distinct_queries_count` lại thấp, điều đó có nghĩa là client đang truy vấn lặp đi lặp lại một vài tên miền.
-
-* **`distinct_queries`**
-    * **Mô tả:** Một danh sách (đã được sắp xếp) chứa các tên miền **duy nhất** đã được truy vấn.
-    * **Kiểu dữ liệu:** `List[str]`.
-    * **Ý nghĩa trong Phân tích An ninh:** Đây là dữ liệu thô quan trọng nhất, cho phép nhà phân tích kiểm tra trực tiếp các tên miền để tìm các dấu hiệu đáng ngờ (TLD lạ, tên miền ngẫu nhiên, v.v.).
-
-* **`distinct_answers_count`**
-    * **Mô tả:** Số lượng các câu trả lời (IP, CNAME) **duy nhất** nhận được.
-    * **Kiểu dữ liệu:** `Integer`.
-    * **Ý nghĩa trong Phân tích An ninh:** Cung cấp một thước đo về sự đa dạng của các máy chủ mà tên miền phân giải tới.
-
-* **`distinct_answers`**
-    * **Mô tả:** Một danh sách (đã được sắp xếp) chứa các câu trả lời **duy nhất**.
-    * **Kiểu dữ liệu:** `List[str]`.
-    * **Ý nghĩa trong Phân tích An ninh:** Cho phép nhà phân tích kiểm tra các địa chỉ IP hoặc CNAME này với các nguồn tin tức tình báo về mối đe dọa (Threat Intelligence).
-
----
-
-#### **B. Các Tín hiệu Phân tích An ninh (Security Analysis Signals)**
-
-Đây là những giá trị đã được "thông minh hóa", đóng vai trò là các cờ báo hiệu hành vi bất thường, giúp tiết kiệm thời gian phân tích và token cho LLM.
-
-* **`failed_queries_ratio`**
-    * **Mô tả:** Tỷ lệ phần trăm các truy vấn DNS bị thất bại (có mã trả về là `NXDOMAIN` hoặc `SERVFAIL`) trên tổng số truy vấn.
-    * **Kiểu dữ liệu:** `Float` (giá trị từ 0.0 đến 1.0).
-    * **Ý nghĩa trong Phân tích An ninh:** **Một trong những chỉ số mạnh nhất để phát hiện Domain Generation Algorithms (DGA)**. Malware sử dụng DGA thường thử hàng loạt tên miền cho đến khi tìm thấy máy chủ C2. Hành vi này tạo ra một tỷ lệ truy vấn thất bại rất cao (ví dụ: > 0.5).
-
-* **`suspicious_qtypes_present`**
-    * **Mô tả:** Một cờ báo hiệu (`True`/`False`). Giá trị là `True` nếu có ít nhất một truy vấn sử dụng loại (qtype) được coi là đáng ngờ, ví dụ như `TXT` hoặc `ANY`.
-    * **Kiểu dữ liệu:** `Boolean`.
-    * **Ý nghĩa trong Phân tích An ninh:** Báo hiệu việc sử dụng DNS một cách không thông thường. Truy vấn `TXT` thường được lạm dụng để truyền lệnh điều khiển (C2) hoặc trích xuất dữ liệu. Truy vấn `ANY` thường được sử dụng trong giai đoạn do thám, thu thập thông tin.
-
-* **`low_ttl_detected`**
-    * **Mô tả:** Một cờ báo hiệu (`True`/`False`). Giá trị là `True` nếu có bất kỳ câu trả lời DNS nào có giá trị Time-To-Live (TTL) thấp hơn ngưỡng đã định (mặc định là 60 giây).
-    * **Kiểu dữ liệu:** `Boolean`.
-    * **Ý nghĩa trong Phân tích An ninh:** **Chỉ số kinh điển của kỹ thuật Fast-Flux DNS**. Kẻ tấn công sử dụng TTL thấp để thay đổi địa chỉ IP của máy chủ độc hại một cách liên tục, gây khó khăn cho việc ngăn chặn dựa trên IP. Cờ này giúp tự động phát hiện kỹ thuật né tránh đó.
-
-* **`high_entropy_domain_detected`**
-    * **Mô tả:** Một cờ báo hiệu (`True`/`False`). Giá trị là `True` nếu có ít nhất một tên miền truy vấn có độ ngẫu nhiên (Shannon entropy) cao hơn ngưỡng (mặc định là 3.5).
-    * **Kiểu dữ liệu:** `Boolean`.
-    * **Ý nghĩa trong Phân tích An ninh:** **Một chỉ số mạnh khác để phát hiện DGA**. Các tên miền do máy tạo ra (ví dụ: `k2gih39d9a1.com`) thường có độ ngẫu nhiên cao, khác với tên miền do người đặt (ví dụ: `google.com`). Cờ này giúp tự động nhận diện các tên miền trông như rác và đáng ngờ.
-
----
-
-Hy vọng bản mô tả chi tiết này sẽ giúp bạn trong việc viết báo cáo.
-"""        
+        # Xây dựng cấu trúc JSON cuối cùng
+        return {
+            "analysis": analysis_summary,
+            "evidence": {
+                "connection_context": {
+                    "source_ip": source_ip,
+                    "destination_dns_server": dns_server_ip
+                },
+                "findings": findings
+            },
+            "statistics": {
+                "total_queries": total_queries,
+                "distinct_queries": len(distinct_queries),
+                "failed_queries_ratio": round(failed_ratio, 2),
+                "distinct_answers": len(distinct_answers)
+            }
+        }

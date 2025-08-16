@@ -1,0 +1,113 @@
+{
+  "alert": {
+    "signature": "ET INFO Vulnerable Java Version 1.8.x Detected",
+    "category": "Potentially Bad Traffic",
+    "timestamp": "2025-05-24T07:49:15.782Z"
+  },
+  "connection": {
+    "identity": {
+      "source_ip": "10.0.0.45",
+      "source_port": "49171",
+      "destination_ip": "23.57.107.27",
+      "destination_port": "80",
+      "traffic_direction": "Egress",
+      "service": "http",
+      "transport_protocol": "tcp"
+    },
+    "statistics": {
+      "duration_sec": 1.2317,
+      "sent_bytes": 293,
+      "received_bytes": 1690
+    },
+    "analysis": {
+      "connection_state": "Reset by Originator (RSTO)",
+      "history_analysis": {
+        "label": "Unrecognized Pattern",
+        "summary": "Requires manual review: 'ShADadR'.",
+        "severity": "Informational"
+      },
+      "flow_analysis": {
+        "direction": "download",
+        "ratio": 6
+      }
+    }
+  },
+  "evidence": {
+    "high": {
+      "http": {
+        "analysis": {
+          "user_agent_category": "Scripting/Tool",
+          "destination_analysis": "Domain Name Connection",
+          "transfer_volume": "Normal",
+          "content_risk": "No Suspicious Content",
+          "file_transfer_risk": "Benign Upload and Benign Download Detected"
+        },
+        "evidence": {
+          "connection_context": {
+            "methods_used": [
+              "POST"
+            ],
+            "user_agent_string": "Java/1.8.0_45",
+            "agent_matched_keyword": "java"
+          },
+          "findings": []
+        },
+        "statistics": {
+          "total_requests": 1,
+          "request_bytes": 70,
+          "response_bytes": 1336,
+          "client_error_ratio": 0.0
+        }
+      }
+    },
+    "reference": {
+      "files": {
+        "analysis": {
+          "session_risk_summary": "No suspicious file activity detected",
+          "highest_threat_level": "Informational",
+          "evasion_techniques_detected": "No",
+          "suspicious_content_summary": "No suspicious content identified."
+        },
+        "statistics": {
+          "total_files_analyzed": 2,
+          "suspicious_files_count": 0,
+          "total_bytes_transferred_kb": 1.37
+        },
+        "evidence": {
+          "findings": [
+            {
+              "type": "FileAnalysisFinding",
+              "fuid": "Fn60Ev3ylGMTU0ORD",
+              "filename": null,
+              "direction": "Upload",
+              "severity": "Informational",
+              "risk_score": 5,
+              "size_bytes": 70,
+              "reasons": [],
+              "hashes": {
+                "md5": "44d945be40f6715348a6b198e7b90c09",
+                "sha1": "c793d5d752366097967022e2f1701c6ff03e1421"
+              },
+              "file_type_reported": "application/ocsp-request"
+            },
+            {
+              "type": "FileAnalysisFinding",
+              "fuid": "FwNCRD20EaoxXbobS1",
+              "filename": null,
+              "direction": "Download",
+              "severity": "Informational",
+              "risk_score": 5,
+              "size_bytes": 1336,
+              "reasons": [],
+              "hashes": {
+                "md5": "a6c3860b85d2d1ab8e9cfe1feed8762b",
+                "sha1": "56b9a1d0718f2474e100a4e389ec56641aa8b02f"
+              },
+              "file_type_reported": "application/ocsp-response"
+            }
+          ]
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,84 @@
+{
+  "alert": {
+    "signature": "ET INFO External IP Lookup Domain (freegeiop .net in DNS lookup)",
+    "category": "Device Retrieving External IP Address Detected",
+    "timestamp": "2025-06-05T11:54:59.584Z"
+  },
+  "connection": {
+    "identity": {
+      "source_ip": "192.168.10.3",
+      "source_port": "61137",
+      "destination_ip": "192.168.10.1",
+      "destination_port": "53",
+      "traffic_direction": "Lateral",
+      "service": "dns",
+      "transport_protocol": "udp"
+    },
+    "statistics": {
+      "duration_sec": 27.6502,
+      "sent_bytes": 208,
+      "received_bytes": 389
+    },
+    "analysis": {
+      "connection_state": "Normal Connection (SF)",
+      "history_analysis": {
+        "label": "Unrecognized Pattern",
+        "summary": "Requires manual review: 'Dd'.",
+        "severity": "Informational"
+      },
+      "flow_analysis": {
+        "direction": "Symmetrical"
+      }
+    }
+  },
+  "evidence": {
+    "high": {
+      "dns": {
+        "analysis": {
+          "query_pattern": "DGA Detected",
+          "query_integrity": "Normal",
+          "tld_risk": "Normal TLDs",
+          "ttl_behavior": "Low TTL Detected"
+        },
+        "evidence": {
+          "connection_context": {
+            "source_ip": "192.168.10.3",
+            "destination_dns_server": "192.168.10.1"
+          },
+          "findings": [
+            {
+              "type": "AttributeFinding",
+              "source": "answer_record",
+              "content": 1,
+              "reasons": [
+                "Low TTL (1 < 60)"
+              ]
+            },
+            {
+              "type": "AttributeFinding",
+              "source": "query_subdomain",
+              "content": "f2.shared.global.fastly.net",
+              "reasons": [
+                "High Shannon Entropy (3.52 > 3.0)"
+              ]
+            },
+            {
+              "type": "AttributeFinding",
+              "source": "query_subdomain",
+              "content": "www.adobetag.com.edgekey.net",
+              "reasons": [
+                "High Shannon Entropy (3.18 > 3.0)"
+              ]
+            }
+          ]
+        },
+        "statistics": {
+          "total_queries": 4,
+          "distinct_queries": 4,
+          "failed_queries_ratio": 0.0,
+          "distinct_answers": 6
+        }
+      }
+    }
+  }
+}

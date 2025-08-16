@@ -1,124 +1,148 @@
-# security_onion_llm_project/collectors/files_collector.py
+# FILE: collectors/files_collector.py
 
-import subprocess
 import json
-from typing import List, Dict, Any
+import logging
+from typing import List, Dict, Any, Tuple
 from .base_collector import BaseCollector
-from log_helper import find_log_files
 
 class FilesCollector(BaseCollector):
-    # --- Phần hằng số giữ nguyên ---
-    SUSPICIOUS_MIME_TYPES = {
-        'application/x-dosexec', 'application/x-msdownload', 'application/octet-stream',
-        'application/zip', 'application/x-rar-compressed', 'application/java-archive',
-        'application/pdf', 'application/msword', 'application/vnd.ms-excel',
-        'application/vnd.ms-cab-compressed', 'application/x-shockwave-flash' # Đã có sẵn
-    } 
-    SUSPICIOUS_EXTENSIONS = {
-        '.exe', '.dll', '.scr', '.pif', '.com', '.bat', '.cmd', '.vbs', '.vbe',
-        '.js', '.jse', '.ps1', '.psm1', '.zip', '.rar', '.7z', '.jar',
-        '.doc', '.docx', '.xls', '.xlsx', '.ppt', '.pptx', '.bin' 
+    # --- CÁC HẰNG SỐ CẤU HÌNH ---
+    SUSPICIOUS_EXTENSIONS = {'.exe', '.dll', '.scr', '.bat', '.cmd', '.js', '.ps1', '.zip', '.rar', '.jar', '.bin', '.vbs', '.hta', '.msi', '.docm', '.xlsm'}
+    SUSPICIOUS_MIME_TYPES = {'application/x-dosexec', 'application/x-msdownload', 'application/octet-stream', 'application/zip' , 'application/x-rar-compressed', 'application/vnd.ms-cab-compressed'}
+    HIGH_ENTROPY_THRESHOLD = 7.5
+
+    # Cấu hình điểm rủi ro cho từng loại phát hiện
+    RISK_SCORES = {
+        "BASE": 5,
+        "SUSPICIOUS_EXTENSION": 20,
+        "SUSPICIOUS_MIME": 20,
+        "HIGH_ENTROPY": 30,
+        "MIME_MISMATCH": 40 # Đây là chỉ số mạnh cho thấy sự né tránh
     }
 
     @property
     def collector_name(self) -> str:
         return "files"
 
-    def collect(self, uid: str, alert_timestamp: float) -> Dict[str, Any] | None:
-        # --- Phần tìm file log giữ nguyên ---
-        list_of_log_files = find_log_files(
-            self.zeek_logs_dir, self.collector_name, alert_timestamp
-        )
-        if not list_of_log_files:
-            return None
+    def _calculate_risk(self, reasons: List[str]) -> Tuple[int, str]:
+        """Tính toán điểm rủi ro và mức độ nghiêm trọng dựa trên các lý do."""
+        score = self.RISK_SCORES["BASE"]
+        for reason in reasons:
+            score += self.RISK_SCORES.get(reason, 0)
 
-        all_matching_lines: List[str] = []
-        command = "grep"
-        for log_file in list_of_log_files:
-            try:
-                result = subprocess.run(
-                    [command, uid, log_file],
-                    capture_output=True, text=True, check=False
-                )
-                if result.returncode <= 1 and result.stdout:
-                    all_matching_lines.extend(result.stdout.strip().split('\n'))
-            except (subprocess.CalledProcessError, FileNotFoundError):
-                continue
+        if score >= 90:
+            severity = "Critical"
+        elif score >= 70:
+            severity = "High"
+        elif score >= 40:
+            severity = "Medium"
+        else:
+            severity = "Informational"
+            
+        return score, severity
 
-        if not all_matching_lines:
-            return None
+    def collect(self, log_lines: List[str]) -> Dict[str, Any] | None:
+        if not log_lines: return None
+
+        # --- PHẦN 1: THU THẬP VÀ XỬ LÝ TỪNG LOG LINE ---
         
-        total_files_seen = 0
-        suspicious_files_summary: List[Dict[str, Any]] = []
-        
-        for line in all_matching_lines:
+        findings = []
+        total_bytes_seen = 0
+        evasion_detected = False
+        highest_severity = "Informational"
+        severity_map = {"Informational": 0, "Medium": 1, "High": 2, "Critical": 3}
+
+        for line in log_lines:
             if not line: continue
             try:
                 log_entry = json.loads(line)
                 
-                # === BẮT ĐẦU THAY ĐỔI QUAN TRỌNG ===
-                # Logic kiểm tra UID linh hoạt hơn
-                
-                # Lấy danh sách các UID kết nối từ trường 'conn_uids'
-                conn_uids_in_log = log_entry.get('conn_uids', [])
-                
-                # Nếu 'conn_uids' rỗng, hãy thử lấy từ trường 'uid' (dành cho các trường hợp khác)
-                if not conn_uids_in_log and 'uid' in log_entry:
-                    conn_uids_in_log.append(log_entry['uid'])
-                
-                # Nếu UID của chúng ta không nằm trong danh sách các UID liên quan, bỏ qua
-                if uid not in conn_uids_in_log:
-                    continue
-                # === KẾT THÚC THAY ĐỔI QUAN TRỌNG ===
-
-                total_files_seen += 1
-                
-                # --- Phần logic sàng lọc và tóm tắt giữ nguyên như cũ ---
-                is_suspicious = False
-                analysis_notes = []
-
-                mime_type = log_entry.get('mime_type')
-                if mime_type in self.SUSPICIOUS_MIME_TYPES:
-                    is_suspicious = True
-
+                # --- A. Phân tích và xây dựng Finding cho từng file ---
+                reasons = []
                 filename = log_entry.get('filename')
-                if filename:
-                    file_ext = '.' + filename.rsplit('.', 1)[-1].lower() if '.' in filename else ''
-                    if file_ext in self.SUSPICIOUS_EXTENSIONS:
-                        is_suspicious = True
                 
-                if log_entry.get('timedout', False):
-                    is_suspicious = True; analysis_notes.append("Analysis Timed Out")
+                # A.1. Kiểm tra các chỉ số đáng ngờ
+                if filename and any(filename.lower().endswith(ext) for ext in self.SUSPICIOUS_EXTENSIONS):
+                    reasons.append("SUSPICIOUS_EXTENSION")
                 
-                if log_entry.get('missing_bytes', 0) > 0:
-                    is_suspicious = True; analysis_notes.append(f"Incomplete Transfer ({log_entry['missing_bytes']} bytes missing)")
+                reported_mime = log_entry.get('mime_type')
+                if reported_mime in self.SUSPICIOUS_MIME_TYPES:
+                    reasons.append("SUSPICIOUS_MIME")
 
-                if is_suspicious:
-                    size_in_bytes = log_entry.get('total_bytes') or log_entry.get('seen_bytes') or log_entry.get('missing_bytes', 0)
-                    summary = {
-                        "filename": filename,
-                        "source_protocol": log_entry.get('source'),
-                        "direction": "upload" if log_entry.get('is_orig') else "download",
-                        "mime_type": mime_type,
-                        "size_kb": round(size_in_bytes / 1024, 2) if size_in_bytes > 0 else 0.0,
-                        "hashes": {
-                            "md5": log_entry.get('md5'),
-                            "sha1": log_entry.get('sha1'),
-                            "sha256": log_entry.get('sha256')
-                        },
-                        "analysis_notes": analysis_notes
-                    }
-                    summary['hashes'] = {k: v for k, v in summary['hashes'].items() if v}
-                    suspicious_files_summary.append(summary)
+                if (entropy := log_entry.get('entropy')) and isinstance(entropy, (int, float)) and entropy > self.HIGH_ENTROPY_THRESHOLD:
+                    reasons.append("HIGH_ENTROPY")
+                    evasion_detected = True
 
-            except (json.JSONDecodeError, KeyError):
+                analysis_mime = log_entry.get('analysis_mime_type')
+                if reported_mime and analysis_mime and reported_mime != analysis_mime:
+                    reasons.append("MIME_MISMATCH")
+                    evasion_detected = True
+
+                # A.2. Tính toán rủi ro
+                risk_score, severity = self._calculate_risk(reasons)
+                if severity_map[severity] > severity_map[highest_severity]:
+                    highest_severity = severity
+
+                # A.3. Xây dựng đối tượng Finding
+                file_finding = {
+                    "type": "FileAnalysisFinding",
+                    "fuid": log_entry.get("fuid"),
+                    "filename": filename,
+                    "direction": "Upload" if log_entry.get('is_orig', False) else "Download",
+                    "severity": severity,
+                    "risk_score": risk_score,
+                    "size_bytes": log_entry.get("seen_bytes", 0),
+                    "reasons": reasons
+                }
+                
+                # Thêm các thông tin chi tiết nếu có
+                if hashes := {k: v for k, v in {'md5': log_entry.get('md5'), 'sha1': log_entry.get('sha1')}.items() if v}:
+                    file_finding['hashes'] = hashes
+                if reported_mime: file_finding['file_type_reported'] = reported_mime
+                if analysis_mime: file_finding['file_type_actual'] = analysis_mime
+                if 'entropy' in log_entry: file_finding['entropy'] = round(log_entry['entropy'], 2)
+                
+                status_notes = []
+                if log_entry.get('timedout', False): status_notes.append("Timed Out")
+                if log_entry.get('missing_bytes', 0) > 0: status_notes.append("Missing Bytes")
+                if status_notes:
+                    file_finding['transfer_status'] = f"Incomplete ({', '.join(status_notes)})"
+                
+                findings.append(file_finding)
+                total_bytes_seen += log_entry.get("seen_bytes", 0)
+
+            except (json.JSONDecodeError, KeyError) as e:
+                logging.warning(f"Skipping malformed or incomplete log line. Error: {e}. Line: {line.strip()}")
                 continue
-
-        if not suspicious_files_summary:
-            return None
         
+        if not findings: return None
+
+        # --- PHẦN 2: TỔNG HỢP VÀ XÂY DỰNG OUTPUT CUỐI CÙNG ---
+        
+        suspicious_files_count = sum(1 for f in findings if f['severity'] not in ["Informational"])
+        
+        # 2.1. Xây dựng mục `analysis`
+        analysis = {
+            "session_risk_summary": "Suspicious file activity detected" if suspicious_files_count > 0 else "No suspicious file activity detected",
+            "highest_threat_level": highest_severity,
+            "evasion_techniques_detected": "Yes" if evasion_detected else "No",
+            "suspicious_content_summary": f"{suspicious_files_count} file(s) flagged with Medium or higher severity." if suspicious_files_count > 0 else "No suspicious content identified."
+        }
+
+        # 2.2. Xây dựng mục `statistics`
+        statistics = {
+            "total_files_analyzed": len(findings),
+            "suspicious_files_count": suspicious_files_count,
+            "total_bytes_transferred_kb": round(total_bytes_seen / 1024, 2)
+        }
+
+        # 2.3. Xây dựng mục `evidence`
+        evidence = {
+            "findings": findings
+        }
+
         return {
-            "total_files_seen": total_files_seen,
-            "suspicious_files_found": len(suspicious_files_summary),
-            "suspicious_files_summary": suspicious_files_summary
+            "analysis": analysis,
+            "statistics": statistics,
+            "evidence": evidence
         }

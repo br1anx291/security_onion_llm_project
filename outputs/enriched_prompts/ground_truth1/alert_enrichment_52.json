@@ -1,0 +1,116 @@
+{
+  "alert": {
+    "signature": "ET DNS Query for .to TLD",
+    "category": "Potentially Bad Traffic",
+    "timestamp": "2025-06-05T11:53:59.390Z"
+  },
+  "connection": {
+    "identity": {
+      "source_ip": "192.168.10.3",
+      "source_port": "60191",
+      "destination_ip": "192.168.10.1",
+      "destination_port": "53",
+      "traffic_direction": "Lateral",
+      "service": "dns",
+      "transport_protocol": "udp"
+    },
+    "statistics": {
+      "duration_sec": 74.1753,
+      "sent_bytes": 684,
+      "received_bytes": 1264
+    },
+    "analysis": {
+      "connection_state": "Normal Connection (SF)",
+      "history_analysis": {
+        "label": "Unrecognized Pattern",
+        "summary": "Requires manual review: 'Dd'.",
+        "severity": "Informational"
+      },
+      "flow_analysis": {
+        "direction": "Symmetrical"
+      }
+    }
+  },
+  "evidence": {
+    "high": {
+      "dns": {
+        "analysis": {
+          "query_pattern": "DGA Detected",
+          "query_integrity": "Normal",
+          "tld_risk": "Normal TLDs",
+          "ttl_behavior": "Low TTL Detected"
+        },
+        "evidence": {
+          "connection_context": {
+            "source_ip": "192.168.10.3",
+            "destination_dns_server": "192.168.10.1"
+          },
+          "findings": [
+            {
+              "type": "AttributeFinding",
+              "source": "query_subdomain",
+              "content": "evn-us-214488029.us-east-1.elb.amazonaws.com",
+              "reasons": [
+                "High Shannon Entropy (3.77 > 3.0)"
+              ]
+            },
+            {
+              "type": "AttributeFinding",
+              "source": "query_subdomain",
+              "content": "waws-prod-blu-015.cloudapp.net",
+              "reasons": [
+                "High Shannon Entropy (3.66 > 3.0)"
+              ]
+            },
+            {
+              "type": "AttributeFinding",
+              "source": "query_subdomain",
+              "content": "akamai-edge.quantserve.com.akadns.net",
+              "reasons": [
+                "High Shannon Entropy (3.74 > 3.0)"
+              ]
+            },
+            {
+              "type": "AttributeFinding",
+              "source": "query_subdomain",
+              "content": "rtb.adgrx.com.tech.akadns.net",
+              "reasons": [
+                "High Shannon Entropy (3.51 > 3.0)"
+              ]
+            },
+            {
+              "type": "AttributeFinding",
+              "source": "answer_record",
+              "content": 19,
+              "reasons": [
+                "Low TTL (19 < 60)"
+              ]
+            },
+            {
+              "type": "AttributeFinding",
+              "source": "query_length",
+              "content": "ttd-useast-match-adsrvr-org-1999903436.us-east-1.elb.amazonaws.com",
+              "reasons": [
+                "Long Query (66 > 50)"
+              ]
+            },
+            {
+              "type": "AttributeFinding",
+              "source": "query_subdomain",
+              "content": "ttd-useast-match-adsrvr-org-1999903436.us-east-1.elb.amazonaws.com",
+              "reasons": [
+                "High Shannon Entropy (4.11 > 3.0)"
+              ]
+            }
+          ]
+        },
+        "statistics": {
+          "total_queries": 13,
+          "distinct_queries": 13,
+          "failed_queries_ratio": 0.0,
+          "distinct_answers": 6
+        }
+      }
+    }
+  }
+}

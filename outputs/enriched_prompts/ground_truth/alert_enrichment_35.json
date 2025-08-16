@@ -1,0 +1,63 @@
+{
+  "alert": {
+    "signature": "ET SCAN UPnP SUBSCRIBE Inbound - Possible CallStranger Scan (CVE-2020-12695)",
+    "category": "Attempted Information Leak",
+    "timestamp": "2025-04-22T08:55:54.891Z"
+  },
+  "connection": {
+    "identity": {
+      "source_ip": "192.168.10.125",
+      "source_port": "1353",
+      "destination_ip": "192.168.10.100",
+      "destination_port": "2869",
+      "traffic_direction": "Lateral",
+      "service": "http",
+      "transport_protocol": "tcp"
+    },
+    "statistics": {
+      "duration_sec": 0.0084,
+      "sent_bytes": 315,
+      "received_bytes": 134
+    },
+    "analysis": {
+      "connection_state": "Reset by Originator (RSTO)",
+      "history_analysis": {
+        "label": "Unrecognized Pattern",
+        "summary": "Requires manual review: 'ShADadfR'.",
+        "severity": "Informational"
+      },
+      "flow_analysis": {
+        "direction": "Symmetrical"
+      }
+    }
+  },
+  "evidence": {
+    "high": {
+      "http": {
+        "analysis": {
+          "user_agent_category": "Normal Browser",
+          "destination_analysis": "Direct-to-IP Connection",
+          "transfer_volume": "Normal",
+          "content_risk": "No Suspicious Content",
+          "file_transfer_risk": "No File Transfer"
+        },
+        "evidence": {
+          "connection_context": {
+            "methods_used": [
+              "SUBSCRIBE"
+            ],
+            "user_agent_string": "Mozilla/4.0 (compatible; UPnP/1.0; Windows 9x)",
+            "destination_ip": "192.168.10.100:2869"
+          },
+          "findings": []
+        },
+        "statistics": {
+          "total_requests": 1,
+          "request_bytes": 0,
+          "response_bytes": 0,
+          "client_error_ratio": 0.0
+        }
+      }
+    }
+  }
+}

@@ -1,7 +1,7 @@
 # security_onion_llm_project/config.py
 
 from elasticsearch import Elasticsearch
-from elasticsearch_dsl import Search
+# from elasticsearch_dsl import Search
 from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import timedelta
@@ -36,7 +36,9 @@ elastic_host = 'https://localhost:9200'  # Use localhost due to SSH tunnel
 
 # Zeek 
 ZEEK_LOGS_DIR = "./so_logs/log/"
-ZEEK_LOGS_DIR_A = "../so_logs/log/"
+# ZEEK_LOGS_DIR = ".\\so_logs\\log\\"
+MAX_WORKERS = 10
+
 remote_zeek_spool_path = "/nsm/zeek/spool/logger/"
 local_zeek_log_path = "../so_logs"
 zeek_log_types = ["conn", "http", "dns", "file", "ssl"]
@@ -45,14 +47,14 @@ zeek_log_types = ["conn", "http", "dns", "file", "ssl"]
 alert_severity = ['1', '2', '3']
 
 # Alertutput paths
-alert_output_path = '../so_alerts/alert_info.csv'
+alert_output_path = '../so_alerts/alert_info.json'
 correlated_output_path = '../so_alerts/correlated_alerts.csv'
 unmatched_output_path = '../so_alerts/unmatched_alerts.csv'
 unmatched_zeek_output_path ="../so_alerts/logs/unmatched_zeek.log"
 
 
 # Cửa sổ thời gian (giây) để tìm kiếm conn.log khi dùng 5-tuple fallback
-CONN_LOG_TIME_WINDOW_SECONDS = 60 # Giữ lại logic 60s từ code cũ, rất hợp lý
+CONN_LOG_TIME_WINDOW_SECONDS = 660 # Giữ lại logic 60s từ code cũ, rất hợp lý
 
 # Đường dẫn tới file quy tắc làm giàu
 ENRICHMENT_RULES_PATH = "enrichment_rules.yml"

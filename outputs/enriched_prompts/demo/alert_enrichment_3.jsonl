@@ -1,0 +1,34 @@
+{
+    "alert": {
+        "signature": "ET SCAN Suspicious inbound to MSSQL port 1433",
+        "category": "Potentially Bad Traffic",
+        "timestamp": "2025-08-15T18:45:06.721Z"
+    },
+    "connection": {
+        "identity": {
+            "source_ip": "192.168.110.131",
+            "source_port": "61622",
+            "destination_ip": "192.168.110.132",
+            "destination_port": "1433",
+            "traffic_direction": "Lateral",
+            "service": null,
+            "transport_protocol": "tcp"
+        },
+        "statistics": {
+            "duration_sec": 0.0044,
+            "sent_bytes": 0,
+            "received_bytes": 0
+        },
+        "analysis": {
+            "connection_state": "Connection Rejected (REJ)",
+            "history_analysis": {
+                "label": "Unrecognized Pattern",
+                "summary": "Requires manual review: 'Sr'.",
+                "severity": "Informational"
+            },
+            "flow_analysis": {
+                "direction": "Symmetrical"
+            }
+        }
+    }
+}

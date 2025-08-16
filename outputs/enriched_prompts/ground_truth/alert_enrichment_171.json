@@ -1,0 +1,63 @@
+{
+  "alert": {
+    "signature": "ET INFO Suspicious Domain (polyfill .io) in TLS SNI",
+    "category": "Potentially Bad Traffic",
+    "timestamp": "2025-06-05T11:56:42.586Z"
+  },
+  "connection": {
+    "identity": {
+      "source_ip": "192.168.10.17",
+      "source_port": "43190",
+      "destination_ip": "151.101.130.109",
+      "destination_port": "443",
+      "traffic_direction": "Egress",
+      "service": "ssl",
+      "transport_protocol": "tcp"
+    },
+    "statistics": {
+      "duration_sec": 0.7364,
+      "sent_bytes": 748,
+      "received_bytes": 11229
+    },
+    "analysis": {
+      "connection_state": "Normal Connection (SF)",
+      "history_analysis": {
+        "label": "Unrecognized Pattern",
+        "summary": "Requires manual review: 'ShADgdaFfR'.",
+        "severity": "Informational"
+      },
+      "flow_analysis": {
+        "direction": "download",
+        "ratio": 15
+      }
+    }
+  },
+  "evidence": {
+    "low": {
+      "ssl": {
+        "identity": {
+          "server_name": "cdn.polyfill.io"
+        },
+        "analysis": {
+          "server_reputation": "Likely Benign Infrastructure",
+          "certificate_status": "Trusted",
+          "encryption_strength": "Strong (Using None)",
+          "ja3_threat_match": "JA3 Not in Watchlist",
+          "ja3s_threat_match": "JA3S Not in Watchlist",
+          "handshake_status": "Failed"
+        },
+        "statistics": {
+          "connection_duration_sec": 0.0
+        },
+        "evidence": {
+          "ja3_hash": "ce694315cbb81ce95e6ae4ae8cbafde6",
+          "ja3s_hash": null,
+          "tls_version": null,
+          "tls_cipher": null,
+          "raw_validation_statuses": [],
+          "certificate_chain_fingerprints": null
+        }
+      }
+    }
+  }
+}

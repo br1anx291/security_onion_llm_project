@@ -1,0 +1,127 @@
+{
+  "alert": {
+    "signature": "ET P2P Possible Torrent Download via HTTP Request",
+    "category": "Potential Corporate Privacy Violation",
+    "timestamp": "2025-04-22T08:55:55.245Z"
+  },
+  "connection": {
+    "identity": {
+      "source_ip": "192.168.10.128",
+      "source_port": "1594",
+      "destination_ip": "130.239.18.173",
+      "destination_port": "80",
+      "traffic_direction": "Egress",
+      "service": "http",
+      "transport_protocol": "tcp"
+    },
+    "statistics": {
+      "duration_sec": 0.0509,
+      "sent_bytes": 1061,
+      "received_bytes": 33441
+    },
+    "analysis": {
+      "connection_state": "Reset by Originator (RSTO)",
+      "history_analysis": {
+        "label": "Unrecognized Pattern",
+        "summary": "Requires manual review: 'ShADadfR'.",
+        "severity": "Informational"
+      },
+      "flow_analysis": {
+        "direction": "download",
+        "ratio": 32
+      }
+    }
+  },
+  "evidence": {
+    "medium": {
+      "http": {
+        "analysis": {
+          "user_agent_category": "Outdated Browser",
+          "destination_analysis": "Domain Name Connection",
+          "transfer_volume": "Normal",
+          "content_risk": "No Suspicious Content",
+          "file_transfer_risk": "Benign Download Detected"
+        },
+        "evidence": {
+          "connection_context": {
+            "methods_used": [
+              "GET"
+            ],
+            "user_agent_string": "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1)"
+          },
+          "findings": []
+        },
+        "statistics": {
+          "total_requests": 3,
+          "request_bytes": 0,
+          "response_bytes": 32539,
+          "client_error_ratio": 0.0
+        }
+      }
+    },
+    "reference": {
+      "files": {
+        "analysis": {
+          "session_risk_summary": "No suspicious file activity detected",
+          "highest_threat_level": "Informational",
+          "evasion_techniques_detected": "No",
+          "suspicious_content_summary": "No suspicious content identified."
+        },
+        "statistics": {
+          "total_files_analyzed": 3,
+          "suspicious_files_count": 0,
+          "total_bytes_transferred_kb": 31.78
+        },
+        "evidence": {
+          "findings": [
+            {
+              "type": "FileAnalysisFinding",
+              "fuid": "Fn6sg73S3Z3KqZWRq3",
+              "filename": null,
+              "direction": "Download",
+              "severity": "Informational",
+              "risk_score": 5,
+              "size_bytes": 6235,
+              "reasons": [],
+              "hashes": {
+                "md5": "d93bf5301a524032f99e76c66d841ed9",
+                "sha1": "1dee0afdfa6251b0d0e118c1bfc5c0595787923b"
+              },
+              "file_type_reported": "text/html"
+            },
+            {
+              "type": "FileAnalysisFinding",
+              "fuid": "FAJt8R2k8yq4bUkni6",
+              "filename": null,
+              "direction": "Download",
+              "severity": "Informational",
+              "risk_score": 5,
+              "size_bytes": 216,
+              "reasons": [],
+              "hashes": {
+                "md5": "4bce9846e05d3bffdfb293d47c840a8e",
+                "sha1": "92cdbbab1c2c8f435301ece3d44a197315e2d988"
+              },
+              "file_type_reported": "image/gif"
+            },
+            {
+              "type": "FileAnalysisFinding",
+              "fuid": "FlnCKg37rSi8lx6LLa",
+              "filename": null,
+              "direction": "Download",
+              "severity": "Informational",
+              "risk_score": 5,
+              "size_bytes": 26088,
+              "reasons": [],
+              "hashes": {
+                "md5": "25e5d101968b89fb15fa28ce10077303",
+                "sha1": "485ee1449098af7b012a9184db1a2229ebd08e4d"
+              },
+              "file_type_reported": "application/x-bittorrent"
+            }
+          ]
+        }
+      }
+    }
+  }
+}

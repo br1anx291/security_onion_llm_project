@@ -1,203 +1,261 @@
+# # FILE: collectors/conn_collector.py
+
+# import json
+# from typing import List, Dict, Any
+
+# class ConnCollector:
+#     """
+#     Collector chuyên phân tích các bản ghi conn.log đã được lọc sẵn
+#     để trích xuất metadata và các tín hiệu bất thường của kết nối.
+#     """
+#     # 1. Thêm property collector_name
+#     @property
+#     def collector_name(self) -> str:
+#         return "conn"
+
+    
+#     # 3. Tạo phương thức collect mới
+#     def collect(self, log_lines: List[str]) -> Dict[str, Any] | None:
+#         """
+#         Phân tích các dòng conn.log để trích xuất trạng thái cuối cùng và các tín hiệu.
+#         """
+#         if not log_lines:
+#             return None
+
+#         # Lấy thông tin từ dòng log cuối cùng, đại diện cho trạng thái cuối của kết nối
+#         try:
+#             last_log_entry = json.loads(log_lines[-1])
+#         except (json.JSONDecodeError, IndexError):
+#             return None
+
+#         # --- Logic mới để phân tích Data Flow ---
+#         orig_bytes = last_log_entry.get('orig_bytes', 0) or 0
+#         resp_bytes = last_log_entry.get('resp_bytes', 0) or 0
+        
+#         data_flow_analysis = "Symmetrical Traffic" # Mặc định
+#         # Đặt ra ngưỡng chênh lệch (ví dụ: 5 lần) để tránh nhiễu
+#         SIGNIFICANT_RATIO = 5 
+
+#         # Kiểm tra xem có phải tuồn dữ liệu không
+#         if orig_bytes > resp_bytes * SIGNIFICANT_RATIO:
+#             orig_kb = round(orig_bytes / 1024, 2)
+#             resp_kb = round(resp_bytes / 1024, 2)
+#             data_flow_analysis = f"Data Exfiltration Pattern ({orig_kb}KB sent vs {resp_kb}KB received)"
+        
+#         # Kiểm tra xem có phải tải payload không
+#         elif resp_bytes > orig_bytes * SIGNIFICANT_RATIO:
+#             resp_kb = round(resp_bytes / 1024, 2)
+#             data_flow_analysis = f"Payload Download Pattern ({resp_kb}KB downloaded)"
+        
+#         # --- Kết thúc logic mới ---
+        
+#         # Trích xuất các thông tin metadata quan trọng
+#         duration = last_log_entry.get('duration')
+#         conn_state = last_log_entry.get('conn_state')
+#         history = last_log_entry.get('history')
+#         service = last_log_entry.get('service')
+
+#         # Tạo tín hiệu mới dựa trên metadata
+#         scan_detected = False
+#         connection_anomaly = None
+        
+#         # Logic phát hiện scan dựa trên history
+#         if history in ('S', 'ShR', 'R'):
+#             scan_detected = True
+
+#         # Logic phát hiện trạng thái kết nối bất thường
+#         if conn_state in ('S0', 'S1', 'S2', 'S3', 'REJ'):
+#             connection_anomaly = f"Abnormal state: {conn_state}"
+
+#         # Trả về dictionary kết quả
+#         output: Dict[str, Any] = {
+#             "duration": duration,
+#             # "data_flow_analysis": data_flow_analysis, # Đây là tín hiệu mới của mày,
+#             "orig_bytes" : orig_bytes, 
+#             "resp_bytes": resp_bytes,
+#             "conn_state": conn_state,
+#             "service": service,
+#         }
+        
+#         if scan_detected:
+#             output["scan_detected"] = scan_detected
+#         if connection_anomaly:
+#             output["connection_anomaly"] = connection_anomaly
+
+#         return output       
+
 # FILE: collectors/conn_collector.py
 
-import subprocess
 import json
-import logging
-from datetime import datetime
+from typing import List, Dict, Any
+from .base_collector import BaseCollector # <-- SỬA LỖI 1: Thêm kế thừa
 
-# Chúng ta cũng cần hàm find_log_files ở đây
-from log_helper import find_log_files
-from config import ZEEK_LOGS_DIR, CONN_LOG_TIME_WINDOW_SECONDS
-class ConnCollector:
+class ConnCollector(BaseCollector): 
     """
-    Một collector đặc biệt, có nhiệm vụ tìm kiếm bản ghi conn.log gốc
-    tương ứng với một alert. Đây là bước đầu tiên của quá trình làm giàu.
+    Collector chuyên phân tích các bản ghi conn.log đã được lọc sẵn
+    để trích xuất metadata và các tín hiệu bất thường của kết nối.
     """
-    def __init__(self, zeek_logs_dir: str, time_window_seconds: int):
-        """
-        Hàm khởi tạo.
-        
-        Args:
-            zeek_logs_dir (str): Đường dẫn tới thư mục chứa log Zeek.
-            time_window_seconds (int): Cửa sổ thời gian (giây) để tìm kiếm.
-        """
-        self.zeek_logs_dir = ZEEK_LOGS_DIR
-        self.time_window_seconds = CONN_LOG_TIME_WINDOW_SECONDS
-        logging.info("ConnCollector initialized.")
+    CONN_STATE_DESCRIPTIONS = {
+        'S0': 'Stealth Scan Attempt (S0)', 'S1': 'Half Open Scan (S1)',
+        'S2': 'Suspicious Connection (S2)', 'S3': 'No Response From Server (S3)',
+        'REJ': 'Connection Rejected (REJ)', 'SF': 'Normal Connection (SF)',
+        'RSTO': 'Reset by Originator (RSTO)', 'RSTR': 'Reset by Responder (RSTR)',
+    }
+    
+    # CSDL các mẫu history và phân tích tương ứng
+    HISTORY_PATTERNS = {
+        "S": {"label": "SYN Scan or Silent Drop", "summary": "Only SYN sent, no response. Likely a stealth scan or silent drop.", "severity": "High"},
+        "ShR": {"label": "Half-Open Scan (RST by Originator)", "summary": "Received SYN/ACK but originator sent RST. Classic half-open scan.", "severity": "High"},
+        "SRA": {"label": "Immediate Rejection (RST by Responder)", "summary": "SYN sent, immediate RST from responder. Port likely closed or firewalled.", "severity": "High"},
+        "ShADr": {"label": "Server Aborted After Data", "summary": "Full handshake, data exchange, then server issued RST. Possible IPS/IDS drop.", "severity": "High"},
+        "ShA": {"label": "Handshake Only, No Data", "summary": "Handshake completed, but no data sent. May indicate probing.", "severity": "Medium"},
+        "SAF": {"label": "Abrupt Close by Client", "summary": "Client performed handshake and closed connection quickly. Possible probe.", "severity": "Medium"},
+        "ShADad": {"label": "Active Session, No Teardown", "summary": "Data flowed both ways, but no FINs. Connection possibly interrupted.", "severity": "Medium"},
+        "ShADafgR": {"label": "Abrupt Client Reset After Graceful Teardown","summary": "Connection established, data sent, server initiated FIN, but client responded with RST instead of normal FIN. May indicate forced termination or evasion.","severity": "Medium"},
+        "ShAD": {"label": "Client Data Sent", "summary": "Client sent data, no response or teardown yet. Normal part of a flow.", "severity": "Informational"},
+        "ShAd": {"label": "Server Data Response", "summary": "Server responded with data without client payload. Normal behavior.", "severity": "Informational"},
+        # Thêm các mẫu khác vào đây nếu cần
+    }
+    NORMAL_HISTORY = {"ShADadfF", "ShADadGfF", "SADadfF", "ShADaggdgF", "ShADagdgTFf"}
+    
+    @property
+    def collector_name(self) -> str:
+        return "conn"
 
-    def _extract_timestamp_from_alert(self, alert: dict) -> float | None:
-        """
-        Trích xuất và chuyển đổi timestamp từ một alert.
-        Hàm này xử lý trường hợp timestamp nằm trong một chuỗi JSON lồng nhau.
-        """
-        try:
-            # 1. Parse chuỗi JSON trong trường 'message'
-            message_data = json.loads(alert['message'])
-            
-            # 2. Lấy chuỗi timestamp thô
-            ts_str_raw = message_data['timestamp']
-            
-            # 3. Chuẩn hóa chuỗi (xử lý cả '+0000' và 'Z')
-            if ts_str_raw.endswith('+0000'):
-                ts_str_normalized = ts_str_raw[:-2] + ':' + ts_str_raw[-2:]
-            else:
-                ts_str_normalized = ts_str_raw.replace('Z', '+00:00')
-                
-            # 4. Chuyển đổi thành Unix timestamp và trả về
-            timestamp = datetime.fromisoformat(ts_str_normalized).timestamp()
-            return timestamp
 
-        except (KeyError, TypeError, json.JSONDecodeError, ValueError) as e:
-            # Bẫy tất cả các lỗi có thể xảy ra: thiếu key, sai kiểu, JSON lỗi, format lỗi
-            logging.error(f"Could not extract timestamp from alert. Error: {e}")
+    def _interpret_history(self, history: str | None) -> Dict[str, str] | None:
+        """Tra cứu và trả về phân tích chi tiết cho một history string."""
+        if not history:
+            return None 
+
+        # 1. Ưu tiên check các pattern nguy hiểm trước
+        if history in self.HISTORY_PATTERNS:
+            return self.HISTORY_PATTERNS[history]
+
+        # 2. Nếu không, check xem có phải là pattern bình thường không
+        if history in self.NORMAL_HISTORY:
+            return {
+                "label": "Normal Full Connection",
+                "summary": "A standard TCP session with a complete handshake, data transfer, and graceful teardown.",
+                "severity": "Informational"
+            }
+
+        # 3. Nếu không thuộc cả hai, coi như là pattern lạ
+        return {
+            "label": "Unrecognized Pattern",
+            "summary": f"The history string '{history}' does not have a predefined analysis. Requires manual review.",
+            "severity": "Informational"
+        }
+
+    def collect(self, log_lines: List[str]) -> Dict[str, Any] | None:
+        """
+        Phân tích các dòng conn.log để trích xuất trạng thái cuối cùng và các tín hiệu.
+        """
+        if not log_lines:
             return None
 
-    def find_connection(self, alert: dict) -> tuple[str | None, dict | None]:
-        timestamp = self._extract_timestamp_from_alert(alert)
-        if timestamp is None:
-            return None, None
+        try:
+            # Lấy thông tin từ dòng log cuối cùng
+            last_log_entry = json.loads(log_lines[-1])
+        except (json.JSONDecodeError, IndexError):
+            return None
 
-        conn_log_files = find_log_files(ZEEK_LOGS_DIR, "conn", timestamp)
-        if not conn_log_files:
-            logging.warning(f"No conn.*.log files found for timestamp {timestamp}.")
-            return None, None
-
-        community_id = alert.get("network", {}).get("community_id")
-
-        # --- Luồng 1: Thử tìm bằng Community ID (Rất nhanh) ---
-        """
-        Tìm UID và tóm tắt kết nối.
-        PHIÊN BẢN NÂNG CẤP:
-        1. Lọc chặt chẽ các ứng viên theo cửa sổ thời gian để tránh Community ID collision.
-        2. Ưu tiên chọn ứng viên có DURATION lớn nhất trong cửa sổ đó.
-        """
-        timestamp = self._extract_timestamp_from_alert(alert)
-        if timestamp is None:
-            return None, None
-
-        conn_log_files = find_log_files(ZEEK_LOGS_DIR, "conn", timestamp)
-        if not conn_log_files:
-            logging.warning(f"No conn.*.log files found for timestamp {timestamp}.")
-            return None, None
-
-        # --- Giai đoạn 1: Thu thập tất cả ứng viên thô ---
-        all_raw_lines = []
-        community_id = alert.get("network", {}).get("community_id")
-
-        if community_id:
-            logging.info(f"Attempting to find connection using Community ID: {community_id}")
-            command = "grep"
-            for log_file in conn_log_files:
-                try:
-                    result = subprocess.run(
-                        [command, f'"community_id":"{community_id}"', log_file],
-                        capture_output=True, text=True, check=False
-                    )
-                    if result.returncode <= 1 and result.stdout:
-                        all_raw_lines.extend(result.stdout.strip().split('\n'))
-                except Exception as e:
-                    logging.warning(f"Error while searching by community_id in {log_file}: {e}")
-            
-            if not all_raw_lines:
-                 logging.warning(f"Community ID {community_id} provided, but no matching logs found.")
-
-        # --- Luồng 2: Dự phòng, tìm bằng 5-Tuple (Chậm hơn) ---
-
-        # === BẮT ĐẦU LOGIC FALLBACK 5-TUPLE ===
-        # Chỉ chạy nếu việc tìm bằng Community ID không có kết quả
-        if not all_raw_lines:
-            logging.warning("Community ID search failed or not available. Falling back to 5-tuple search.")
-            try:
-                src_ip = alert['source']['ip']
-                src_port = alert['source']['port']
-                dest_ip = alert['destination']['ip']
-                dest_port = alert['destination']['port']
-            except (KeyError, TypeError):
-                logging.error("Alert is missing source/destination IP/port for 5-tuple search.")
-                return None, None
-            
-            command = "grep"
-            for log_file in conn_log_files:
-                try:
-                    # Dùng chuỗi các lệnh grep để lọc hiệu quả
-                    p1 = subprocess.Popen([command, f'"id.orig_h":"{src_ip}"', log_file], stdout=subprocess.PIPE, text=True)
-                    p2 = subprocess.Popen([command, f'"id.orig_p":{src_port}'], stdin=p1.stdout, stdout=subprocess.PIPE, text=True)
-                    p3 = subprocess.Popen([command, f'"id.resp_h":"{dest_ip}"'], stdin=p2.stdout, stdout=subprocess.PIPE, text=True)
-                    p4 = subprocess.Popen([command, f'"id.resp_p":{dest_port}'], stdin=p3.stdout, stdout=subprocess.PIPE, text=True)
-                    
-                    # Đóng các pipe không cần thiết
-                    p1.stdout.close()
-                    p2.stdout.close()
-                    p3.stdout.close()
-
-                    result_stdout, _ = p4.communicate()
-                    if result_stdout:
-                        all_raw_lines.extend(result_stdout.strip().split('\n'))
-                except Exception as e:
-                    logging.warning(f"Error during 5-tuple search in {log_file}: {e}")
-        # === KẾT THÚC LOGIC FALLBACK 5-TUPLE ===
-
-        # --- Phần xử lý kết quả (Dùng chung cho cả 2 luồng) ---
-        if not all_raw_lines:
-            logging.warning("No raw connection logs found matching the criteria.")
-            return None, None
-
-        # --- Giai đoạn 2: Lọc ứng viên theo cửa sổ thời gian ---
-        time_relevant_candidates = []
-        for line in all_raw_lines:
-            if not line: continue
-            try:
-                log_entry = json.loads(line)
-                log_ts = float(log_entry['ts'])
-                time_diff = abs(log_ts - timestamp)
-
-                # **LOGIC LỌC QUAN TRỌNG NHẤT**
-                # Chỉ giữ lại những ứng viên nằm trong cửa sổ thời gian hẹp
-                if time_diff < CONN_LOG_TIME_WINDOW_SECONDS:
-                    time_relevant_candidates.append(log_entry)
-
-            except (json.JSONDecodeError, KeyError, TypeError, ValueError):
-                # Bỏ qua các dòng log lỗi hoặc thiếu trường
-                continue
+        # --- PHẦN 1: Trích xuất metadata gốc ---
+        source_ip = last_log_entry.get('id.orig_h')
+        source_port = last_log_entry.get('id.orig_p')
+        dest_ip = last_log_entry.get('id.resp_h')
+        dest_port = last_log_entry.get('id.resp_p')
         
-        if not time_relevant_candidates:
-            logging.warning(f"Found {len(all_raw_lines)} raw candidates, but NONE were within the time window of {CONN_LOG_TIME_WINDOW_SECONDS}s.")
-            return None, None
+        if local_orig := last_log_entry.get('local_orig', False) and not last_log_entry.get('local_resp', False):
+            direction = "Egress"
+        elif not last_log_entry.get('local_orig', False) and (local_resp := last_log_entry.get('local_resp', False)):
+            direction = "Ingress"
+        elif local_orig and local_resp:
+            direction = "Lateral"
+        else:
+            direction = "Unknown"
 
-        logging.info(f"Found {len(time_relevant_candidates)} time-relevant candidates. Selecting the best match...")
+        identity: List[Dict[str, Any]] = []
+        identity = {
+            "source": f"{source_ip} : {source_port}",
+            "destination": f"{dest_ip} : {dest_port}",
+            "traffic_direction": direction,
+            "service": last_log_entry.get('service'),
+            "transport_protocol": last_log_entry.get('proto'),
+        }
 
-        # --- Giai đoạn 3: Chọn best_match từ các ứng viên hợp lệ ---
-        best_match = None
-        max_duration = -1.0  # Bắt đầu với duration âm để đảm bảo mọi duration > 0 sẽ được chọn
 
-        for candidate in time_relevant_candidates:
-            # Lấy duration, mặc định là 0 nếu không có
-            duration = float(candidate.get('duration', 0.0) or 0.0)
-            
-            # **LOGIC CHỌN LỌC MỚI**
-            # Ưu tiên ứng viên có DURATION dài nhất
-            if duration > max_duration:
-                max_duration = duration
-                best_match = candidate
+        conn_state = last_log_entry.get('conn_state')
+        history = last_log_entry.get('history')
+        duration = last_log_entry.get('duration')
+        orig_bytes = last_log_entry.get('orig_bytes', 0)
+        resp_bytes = last_log_entry.get('resp_bytes', 0)
         
-        # --- Giai đoạn 4: Trả về kết quả ---
-        if best_match:
-            uid = best_match.get('uid')
-            # Lấy thông tin time_diff của chính best_match để log
-            final_time_diff = abs(float(best_match.get('ts', 0.0)) - timestamp)
-            
-            conn_summary = {
-                "uid": uid,
-                "duration": best_match.get('duration'),
-                "orig_bytes": best_match.get('orig_bytes'),
-                "resp_bytes": best_match.get('resp_bytes'),
-                "conn_state": best_match.get('conn_state'),
-                "service": best_match.get('service'),
-                "history": best_match.get('history'),
+        connection_state_summary = self.CONN_STATE_DESCRIPTIONS.get(conn_state, f"Unknown State ({conn_state})")
+        history_analysis = self._interpret_history(history)
+        
+        behavior: List[Dict[str, Any]] = []
+        behavior = {
+            "connection_state": connection_state_summary,
+            # "history_analysis": history_analysis, # Tích hợp phân tích mới
+            "duration_sec": round(duration, 4) if duration else 0.0,
+        }
+        
+        # --- PHẦN 2: Phân tích và tạo ra các tín hiệu ---
+        asymmetric_traffic_details: Dict[str, Any] | None = None
+        SIGNIFICANT_RATIO = 5 
+
+        # Logic phân tích traffic bất đối xứng
+        if orig_bytes > resp_bytes * SIGNIFICANT_RATIO and resp_bytes > 0:
+            ratio = round(orig_bytes / resp_bytes)
+            asymmetric_traffic_details = {
+                "direction": "upload",
+                "ratio": ratio,
+                "summary": f"Sent {round(orig_bytes/1024, 2)} KB, received {round(resp_bytes/1024, 2)} KB"
             }
-            logging.info(f"Successfully selected best match UID: {uid} (duration: {max_duration:.6f}s, time_diff: {final_time_diff:.4f}s)")
-            return uid, conn_summary
-            
-        logging.error("This should not happen: Found time-relevant candidates but failed to select a best match.")
-        return None, None
-    
+        elif resp_bytes > orig_bytes * SIGNIFICANT_RATIO and orig_bytes > 0:
+            ratio = round(resp_bytes / orig_bytes)
+            asymmetric_traffic_details = {
+                "direction": "download",
+                "ratio": ratio,
+                "summary": f"Received {round(resp_bytes/1024, 2)} KB, sent {round(orig_bytes/1024, 2)} KB"
+            }
+
+        # # CẢI TIẾN 3: Gắn thẻ (tagging) các hành vi bất thường
+        # if history in ('S', 'ShR', 'R'):
+        #     connection_tags.append({
+        #         "finding_type": "scan_behavior",
+        #         "summary": f"Potential Scan based on '{history}' history"
+        #     })
+
+        # # Tạo một mapping để code sạch hơn
+        # CONN_STATE_DESCRIPTIONS = {
+        #     'S0': 'Stealth Scan Attempt', 'S1': 'Half Open Scan',
+        #     'S2': 'Suspicious Connection', 'S3': 'No Response From Server',
+        #     'REJ': 'Connection Rejected'
+        # }
+        # if conn_state in CONN_STATE_DESCRIPTIONS:
+        #     connection_tags.append({
+        #         "finding_type": "abnormal_state",
+        #         "summary": f"{conn_state}-{CONN_STATE_DESCRIPTIONS[conn_state]}" 
+        #     })
+
+
+        # connection_details = {
+        #     "duration": duration,
+        #     "service": last_log_entry.get('service'),
+        #     "conn_state": conn_state,
+        #     "history": history,
+        #     "orig_bytes": orig_bytes,
+        #     "resp_bytes": resp_bytes
+        # }
+        
+        # Chuyển các kết quả phân tích thành một danh sách (list) các chuỗi
+        if asymmetric_traffic_details:
+            behavior["asymmetric_traffic_details"] = asymmetric_traffic_details
+
+        # Trả về một dictionary với các key rõ ràng
+        return {
+            "identity": identity,
+            "behavior": behavior
+        }

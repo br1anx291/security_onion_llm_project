@@ -1,0 +1,77 @@
+{
+  "alert": {
+    "signature": "ET INFO Tencent Cloud Storage Domain in DNS Lookup (myqcloud .com)",
+    "category": "Misc activity",
+    "timestamp": "2025-05-25T09:30:38.895Z"
+  },
+  "connection": {
+    "identity": {
+      "source_ip": "192.168.10.19",
+      "source_port": "62339",
+      "destination_ip": "192.168.10.3",
+      "destination_port": "53",
+      "traffic_direction": "Lateral",
+      "service": "dns",
+      "transport_protocol": "udp"
+    },
+    "statistics": {
+      "duration_sec": 0.0164,
+      "sent_bytes": 102,
+      "received_bytes": 664
+    },
+    "analysis": {
+      "connection_state": "Normal Connection (SF)",
+      "history_analysis": {
+        "label": "Unrecognized Pattern",
+        "summary": "Requires manual review: 'Dd'.",
+        "severity": "Informational"
+      },
+      "flow_analysis": {
+        "direction": "download",
+        "ratio": 7
+      }
+    }
+  },
+  "evidence": {
+    "high": {
+      "dns": {
+        "analysis": {
+          "query_pattern": "DGA Detected",
+          "query_integrity": "Normal",
+          "tld_risk": "Normal TLDs",
+          "ttl_behavior": "Normal TTLs"
+        },
+        "evidence": {
+          "connection_context": {
+            "source_ip": "192.168.10.19",
+            "destination_dns_server": "192.168.10.3"
+          },
+          "findings": [
+            {
+              "type": "AttributeFinding",
+              "source": "query_subdomain",
+              "content": "udata-10009275.image.myqcloud.com",
+              "reasons": [
+                "High Shannon Entropy (3.64 > 3.0)"
+              ]
+            },
+            {
+              "type": "AttributeFinding",
+              "source": "query_subdomain",
+              "content": "udata-10009275.image.myqcloud.com",
+              "reasons": [
+                "High Shannon Entropy (3.64 > 3.0)"
+              ]
+            }
+          ]
+        },
+        "statistics": {
+          "total_queries": 2,
+          "distinct_queries": 1,
+          "failed_queries_ratio": 0.0,
+          "distinct_answers": 16
+        }
+      }
+    }
+  }
+}

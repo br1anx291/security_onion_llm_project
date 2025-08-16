@@ -1,0 +1,68 @@
+{
+  "alert": {
+    "signature": "ET DNS Query for .cc TLD",
+    "category": "Potentially Bad Traffic",
+    "timestamp": "2025-05-25T06:33:12.173Z"
+  },
+  "connection": {
+    "identity": {
+      "source_ip": "192.168.10.17",
+      "source_port": "35332",
+      "destination_ip": "192.168.10.3",
+      "destination_port": "53",
+      "traffic_direction": "Lateral",
+      "service": "dns",
+      "transport_protocol": "udp"
+    },
+    "statistics": {
+      "duration_sec": 0.0003,
+      "sent_bytes": 62,
+      "received_bytes": 94
+    },
+    "analysis": {
+      "connection_state": "Normal Connection (SF)",
+      "history_analysis": {
+        "label": "Unrecognized Pattern",
+        "summary": "Requires manual review: 'Dd'.",
+        "severity": "Informational"
+      },
+      "flow_analysis": {
+        "direction": "Symmetrical"
+      }
+    }
+  },
+  "evidence": {
+    "low": {
+      "dns": {
+        "analysis": {
+          "query_pattern": "Normal Patterns",
+          "query_integrity": "Normal",
+          "tld_risk": "Normal TLDs",
+          "ttl_behavior": "Low TTL Detected"
+        },
+        "evidence": {
+          "connection_context": {
+            "source_ip": "192.168.10.17",
+            "destination_dns_server": "192.168.10.3"
+          },
+          "findings": [
+            {
+              "type": "AttributeFinding",
+              "source": "answer_record",
+              "content": 9,
+              "reasons": [
+                "Low TTL (9 < 60)"
+              ]
+            }
+          ]
+        },
+        "statistics": {
+          "total_queries": 2,
+          "distinct_queries": 1,
+          "failed_queries_ratio": 0.0,
+          "distinct_answers": 1
+        }
+      }
+    }
+  }
+}

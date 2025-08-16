@@ -1,0 +1,105 @@
+{
+  "alert": {
+    "signature": "ET EXPLOIT_KIT Possible Evil Redirector Leading to EK Nov 09 2015 M2",
+    "category": "Exploit Kit Activity Detected",
+    "timestamp": "2025-05-24T10:06:50.399Z"
+  },
+  "connection": {
+    "identity": {
+      "source_ip": "10.41.245.114",
+      "source_port": "49258",
+      "destination_ip": "85.93.0.32",
+      "destination_port": "80",
+      "traffic_direction": "Egress",
+      "service": "http",
+      "transport_protocol": "tcp"
+    },
+    "statistics": {
+      "duration_sec": 0.0365,
+      "sent_bytes": 380,
+      "received_bytes": 657
+    },
+    "analysis": {
+      "connection_state": "Normal Connection (SF)",
+      "history_analysis": {
+        "label": "Normal Full Connection",
+        "summary": "A standard TCP session...",
+        "severity": "Informational"
+      },
+      "flow_analysis": {
+        "direction": "Symmetrical"
+      }
+    }
+  },
+  "evidence": {
+    "high": {
+      "http": {
+        "analysis": {
+          "user_agent_category": "Normal Browser",
+          "destination_analysis": "Domain Name Connection",
+          "transfer_volume": "Normal",
+          "content_risk": "Suspicious Content Detected",
+          "file_transfer_risk": "Benign Download Detected"
+        },
+        "evidence": {
+          "connection_context": {
+            "methods_used": [
+              "GET"
+            ],
+            "user_agent_string": "Mozilla/5.0 (Windows NT 6.1; Trident/7.0; rv:11.0) like Gecko"
+          },
+          "findings": [
+            {
+              "type": "Content Finding",
+              "source": "uri",
+              "content": "/hot.php?id=4046AAB187AB2C1563B214BE7AC6702950B304E2E9E1696E18244B8501B268FD92DA0D313D2273E24C283B",
+              "reasons": [
+                "Hex-based Key"
+              ]
+            }
+          ]
+        },
+        "statistics": {
+          "total_requests": 1,
+          "request_bytes": 0,
+          "response_bytes": 464,
+          "client_error_ratio": 0.0
+        }
+      }
+    },
+    "reference": {
+      "files": {
+        "analysis": {
+          "session_risk_summary": "No suspicious file activity detected",
+          "highest_threat_level": "Informational",
+          "evasion_techniques_detected": "No",
+          "suspicious_content_summary": "No suspicious content identified."
+        },
+        "statistics": {
+          "total_files_analyzed": 1,
+          "suspicious_files_count": 0,
+          "total_bytes_transferred_kb": 0.45
+        },
+        "evidence": {
+          "findings": [
+            {
+              "type": "FileAnalysisFinding",
+              "fuid": "FGtHcpvN3wt9GG085",
+              "filename": null,
+              "direction": "Download",
+              "severity": "Informational",
+              "risk_score": 5,
+              "size_bytes": 464,
+              "reasons": [],
+              "hashes": {
+                "md5": "e3b77beabcb0c175950f736130900c6d",
+                "sha1": "fc0db3b1e101ea0a7235088db657be856cc46aeb"
+              },
+              "file_type_reported": "text/html"
+            }
+          ]
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,105 @@
+{
+  "alert": {
+    "signature": "GPL P2P BitTorrent announce request",
+    "category": "Potential Corporate Privacy Violation",
+    "timestamp": "2025-06-30T08:39:57.573Z"
+  },
+  "connection": {
+    "identity": {
+      "source_ip": "192.168.10.128",
+      "source_port": "1597",
+      "destination_ip": "130.239.18.173",
+      "destination_port": "6969",
+      "traffic_direction": "Egress",
+      "service": "http",
+      "transport_protocol": "tcp"
+    },
+    "statistics": {
+      "duration_sec": 0.0005,
+      "sent_bytes": 339,
+      "received_bytes": 299
+    },
+    "analysis": {
+      "connection_state": "Normal Connection (SF)",
+      "history_analysis": {
+        "label": "Unrecognized Pattern",
+        "summary": "Requires manual review: 'ShADafdtF'.",
+        "severity": "Informational"
+      },
+      "flow_analysis": {
+        "direction": "Symmetrical"
+      }
+    }
+  },
+  "evidence": {
+    "high": {
+      "http": {
+        "analysis": {
+          "user_agent_category": "Normal Browser",
+          "destination_analysis": "Domain Name Connection",
+          "transfer_volume": "Normal",
+          "content_risk": "Suspicious Content Detected",
+          "file_transfer_risk": "Benign Download Detected"
+        },
+        "evidence": {
+          "connection_context": {
+            "methods_used": [
+              "GET"
+            ],
+            "user_agent_string": "BitTorrent/6120"
+          },
+          "findings": [
+            {
+              "type": "Content Finding",
+              "source": "uri",
+              "content": "/announce?info_hash=\\xbd\\xe6;\\x84\\xc5\\xc8\\xf9OB\\xcb*\\x9a\\x1c|\\xc2q\\xc9W\\x931&peer_id=M6-1-2--n4\\x17`\\x89\\x19^\\xa1e\\xe7T\\x95&port=37612&uploaded=0&downloaded=0&left=677857280&corrupt=0&key=C664AD39&event=started&numwant=200&compact=1&no_peer_id=1",
+              "reasons": [
+                "Classic SQLi"
+              ]
+            }
+          ]
+        },
+        "statistics": {
+          "total_requests": 1,
+          "request_bytes": 0,
+          "response_bytes": 215,
+          "client_error_ratio": 0.0
+        }
+      }
+    },
+    "reference": {
+      "files": {
+        "analysis": {
+          "session_risk_summary": "No suspicious file activity detected",
+          "highest_threat_level": "Informational",
+          "evasion_techniques_detected": "No",
+          "suspicious_content_summary": "No suspicious content identified."
+        },
+        "statistics": {
+          "total_files_analyzed": 1,
+          "suspicious_files_count": 0,
+          "total_bytes_transferred_kb": 0.21
+        },
+        "evidence": {
+          "findings": [
+            {
+              "type": "FileAnalysisFinding",
+              "fuid": "FiUS7R3MHhxVjqDt5k",
+              "filename": null,
+              "direction": "Download",
+              "severity": "Informational",
+              "risk_score": 5,
+              "size_bytes": 215,
+              "reasons": [],
+              "hashes": {
+                "md5": "fea499b67f11b09c23c3e40b0eafb7f9",
+                "sha1": "66cbca851bfe714b1765b66153d114be9a238dee"
+              },
+              "file_type_reported": "text/plain"
+            }
+          ]
+        }
+      }
+    }
+  }
+}

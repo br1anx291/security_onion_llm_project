@@ -1,0 +1,92 @@
+{
+  "alert": {
+    "signature": "ET DNS Query for .to TLD",
+    "category": "Potentially Bad Traffic",
+    "timestamp": "2025-05-25T08:28:15.849Z"
+  },
+  "connection": {
+    "identity": {
+      "source_ip": "192.168.10.3",
+      "source_port": "60303",
+      "destination_ip": "192.168.10.1",
+      "destination_port": "53",
+      "traffic_direction": "Lateral",
+      "service": "dns",
+      "transport_protocol": "udp"
+    },
+    "statistics": {
+      "duration_sec": 25.4327,
+      "sent_bytes": 301,
+      "received_bytes": 623
+    },
+    "analysis": {
+      "connection_state": "Normal Connection (SF)",
+      "history_analysis": {
+        "label": "Unrecognized Pattern",
+        "summary": "Requires manual review: 'Dd'.",
+        "severity": "Informational"
+      },
+      "flow_analysis": {
+        "direction": "Symmetrical"
+      }
+    }
+  },
+  "evidence": {
+    "high": {
+      "dns": {
+        "analysis": {
+          "query_pattern": "DGA Detected",
+          "query_integrity": "Normal",
+          "tld_risk": "Normal TLDs",
+          "ttl_behavior": "Low TTL Detected"
+        },
+        "evidence": {
+          "connection_context": {
+            "source_ip": "192.168.10.3",
+            "destination_dns_server": "192.168.10.1"
+          },
+          "findings": [
+            {
+              "type": "AttributeFinding",
+              "source": "query_subdomain",
+              "content": "suggest.discovery.envato.com",
+              "reasons": [
+                "High Shannon Entropy (3.45 > 3.0)"
+              ]
+            },
+            {
+              "type": "AttributeFinding",
+              "source": "answer_record",
+              "content": 59,
+              "reasons": [
+                "Low TTL (59 < 60)"
+              ]
+            },
+            {
+              "type": "AttributeFinding",
+              "source": "query_subdomain",
+              "content": "aax.amazon-adsystem.amazon.com",
+              "reasons": [
+                "High Shannon Entropy (3.17 > 3.0)"
+              ]
+            },
+            {
+              "type": "AttributeFinding",
+              "source": "query_subdomain",
+              "content": "aax.amazon-adsystem.amazon.com",
+              "reasons": [
+                "High Shannon Entropy (3.17 > 3.0)"
+              ]
+            }
+          ]
+        },
+        "statistics": {
+          "total_queries": 6,
+          "distinct_queries": 5,
+          "failed_queries_ratio": 0.0,
+          "distinct_answers": 8
+        }
+      }
+    }
+  }
+}

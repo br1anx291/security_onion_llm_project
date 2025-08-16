@@ -1,0 +1,67 @@
+{
+  "alert": {
+    "signature": "ET INFO OpenSSL Demo CA - Internet Widgits Pty (O)",
+    "category": "Not Suspicious Traffic",
+    "timestamp": "2025-05-25T09:31:03.836Z"
+  },
+  "connection": {
+    "identity": {
+      "source_ip": "172.16.0.1",
+      "source_port": "45022",
+      "destination_ip": "192.168.10.51",
+      "destination_port": "444",
+      "traffic_direction": "Lateral",
+      "service": "ssl",
+      "transport_protocol": "tcp"
+    },
+    "statistics": {
+      "duration_sec": 22.0566,
+      "sent_bytes": 88375,
+      "received_bytes": 80088613
+    },
+    "analysis": {
+      "connection_state": "Reset by Originator (RSTO)",
+      "history_analysis": {
+        "label": "Unrecognized Pattern",
+        "summary": "Requires manual review: 'ShADadggggGtgFR'.",
+        "severity": "Informational"
+      },
+      "flow_analysis": {
+        "direction": "download",
+        "ratio": 906
+      }
+    }
+  },
+  "evidence": {
+    "reference": {
+      "ssl": {
+        "identity": {
+          "server_name": null
+        },
+        "analysis": {
+          "server_reputation": "Unknown",
+          "certificate_status": "Trusted",
+          "encryption_strength": "Strong (Using TLSv12)",
+          "ja3_threat_match": "JA3 Not in Watchlist",
+          "ja3s_threat_match": "JA3S Not in Watchlist",
+          "handshake_status": "Successful"
+        },
+        "statistics": {
+          "connection_duration_sec": 0.0
+        },
+        "evidence": {
+          "ja3_hash": "7c657f99ee40e9602437b4c56bcc4c16",
+          "ja3s_hash": "f6e234011390444c303f74d09d87322d",
+          "tls_version": "TLSv12",
+          "tls_cipher": "TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384",
+          "raw_validation_statuses": [
+            "self signed certificate"
+          ],
+          "certificate_chain_fingerprints": [
+            "f6789842db245527b7df9a98966cfe733f206ba9c8e2b47cc0818bd1710eedc4"
+          ]
+        }
+      }
+    }
+  }
+}

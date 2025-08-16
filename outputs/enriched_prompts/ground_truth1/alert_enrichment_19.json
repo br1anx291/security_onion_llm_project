@@ -1,0 +1,94 @@
+{
+  "alert": {
+    "signature": "ET MALWARE Ursnif Variant CnC Beacon - URI Struct M1 (_2B)",
+    "category": "Malware Command and Control Activity Detected",
+    "timestamp": "2025-05-11T08:55:26.943Z"
+  },
+  "connection": {
+    "identity": {
+      "source_ip": "10.41.245.114",
+      "source_port": "49303",
+      "destination_ip": "192.210.137.123",
+      "destination_port": "80",
+      "traffic_direction": "Egress",
+      "service": "http",
+      "transport_protocol": "tcp"
+    },
+    "statistics": {
+      "duration_sec": 0.054,
+      "sent_bytes": 353,
+      "received_bytes": 230666
+    },
+    "analysis": {
+      "connection_state": "Normal Connection (SF)",
+      "history_analysis": {
+        "label": "Normal Full Connection",
+        "summary": "A standard TCP session...",
+        "severity": "Informational"
+      },
+      "flow_analysis": {
+        "direction": "download",
+        "ratio": 653
+      }
+    }
+  },
+  "evidence": {
+    "reference": {
+      "http": {
+        "analysis": {
+          "user_agent_category": "Normal Browser",
+          "destination_analysis": "Domain Name Connection",
+          "transfer_volume": "Normal",
+          "content_risk": "No Suspicious Content",
+          "file_transfer_risk": "Benign Download Detected"
+        },
+        "evidence": {
+          "connection_context": {
+            "methods_used": [
+              "GET"
+            ],
+            "user_agent_string": "Mozilla/5.0 (Windows NT 6.1; Trident/7.0; rv:11.0) like Gecko"
+          },
+          "findings": []
+        },
+        "statistics": {
+          "total_requests": 1,
+          "request_bytes": 0,
+          "response_bytes": 230507,
+          "client_error_ratio": 0.0
+        }
+      },
+      "files": {
+        "analysis": {
+          "session_risk_summary": "No suspicious file activity detected",
+          "highest_threat_level": "Informational",
+          "evasion_techniques_detected": "No",
+          "suspicious_content_summary": "No suspicious content identified."
+        },
+        "statistics": {
+          "total_files_analyzed": 1,
+          "suspicious_files_count": 0,
+          "total_bytes_transferred_kb": 225.1
+        },
+        "evidence": {
+          "findings": [
+            {
+              "type": "FileAnalysisFinding",
+              "fuid": "FxSpQa2mwXpNCRimrf",
+              "filename": null,
+              "direction": "Download",
+              "severity": "Informational",
+              "risk_score": 5,
+              "size_bytes": 230507,
+              "reasons": [],
+              "hashes": {
+                "md5": "032557398230f49a5310a9a60f00e33b",
+                "sha1": "6c0a1790a0bd15fff0d320137c26146ff5f68d2f"
+              }
+            }
+          ]
+        }
+      }
+    }
+  }
+}

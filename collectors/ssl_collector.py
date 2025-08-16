@@ -1,103 +1,167 @@
-# FILE: collectors/ssl_collector.py
-
-import subprocess
 import json
 import logging
-from .base_collector import BaseCollector
-from log_helper import find_log_files
+from typing import List, Dict, Any, Set
+
+import yaml         # Thư viện để đọc tệp YAML
+import tldextract   # Thư viện để phân tích tên miền
+
+# Cấu hình logging cơ bản để ghi lại các lỗi
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
+# Giả định BaseCollector tồn tại
+class BaseCollector:
+    def __init__(self, zeek_logs_dir: str = None):
+        self.zeek_logs_dir = zeek_logs_dir
+    @property
+    def collector_name(self) -> str:
+        raise NotImplementedError
+    def collect(self, log_lines: List[str]) -> Dict[str, Any] | None:
+        raise NotImplementedError
 
 class SslCollector(BaseCollector):
-    """
-    Collector chuyên thu thập và tóm tắt thông tin từ ssl.log.
-    Nó trích xuất các thông tin định danh quan trọng như SNI, JA3, JA3S
-    và đưa ra cảnh báo nếu phát hiện giao thức hoặc bộ mật mã yếu.
-    """
     
-    # Các phiên bản giao thức bị coi là yếu và không an toàn
-    WEAK_PROTOCOLS = {'SSLv3', 'TLSv1.0', 'TLSv1.1'}
-    
-    # Các chuỗi con trong tên bộ mật mã cho thấy sự yếu kém
-    # Ví dụ: 'TLS_RSA_WITH_RC4_128_MD5' chứa cả 'RC4' và 'MD5'
-    WEAK_CIPHER_SUBSTRINGS = {'RC4', 'MD5', 'EXPORT', 'NULL', 'DES'}
+    def __init__(self, zeek_logs_dir: str = None, config_path: str = './collectors/ssl_pattern.yaml'):
+        super().__init__(zeek_logs_dir)
+        try:
+            with open(config_path, 'r') as f:
+                self.config = yaml.safe_load(f)
+        except (IOError, yaml.YAMLError) as e:
+            logging.error(f"FATAL: Không thể tải tệp cấu hình '{config_path}': {e}")
+            raise  # Dừng chương trình nếu không có cấu hình
 
     @property
     def collector_name(self) -> str:
         return "ssl"
 
-    def collect(self, uid: str, alert_timestamp: float) -> dict | None:
-        list_of_log_files = find_log_files(
-            self.zeek_logs_dir, self.collector_name, alert_timestamp
-        )
-        if not list_of_log_files:
-            return None
+    def _get_sni_reputation(self, server_name: str) -> str:
+        if not server_name: return "Unknown"
+        
+        # SỬA LỖI 1: Sử dụng tldextract để lấy tên miền gốc chính xác
+        extracted = tldextract.extract(server_name)
+        registered_domain = f"{extracted.domain}.{extracted.suffix}"
+        
+        # Kiểm tra tên miền gốc trong danh sách tin cậy
+        if registered_domain in self.config['reputation']['trusted_domains']:
+            return self.config['reputation']['trusted_domains'][registered_domain]
 
-        all_matching_lines = []
-        command = "grep"
-        for log_file in list_of_log_files:
-            try:
-                result = subprocess.run(
-                    [command, uid, log_file],
-                    capture_output=True, text=True, check=False
-                )
-                if result.returncode <= 1 and result.stdout:
-                    all_matching_lines.extend(result.stdout.strip().split('\n'))
-            except (subprocess.CalledProcessError, FileNotFoundError):
-                continue
+        # Kiểm tra từ khóa trong toàn bộ FQDN (linh hoạt hơn)
+        domain_parts = set(server_name.lower().split('.')) | set(server_name.lower().split('-'))
+        adware_keywords = set(self.config['reputation']['adware_keywords'])
+        benign_keywords = set(self.config['reputation']['benign_keywords'])
 
-        if not all_matching_lines:
-            return None
+        if not adware_keywords.isdisjoint(domain_parts): return "Adware/Tracker"
+        if not benign_keywords.isdisjoint(domain_parts): return "Likely Benign Infrastructure"
+        
+        return "Unknown Reputation"
 
-        # --- KHỞI TẠO CÁC BIẾN ĐỂ LƯU KẾT QUẢ TÓM TẮT ---
-        server_name_sni = None
-        ja3_hash = None
-        ja3s_hash = None
-        tls_version = None
-        weak_cipher_or_protocol_detected = False
+    def collect(self, log_lines: List[str]) -> Dict[str, Any] | None:
+        if not log_lines: return None
 
-        # --- LẶP QUA CÁC BẢN GHI ĐỂ TỔNG HỢP THÔNG TIN ---
-        # Một kết nối có thể có nhiều bản ghi ssl.log, ta tổng hợp lại để lấy thông tin đầy đủ nhất
-        for line in all_matching_lines:
-            if not line: continue
+        # --- PHẦN 1: Thu thập bằng chứng thô (Logic được làm lại) ---
+        # SỬA LỖI 4: Không giả định thứ tự log, xử lý tuần tự
+        
+        # Thông tin tổng hợp của kết nối
+        summary = {
+            "uid": None, "source_ip": None, "dest_ip": None,
+            "server_name": None, "ja3": None, "ja3s": None,
+            "version": None, "cipher": None,
+            "handshake_established": False, "duration": 0.0,
+            "cert_chain_fps": None
+        }
+        
+        # Các bằng chứng thu thập được qua nhiều log
+        certificate_issues: Set[str] = set()
+        all_validation_statuses: Set[str] = set()
+        weak_protocol_evidence = None
+        weak_cipher_evidence = None
+
+        for line in log_lines:
             try:
                 log_entry = json.loads(line)
-                if log_entry.get('uid') != uid:
-                    continue
-
-                # Cập nhật các giá trị cốt lõi (giá trị cuối cùng sẽ được giữ lại)
-                if log_entry.get('server_name'):
-                    server_name_sni = log_entry['server_name']
-                if log_entry.get('ja3'):
-                    ja3_hash = log_entry['ja3']
-                if log_entry.get('ja3s'):
-                    ja3s_hash = log_entry['ja3s']
-                if log_entry.get('version'):
-                    tls_version = log_entry['version']
                 
-                # --- LOGIC PHÁT HIỆN ĐIỂM YẾU ---
-                if not weak_cipher_or_protocol_detected:
-                    # 1. Kiểm tra phiên bản giao thức
-                    if tls_version in self.WEAK_PROTOCOLS:
-                        weak_cipher_or_protocol_detected = True
-                    
-                    # 2. Kiểm tra bộ mật mã (nếu giao thức chưa bị coi là yếu)
-                    if not weak_cipher_or_protocol_detected and 'cipher' in log_entry:
-                        cipher_str = log_entry['cipher'].upper()
-                        for weak_part in self.WEAK_CIPHER_SUBSTRINGS:
-                            if weak_part in cipher_str:
-                                weak_cipher_or_protocol_detected = True
-                                break # Thoát khi đã tìm thấy điểm yếu
+                # SỬA LỖI 3: Cải thiện xử lý lỗi, không bỏ qua toàn bộ kết nối
+                # Lấy các thông tin cơ bản một cách an toàn
+                summary['uid'] = log_entry.get('uid', summary['uid'])
+                if 'id.orig_h' in log_entry: summary['source_ip'] = log_entry['id.orig_h']
+                if 'id.resp_h' in log_entry: summary['dest_ip'] = log_entry['id.resp_h']
+                
+                # Cập nhật các trường thông tin nếu chúng chưa có
+                summary['server_name'] = log_entry.get('server_name') or summary['server_name']
+                summary['ja3'] = log_entry.get('ja3') or summary['ja3']
+                summary['ja3s'] = log_entry.get('ja3s') or summary['ja3s']
+                summary['version'] = log_entry.get('version') or summary['version']
+                summary['cipher'] = log_entry.get('cipher') or summary['cipher']
+                summary['cert_chain_fps'] = log_entry.get('cert_chain_fps') or summary['cert_chain_fps']
 
-            except (json.JSONDecodeError, KeyError):
+                # Cập nhật các trường có thể thay đổi (lấy giá trị cuối cùng)
+                if log_entry.get('established', False): summary['handshake_established'] = True
+                if 'duration' in log_entry: summary['duration'] = log_entry['duration']
+
+                # SỬA LỖI 2: Phát hiện Cipher/Protocol yếu bằng so khớp chính xác
+                if (v := log_entry.get('version')) and v in self.config['security']['weak_protocols']:
+                    weak_protocol_evidence = v
+                if (c := log_entry.get('cipher')) and c in self.config['security']['weak_ciphers']:
+                    weak_cipher_evidence = c
+                
+                # Thu thập tất cả các trạng thái xác thực chứng chỉ
+                if status := log_entry.get('validation_status', ''):
+                    all_validation_statuses.add(status)
+                    status_lower = status.lower()
+                    if "self-signed" in status_lower: certificate_issues.add("Self-Signed Certificate")
+                    if "unable to get local issuer" in status_lower: certificate_issues.add("Untrusted Chain")
+                    if "has expired" in status_lower: certificate_issues.add("Expired Certificate")
+
+            except json.JSONDecodeError:
+                logging.warning(f"Lỗi phân tích JSON cho UID {summary.get('uid', 'Unknown')}. Bỏ qua dòng log này.")
+                continue # Tiếp tục xử lý các dòng log khác
+            except KeyError as e:
+                logging.warning(f"Thiếu key {e} trong log cho UID {summary.get('uid', 'Unknown')}. Bỏ qua dòng log này.")
                 continue
 
-        # Chỉ trả về kết quả nếu có thông tin định danh hữu ích (SNI hoặc JA3)
-        if not server_name_sni and not ja3_hash:
+        if not (summary['server_name'] or summary['ja3']):
             return None
+
+        # --- PHẦN 2: Phân tích và tạo các tín hiệu ---
+        server_reputation = self._get_sni_reputation(summary['server_name'])
+        cert_status = f"Invalid ({', '.join(sorted(list(certificate_issues)))})" if certificate_issues else "Trusted"
         
+        weaknesses = []
+        if weak_protocol_evidence: weaknesses.append(f"Outdated Protocol: {weak_protocol_evidence}")
+        if weak_cipher_evidence: weaknesses.append(f"Insecure Cipher: {weak_cipher_evidence}")
+        
+        encryption_strength = f"Weak ({'; '.join(weaknesses)})" if weaknesses else f"Strong (Using {summary['version']})"
+
+        # SỬA LỖI 1: Phân tích cả JA3 và JA3S
+        ja3_threat = self.config['threat_intel']['known_malicious_ja3'].get(summary['ja3'])
+        ja3_match = f"JA3 Matched Malware: {ja3_threat}" if ja3_threat else "JA3 Not in Watchlist"
+        
+        ja3s_threat = self.config['threat_intel']['known_malicious_ja3s'].get(summary['ja3s'])
+        ja3s_match = f"JA3S Matched C2 Server: {ja3s_threat}" if ja3s_threat else "JA3S Not in Watchlist"
+        
+        handshake_status = "Successful" if summary['handshake_established'] else "Failed"
+
+        # --- PHẦN 3: Xây dựng output cuối cùng ---
         return {
-            "server_name_sni": server_name_sni,
-            "ja3_hash": ja3_hash,
-            "ja3s_hash": ja3s_hash,
-            "tls_version": tls_version,
-            # "weak_cipher_or_protocol_detected": weak_cipher_or_protocol_detected
+            "identity": {
+                "server_name": summary['server_name']
+            },
+            "analysis": {
+                "server_reputation": server_reputation,
+                "certificate_status": cert_status,
+                "encryption_strength": encryption_strength,
+                "ja3_threat_match": ja3_match,
+                "ja3s_threat_match": ja3s_match, # Bổ sung tín hiệu JA3S
+                "handshake_status": handshake_status
+            },
+            "statistics": {
+                "connection_duration_sec": round(summary['duration'], 4) if summary['duration'] else 0.0
+            },
+            "evidence": {
+                "ja3_hash": summary['ja3'],
+                "ja3s_hash": summary['ja3s'],
+                "tls_version": summary['version'],
+                "tls_cipher": summary['cipher'],
+                "raw_validation_statuses": sorted(list(all_validation_statuses)),
+                "certificate_chain_fingerprints": summary['cert_chain_fps']
+            }
         }

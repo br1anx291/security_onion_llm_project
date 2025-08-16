@@ -1,0 +1,62 @@
+{
+  "alert": {
+    "signature": "ET DOS Terse HTTP GET Likely AnonMafiaIC DDoS tool",
+    "category": "Attempted Denial of Service",
+    "timestamp": "2025-05-25T09:58:18.259Z"
+  },
+  "connection": {
+    "identity": {
+      "source_ip": "172.16.0.1",
+      "source_port": "52829",
+      "destination_ip": "192.168.10.50",
+      "destination_port": "80",
+      "traffic_direction": "Lateral",
+      "service": "http",
+      "transport_protocol": "tcp"
+    },
+    "statistics": {
+      "duration_sec": 0.2735,
+      "sent_bytes": 20,
+      "received_bytes": 11595
+    },
+    "analysis": {
+      "connection_state": "Reset by Originator (RSTO)",
+      "history_analysis": {
+        "label": "Unrecognized Pattern",
+        "summary": "Requires manual review: 'ShADafgR'.",
+        "severity": "Informational"
+      },
+      "flow_analysis": {
+        "direction": "download",
+        "ratio": 580
+      }
+    }
+  },
+  "evidence": {
+    "reference": {
+      "http": {
+        "analysis": {
+          "user_agent_category": "Unknown",
+          "destination_analysis": "Domain Name Connection",
+          "transfer_volume": "Normal",
+          "content_risk": "No Suspicious Content",
+          "file_transfer_risk": "No File Transfer"
+        },
+        "evidence": {
+          "connection_context": {
+            "methods_used": [
+              "GET"
+            ]
+          },
+          "findings": []
+        },
+        "statistics": {
+          "total_requests": 1,
+          "request_bytes": 0,
+          "response_bytes": 0,
+          "client_error_ratio": 0.0
+        }
+      }
+    }
+  }
+}

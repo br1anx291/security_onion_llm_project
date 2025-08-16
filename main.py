@@ -4,125 +4,206 @@ import json
 import logging
 from enrichment_manager import EnrichmentManager
 from concurrent.futures import ThreadPoolExecutor, as_completed
-
-
+from llm_client import LLMClient
+import time
+import os
 LOG_FORMAT = "%(asctime)s [%(threadName)-12.12s] [%(levelname)-5.5s]  %(message)s"
 logging.basicConfig(level=logging.INFO, format=LOG_FORMAT)
 
-ALERTS_FILE_PATH = "./so_alerts/alerts_ids2017_thur.json"
-OUTPUT_FILE_PATH = "./user_prompt/ids2017_thur_enriched_prompts.txt" 
 
-# ALERTS_FILE_PATH = "./so_test_alerts/4log.json"
-# OUTPUT_FILE_PATH = "./user_prompt/4log.txt"
+
+# ********* TEST ALERTs ** *******
+
+# name_alert = '200_alerts'
+# ALERTS_FILE_PATH = f"./so_alerts/ground_truth/{name_alert}.json"
+
+# name_alert = 'demo'
+# ALERTS_FILE_PATH = f"./so_alerts/{name_alert}.json"
+# FINAL_ANALYSIS_OUTPUT_PATH = f"./user_prompt/ground_truth/{name_alert}.json"
+
+# name_alert = '4'
+# ALERTS_FILE_PATH = f"./so_alerts/ground_truth/{name_alert}.json"
+# FINAL_ANALYSIS_OUTPUT_PATH = f"./user_prompt/ground_truth/{name_alert}.json"
+
+
+# name_alert = 'alerts_all-2025-08-13'
+# FINAL_ANALYSIS_OUTPUT_PATH = f"./user_prompt/{name_alert}.json"
+
+
+# ********* TEST ALERTs *********
+
+# name_alert = '1'
+# ALERTS_FILE_PATH = f"./so_test_alerts/ground_truth/{name_alert}.json"
+# FINAL_ANALYSIS_OUTPUT_PATH = f"./user_prompt/{name_alert}.json"
+
+# ALERTS_FILE_PATH = f"./so_test_alerts/{name_alert}.json"
+number = '70'
+# Các alert_index còn thiếu:
+
+# 70
+# 71
+# 72
+# 73
+# 102
+# 107
+# 108
+# 111
+# 112
+# 113
+# 115
+# 124
+# 125
+# 126
+# 127
+# 128
+# 129
+# 130
+# 131
+# 132
+# 133
+# 134
+# 135
+# 136
+# 137
+# 139
+# 140
+# 141
+# 149
+# 150
+# 158
+# 162
+# 188
+# 190
+
+name_alert = f'{number}_ground_truth'
+ALERTS_FILE_PATH = f"./so_test_alerts/ground_truth_thieu/{name_alert}.json"
+# Outputs
+OUTPUTS_BASE_DIR = "./outputs"
+FINAL_ANALYSIS_DIR = f"{OUTPUTS_BASE_DIR}/final_analysis"
+ENRICHED_PROMPTS_DIR = f"{OUTPUTS_BASE_DIR}/enriched_prompts/ground_truth_thieu/"
+FINAL_ANALYSIS_OUTPUT_PATH = f"{FINAL_ANALYSIS_DIR}/ground_truth_thieu/{name_alert}_analysis.jsonl"
 
 MAX_WORKERS = 10 
-
-# "./dns_alert.json"
-# "./http_alert.json"
-# "./files_alert.json"
-# "./ssl_alert.json"
-
-def process_single_alert(manager, alert, index):
-    """Hàm để xử lý một alert duy nhất, dùng cho việc xử lý song song."""
+               
+def process_single_alert(manager: EnrichmentManager, llm_client: LLMClient, alert: dict, index: int) -> dict | None:
+    """Hàm để xử lý một alert duy nhất, bao gồm làm giàu và phân loại bởi LLM."""
     try:
-        logging.info(f"Bắt đầu xử lý alert #{index}")
-        alert_name = alert.get('rule', {}).get('name', 'N/A')
         
-        final_prompt = manager.enrich_and_prompt(alert)
+        logging.info(f"Worker #{index}: Bắt đầu xử lý alert...")
         
-        logging.info(f"Hoàn thành xử lý alert #{index} - Tên: {alert_name}")
+        # --- ĐO THỜI GIAN ENRICHMENT ---
+        start_enrich = time.monotonic()
+        enriched_prompt_dict  = manager.enrich_and_prompt(alert)
+        end_enrich = time.monotonic()
+        logging.info(f"Worker #{index}: Thời gian làm giàu: {end_enrich - start_enrich:.2f} giây.")  
+        # --------------------------------      
         
-        # === DÒNG SỬA QUAN TRỌNG NHẤT LÀ ĐÂY ===
-        # Phải trả về cả index và prompt
-        return index, final_prompt
+        if not enriched_prompt_dict:
+            logging.warning(f"Worker #{index}: Bỏ qua vì không tạo được prompt.")
+            return None
+        
+        # --- LƯU PROMPT ĐÃ LÀM GIÀU ---                
+        enriched_prompt_output_path = f"{ENRICHED_PROMPTS_DIR}/alert_enrichment_{number}.json"
+        try:
+            # Đảm bảo thư mục tồn tại
+            import os
+            os.makedirs(ENRICHED_PROMPTS_DIR, exist_ok=True)
+            with open(enriched_prompt_output_path, "w", encoding='utf-8') as f_prompt:
+                json.dump(enriched_prompt_dict, f_prompt, indent=2, ensure_ascii=False)
+        except IOError as e:
+            logging.error(f"Worker #{index}: Lỗi khi ghi file prompt trung gian: {e}")
+        
+        prompt_as_json_string = json.dumps(enriched_prompt_dict) 
+         # --- -------------------- ---           
+         
+         
+        test = False
+        if test is True:
+            llm_result = {}
+            if not llm_result:
+                pass
+        else:
+            start_llm = time.monotonic()
+            llm_result = llm_client.get_classification(prompt_as_json_string)
+            end_llm = time.monotonic()
+            logging.info(f"Worker #{index}: Thời gian LLM inference: {end_llm - start_llm:.2f} giây.")
+            if not llm_result:
+                logging.error(f"Worker #{index}: LLM không trả về kết quả hợp lệ.")
+                return None
+    
+        output_record = {
+            "alert_index": index,
+            "original_alert": {
+                "timestamp": alert.get('@timestamp'),
+                "signature": alert.get('rule', {}).get('name', 'N/A'),
+            },
+            "llm_analysis": llm_result
+        }
+        logging.info(f"Worker #{index}: Hoàn thành xử lý.")
+        return output_record
 
-    except Exception:
-        # Khi có lỗi cũng phải trả về 2 giá trị
-        alert_name = alert.get('rule', {}).get('name', 'N/A')
-        logging.error(f"LỖI khi xử lý alert #{index}: {alert_name}", exc_info=True)
-        return index, None
+    except Exception as e:
+        logging.error(f"Worker #{index}: Lỗi không xác định khi xử lý alert.", exc_info=True)
+        return None
 
 def main():
-    """
-    Hàm chính để chạy thử nghiệm toàn bộ luồng làm việc.
-    Đọc các cảnh báo từ một file JSON và xử lý từng cái một.
-    """
-    logging.info("--- BẮT ĐẦU QUÁ TRÌNH LÀM GIÀU HÀNG LOẠT (SONG SONG) ---")
+    logging.info("--- BẮT ĐẦU QUÁ TRÌNH PHÂN TÍCH HÀNG LOẠT ---")
         
-    # Khởi tạo bộ não của hệ thống một lần duy nhất
     manager = EnrichmentManager()
+    llm_client = LLMClient()
     
-    # Đọc và parse file JSON chứa danh sách các alert
+    # Nếu bạn muốn đọc từ file JSON, hãy sử dụng đoạn mã sau:
     try:
         with open(ALERTS_FILE_PATH, 'r', encoding='utf-8') as f:
             alerts_to_process = json.load(f)
-        print(f"Tìm thấy {len(alerts_to_process)} cảnh báo trong file '{ALERTS_FILE_PATH}'.")
-    except FileNotFoundError:
-        print(f"LỖI: Không tìm thấy file '{ALERTS_FILE_PATH}'. Vui lòng tạo file này.")
+        logging.info(f"Đã tải {len(alerts_to_process)} cảnh báo từ '{ALERTS_FILE_PATH}'.")
+    except (FileNotFoundError, json.JSONDecodeError) as e:
+        logging.error(f"Lỗi khi đọc file cảnh báo: {e}")
         return
-    except json.JSONDecodeError:
-        print(f"LỖI: File '{ALERTS_FILE_PATH}' không chứa định dạng JSON hợp lệ.")
-        return  
 
-  # Dùng dictionary để lưu kết quả, giúp dễ dàng sắp xếp lại nếu cần
-    results = {}
-    with ThreadPoolExecutor(max_workers=MAX_WORKERS, thread_name_prefix='Worker') as executor:
-        future_to_alert = {
-            executor.submit(process_single_alert, manager, alert, i): i 
-            for i, alert in enumerate(alerts_to_process, 1)
-        }
-        
-        for future in as_completed(future_to_alert):
-            index, prompt = future.result()
-            if prompt:
-                results[index] = prompt
+    # # Nếu bạn muốn đọc từ file JSONL, hãy sử dụng đoạn mã sau:
+    # alerts_to_process = []
+    # try:
+    #     with open(ALERTS_FILE_PATH, 'r', encoding='utf-8') as f:
+    #         # Lặp qua từng dòng trong file
+    #         for line in f:
+    #             # Bỏ qua các dòng trống có thể có
+    #             if not line.strip():
+    #                 continue
+    #             try:
+    #                 # Dùng json.loads() để parse từng dòng
+    #                 alert = json.loads(line)
+    #                 alerts_to_process.append(alert)
+    #             except json.JSONDecodeError:
+    #                 logging.warning(f"Bỏ qua dòng JSON không hợp lệ: {line.strip()}")
 
-    logging.info("--- KẾT THÚC QUÁ TRÌNH XỬ LÝ ---")
-    logging.info(f"Đã xử lý và tạo prompt thành công cho {len(results)} / {len(alerts_to_process)} cảnh báo.")
+    #     logging.info(f"Đã tải {len(alerts_to_process)} cảnh báo từ '{ALERTS_FILE_PATH}'.")
+
+    # except FileNotFoundError:
+    #     logging.error(f"Lỗi: Không tìm thấy file cảnh báo '{ALERTS_FILE_PATH}'.")
+    #     return
+
     
-    # === BẮT ĐẦU PHẦN THAY ĐỔI: GHI TẤT CẢ PROMPT RA FILE ===
-    if results:
-        logging.info(f"Bắt đầu ghi {len(results)} prompts ra file '{OUTPUT_FILE_PATH}'...")
-        try:
-            with open(OUTPUT_FILE_PATH, "w", encoding='utf-8') as f:
-                # Sắp xếp các prompt theo đúng thứ tự của alert ban đầu
-                
-                f.write(f"""
-### BỐI CẢNH HỆ THỐNG ###
-BẠN LÀ một mô hình ngôn ngữ lớn được tinh chỉnh cho nhiệm vụ phân tích an ninh mạng.
-VAI TRÒ CỦA BẠN là một chuyên gia phân tích SOC Cấp 2, có nhiệm vụ thẩm định các cảnh báo bằng cách suy luận logic dựa trên bằng chứng được cung cấp.
+    
+    # Khôi phục logic ghi file JSONL
+    os.makedirs(FINAL_ANALYSIS_DIR, exist_ok=True)    
+    with open(FINAL_ANALYSIS_OUTPUT_PATH, "w", encoding='utf-8') as f_out:
+        # Khôi phục logic xử lý song song với ThreadPoolExecutor
+        with ThreadPoolExecutor(max_workers=MAX_WORKERS, thread_name_prefix='Worker') as executor:
+            future_to_index = {
+                executor.submit(process_single_alert, manager, llm_client, alert, i): i 
+                for i, alert in enumerate(alerts_to_process, 1)
+            }
+            
+            processed_count = 0
+            for future in as_completed(future_to_index):
+                result_record = future.result()
+                if result_record:
+                    f_out.write(json.dumps(result_record) + '\n')
+                    processed_count += 1
 
-### YÊU CẦU NHIỆM VỤ ###
-Thực hiện một quy trình phân tích gồm 2 phần: (A) SUY LUẬN TỪNG BƯỚC và (B) KẾT LUẬN CUỐI CÙNG.
-
-#### (A) SUY LUẬN TỪNG BƯỚC (CHAIN OF THOUGHT):
-Hãy viết ra quá trình suy nghĩ của bạn theo các bước sau để đi đến kết luận:
-1.  **Phân tích Cảnh báo gốc:** Ý nghĩa của signature "ETPRO TROJAN Win32/Dridex SSL Certificate Observed" là gì?
-2.  **Đánh giá Bằng chứng Sơ cấp:** Thông tin từ `ssl.log` (subject, issuer, validation_status) cho thấy điều gì bất thường? Gợi ý hệ thống về JA3 hash có ý nghĩa gì?
-3.  **Đối chiếu với Bằng chứng Thứ cấp:** Thông tin từ `dns.log` có xác nhận hay mâu thuẫn với bằng chứng sơ cấp không?
-4.  **Phân tích Bằng chứng Phủ định:** Sự vắng mặt của log HTTP có ý nghĩa gì trong bối cảnh một kết nối SSL đáng ngờ?
-5.  **Tổng hợp Suy luận:** Liên kết tất cả các điểm trên lại. Mức độ trùng khớp và tin cậy của các bằng chứng là cao hay thấp? Tại sao?
-
-#### (B) KẾT LUẬN CUỐI CÙNG:
-Dựa trên quá trình suy luận ở trên, hãy cung cấp kết luận theo định dạng JSON nghiêm ngặt sau đây. Không thêm bất kỳ văn bản nào khác.
-
-{
-  "classification": "...",
-  "reasoning_summary": "..."
-}
-
-### DỮ LIỆU ĐẦU VÀO ###
-Dưới đây là một bộ dữ liệu đã được thu thập và tiền xử lý, bao gồm cảnh báo gốc và các bằng chứng liên quan
-""")
-                for i in sorted(results.keys()):
-                    prompt = results[i]
-                    f.write(f"========================= PROMPT CHO ALERT #{i} =========================\n\n")
-                    f.write(prompt)
-                    f.write("\n\n\n") # Thêm khoảng trắng để dễ đọc
-            logging.info(f"Đã ghi thành công tất cả prompts vào file '{OUTPUT_FILE_PATH}'")
-        except Exception as e:
-            logging.error(f"Không thể ghi file output: {e}", exc_info=True)
-    # === KẾT THÚC PHẦN THAY ĐỔI ===
+    logging.info(f"--- KẾT THÚC QUÁ TRÌNH ---")
+    logging.info(f"Đã xử lý và ghi ra file thành công {processed_count} / {len(alerts_to_process)} bản ghi.")
 
 
 if __name__ == "__main__":

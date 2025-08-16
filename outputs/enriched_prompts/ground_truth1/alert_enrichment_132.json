@@ -1,0 +1,71 @@
+{
+  "alert": {
+    "signature": "ET USER_AGENTS Observed Suspicious UA (NSIS_Inetc (Mozilla))",
+    "category": "Potentially Bad Traffic",
+    "timestamp": "2025-05-24T10:03:45.088Z"
+  },
+  "connection": {
+    "identity": {
+      "source_ip": "10.0.0.45",
+      "source_port": "56590",
+      "destination_ip": "83.145.109.178",
+      "destination_port": "80",
+      "traffic_direction": "Egress",
+      "service": "http",
+      "transport_protocol": "tcp"
+    },
+    "statistics": {
+      "duration_sec": 0.0002,
+      "sent_bytes": 192,
+      "received_bytes": 282
+    },
+    "analysis": {
+      "connection_state": "Normal Connection (SF)",
+      "history_analysis": {
+        "label": "Normal Full Connection",
+        "summary": "A standard TCP session...",
+        "severity": "Informational"
+      },
+      "flow_analysis": {
+        "direction": "Symmetrical"
+      }
+    }
+  },
+  "evidence": {
+    "high": {
+      "http": {
+        "analysis": {
+          "user_agent_category": "Normal Browser",
+          "destination_analysis": "Domain Name Connection",
+          "transfer_volume": "Normal",
+          "content_risk": "Suspicious Content Detected",
+          "file_transfer_risk": "No File Transfer"
+        },
+        "evidence": {
+          "connection_context": {
+            "methods_used": [
+              "GET"
+            ],
+            "user_agent_string": "NSIS_Inetc (Mozilla)"
+          },
+          "findings": [
+            {
+              "type": "Content Finding",
+              "source": "uri",
+              "content": "/dockbundle/bundle.php?C=id346fc4105910b4c9124b00006167853e&tag=",
+              "reasons": [
+                "Hex-based Key"
+              ]
+            }
+          ]
+        },
+        "statistics": {
+          "total_requests": 1,
+          "request_bytes": 0,
+          "response_bytes": 0,
+          "client_error_ratio": 0.0
+        }
+      }
+    }
+  }
+}

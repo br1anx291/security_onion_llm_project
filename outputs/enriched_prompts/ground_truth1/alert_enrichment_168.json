@@ -1,0 +1,66 @@
+{
+  "alert": {
+    "signature": "ET INFO Session Traversal Utilities for NAT (STUN Binding Request On Non-Standard High Port)",
+    "category": "Misc activity",
+    "timestamp": "2025-05-25T09:32:04.059Z"
+  },
+  "connection": {
+    "identity": {
+      "source_ip": "192.168.10.16",
+      "source_port": "50984",
+      "destination_ip": "159.203.79.231",
+      "destination_port": "5001",
+      "traffic_direction": "Egress",
+      "service": "dtls",
+      "transport_protocol": "udp"
+    },
+    "statistics": {
+      "duration_sec": 0.5449,
+      "sent_bytes": 3324,
+      "received_bytes": 2872
+    },
+    "analysis": {
+      "connection_state": "Normal Connection (SF)",
+      "history_analysis": {
+        "label": "Unrecognized Pattern",
+        "summary": "Requires manual review: 'Dd'.",
+        "severity": "Informational"
+      },
+      "flow_analysis": {
+        "direction": "Symmetrical"
+      }
+    }
+  },
+  "evidence": {
+    "reference": {
+      "ssl": {
+        "identity": {
+          "server_name": null
+        },
+        "analysis": {
+          "server_reputation": "Unknown",
+          "certificate_status": "Trusted",
+          "encryption_strength": "Strong (Using DTLSv12)",
+          "ja3_threat_match": "JA3 Not in Watchlist",
+          "ja3s_threat_match": "JA3S Not in Watchlist",
+          "handshake_status": "Successful"
+        },
+        "statistics": {
+          "connection_duration_sec": 0.0
+        },
+        "evidence": {
+          "ja3_hash": "af24fac9b1dfd36bd06c721892914509",
+          "ja3s_hash": "34737d35536edf6c19f37e58793bd0a5",
+          "tls_version": "DTLSv12",
+          "tls_cipher": "TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256",
+          "raw_validation_statuses": [
+            "self signed certificate"
+          ],
+          "certificate_chain_fingerprints": [
+            "47fa81112a2693977fafb1d0ad360190c0f368074216f028d71654a9ce60be07"
+          ]
+        }
+      }
+    }
+  }
+}

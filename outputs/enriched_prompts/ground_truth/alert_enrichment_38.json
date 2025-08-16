@@ -1,0 +1,94 @@
+{
+  "alert": {
+    "signature": "ET USER_AGENTS Microsoft Device Metadata Retrieval Client User-Agent",
+    "category": "Misc activity",
+    "timestamp": "2025-05-25T09:51:12.141Z"
+  },
+  "connection": {
+    "identity": {
+      "source_ip": "192.168.10.14",
+      "source_port": "49488",
+      "destination_ip": "40.112.213.22",
+      "destination_port": "80",
+      "traffic_direction": "Egress",
+      "service": "http",
+      "transport_protocol": "tcp"
+    },
+    "statistics": {
+      "duration_sec": 1.2837,
+      "sent_bytes": 3828,
+      "received_bytes": 4276
+    },
+    "analysis": {
+      "connection_state": "Reset by Responder (RSTR)",
+      "history_analysis": {
+        "label": "Unrecognized Pattern",
+        "summary": "Requires manual review: 'ShADagGr'.",
+        "severity": "Informational"
+      },
+      "flow_analysis": {
+        "direction": "Symmetrical"
+      }
+    }
+  },
+  "evidence": {
+    "reference": {
+      "http": {
+        "analysis": {
+          "user_agent_category": "Normal Browser",
+          "destination_analysis": "Domain Name Connection",
+          "transfer_volume": "Normal",
+          "content_risk": "No Suspicious Content",
+          "file_transfer_risk": "Benign Upload Detected"
+        },
+        "evidence": {
+          "connection_context": {
+            "methods_used": [
+              "POST"
+            ],
+            "user_agent_string": "MICROSOFT_DEVICE_METADATA_RETRIEVAL_CLIENT"
+          },
+          "findings": []
+        },
+        "statistics": {
+          "total_requests": 2,
+          "request_bytes": 1242,
+          "response_bytes": 0,
+          "client_error_ratio": 0.0
+        }
+      },
+      "files": {
+        "analysis": {
+          "session_risk_summary": "No suspicious file activity detected",
+          "highest_threat_level": "Informational",
+          "evasion_techniques_detected": "No",
+          "suspicious_content_summary": "No suspicious content identified."
+        },
+        "statistics": {
+          "total_files_analyzed": 1,
+          "suspicious_files_count": 0,
+          "total_bytes_transferred_kb": 1.21
+        },
+        "evidence": {
+          "findings": [
+            {
+              "type": "FileAnalysisFinding",
+              "fuid": "F5RaHI12UQEZ7fHV0c",
+              "filename": null,
+              "direction": "Upload",
+              "severity": "Informational",
+              "risk_score": 5,
+              "size_bytes": 1242,
+              "reasons": [],
+              "hashes": {
+                "md5": "ae721c7462a876bc2d94ef939fb75ed3",
+                "sha1": "16410d3f32d7ae5cd939d88e4a169eb2d6439852"
+              },
+              "file_type_reported": "application/xml"
+            }
+          ]
+        }
+      }
+    }
+  }
+}

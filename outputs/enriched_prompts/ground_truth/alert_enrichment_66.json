@@ -1,0 +1,63 @@
+{
+  "alert": {
+    "signature": "ET INFO Python-urllib/ Suspicious User Agent",
+    "category": "Attempted Information Leak",
+    "timestamp": "2025-05-25T09:55:49.481Z"
+  },
+  "connection": {
+    "identity": {
+      "source_ip": "192.168.10.25",
+      "source_port": "51031",
+      "destination_ip": "151.101.0.223",
+      "destination_port": "80",
+      "traffic_direction": "Egress",
+      "service": "http",
+      "transport_protocol": "tcp"
+    },
+    "statistics": {
+      "duration_sec": 0.0004,
+      "sent_bytes": 146,
+      "received_bytes": 422
+    },
+    "analysis": {
+      "connection_state": "Normal Connection (SF)",
+      "history_analysis": {
+        "label": "Normal Full Connection",
+        "summary": "A standard TCP session...",
+        "severity": "Informational"
+      },
+      "flow_analysis": {
+        "direction": "Symmetrical"
+      }
+    }
+  },
+  "evidence": {
+    "high": {
+      "http": {
+        "analysis": {
+          "user_agent_category": "Scripting/Tool",
+          "destination_analysis": "Domain Name Connection",
+          "transfer_volume": "Normal",
+          "content_risk": "No Suspicious Content",
+          "file_transfer_risk": "No File Transfer"
+        },
+        "evidence": {
+          "connection_context": {
+            "methods_used": [
+              "GET"
+            ],
+            "user_agent_string": "Python-urllib/2.5 setuptools/0.6c7",
+            "agent_matched_keyword": "python"
+          },
+          "findings": []
+        },
+        "statistics": {
+          "total_requests": 1,
+          "request_bytes": 0,
+          "response_bytes": 0,
+          "client_error_ratio": 0.0
+        }
+      }
+    }
+  }
+}

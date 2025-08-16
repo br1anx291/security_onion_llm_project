@@ -1,0 +1,63 @@
+{
+  "alert": {
+    "signature": "ET INFO HTTP Request to a *.tw domain",
+    "category": "Potentially Bad Traffic",
+    "timestamp": "2025-05-25T09:31:06.005Z"
+  },
+  "connection": {
+    "identity": {
+      "source_ip": "192.168.10.51",
+      "source_port": "33982",
+      "destination_ip": "104.27.32.64",
+      "destination_port": "80",
+      "traffic_direction": "Egress",
+      "service": "http",
+      "transport_protocol": "tcp"
+    },
+    "statistics": {
+      "duration_sec": 1.2009,
+      "sent_bytes": 3327,
+      "received_bytes": 106128
+    },
+    "analysis": {
+      "connection_state": "Normal Connection (SF)",
+      "history_analysis": {
+        "label": "Unrecognized Pattern",
+        "summary": "Requires manual review: 'ShADagdgFf'.",
+        "severity": "Informational"
+      },
+      "flow_analysis": {
+        "direction": "download",
+        "ratio": 32
+      }
+    }
+  },
+  "evidence": {
+    "medium": {
+      "http": {
+        "analysis": {
+          "user_agent_category": "Outdated Browser",
+          "destination_analysis": "Domain Name Connection",
+          "transfer_volume": "Normal",
+          "content_risk": "No Suspicious Content",
+          "file_transfer_risk": "No File Transfer"
+        },
+        "evidence": {
+          "connection_context": {
+            "methods_used": [
+              "GET"
+            ],
+            "user_agent_string": "Mozilla/5.0 (X11; Ubuntu; Linux i686; rv:31.0) Gecko/20100101 Firefox/31.0"
+          },
+          "findings": []
+        },
+        "statistics": {
+          "total_requests": 7,
+          "request_bytes": 0,
+          "response_bytes": 0,
+          "client_error_ratio": 0.0
+        }
+      }
+    }
+  }
+}

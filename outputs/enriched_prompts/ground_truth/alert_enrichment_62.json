@@ -1,0 +1,68 @@
+{
+  "alert": {
+    "signature": "ET INFO External IP Lookup Domain (ipify .org) in DNS Lookup",
+    "category": "Misc activity",
+    "timestamp": "2025-06-05T11:54:01.836Z"
+  },
+  "connection": {
+    "identity": {
+      "source_ip": "192.168.10.5",
+      "source_port": "50280",
+      "destination_ip": "192.168.10.3",
+      "destination_port": "53",
+      "traffic_direction": "Lateral",
+      "service": "dns",
+      "transport_protocol": "udp"
+    },
+    "statistics": {
+      "duration_sec": 0.0023,
+      "sent_bytes": 124,
+      "received_bytes": 450
+    },
+    "analysis": {
+      "connection_state": "Normal Connection (SF)",
+      "history_analysis": {
+        "label": "Unrecognized Pattern",
+        "summary": "Requires manual review: 'Dd'.",
+        "severity": "Informational"
+      },
+      "flow_analysis": {
+        "direction": "Symmetrical"
+      }
+    }
+  },
+  "evidence": {
+    "low": {
+      "dns": {
+        "analysis": {
+          "query_pattern": "Normal Patterns",
+          "query_integrity": "Normal",
+          "tld_risk": "Normal TLDs",
+          "ttl_behavior": "Low TTL Detected"
+        },
+        "evidence": {
+          "connection_context": {
+            "source_ip": "192.168.10.5",
+            "destination_dns_server": "192.168.10.3"
+          },
+          "findings": [
+            {
+              "type": "AttributeFinding",
+              "source": "answer_record",
+              "content": 1,
+              "reasons": [
+                "Low TTL (1 < 60)"
+              ]
+            }
+          ]
+        },
+        "statistics": {
+          "total_queries": 4,
+          "distinct_queries": 1,
+          "failed_queries_ratio": 0.0,
+          "distinct_answers": 8
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,63 @@
+{
+  "alert": {
+    "signature": "ET JA3 Hash - [Abuse.ch] Possible Adware",
+    "category": "Unknown Traffic",
+    "timestamp": "2025-06-05T11:54:50.736Z"
+  },
+  "connection": {
+    "identity": {
+      "source_ip": "192.168.10.5",
+      "source_port": "56802",
+      "destination_ip": "54.88.128.0",
+      "destination_port": "443",
+      "traffic_direction": "Egress",
+      "service": "ssl",
+      "transport_protocol": "tcp"
+    },
+    "statistics": {
+      "duration_sec": 0.1387,
+      "sent_bytes": 770,
+      "received_bytes": 5216
+    },
+    "analysis": {
+      "connection_state": "Normal Connection (SF)",
+      "history_analysis": {
+        "label": "Unrecognized Pattern",
+        "summary": "Requires manual review: 'ShADadgFfR'.",
+        "severity": "Informational"
+      },
+      "flow_analysis": {
+        "direction": "download",
+        "ratio": 7
+      }
+    }
+  },
+  "evidence": {
+    "low": {
+      "ssl": {
+        "identity": {
+          "server_name": "arrassley.info"
+        },
+        "analysis": {
+          "server_reputation": "Unknown Reputation",
+          "certificate_status": "Trusted",
+          "encryption_strength": "Strong (Using None)",
+          "ja3_threat_match": "JA3 Not in Watchlist",
+          "ja3s_threat_match": "JA3S Not in Watchlist",
+          "handshake_status": "Failed"
+        },
+        "statistics": {
+          "connection_duration_sec": 0.0
+        },
+        "evidence": {
+          "ja3_hash": "29085f03f8e8a03f0b399c5c7cf0b0b8",
+          "ja3s_hash": null,
+          "tls_version": null,
+          "tls_cipher": null,
+          "raw_validation_statuses": [],
+          "certificate_chain_fingerprints": null
+        }
+      }
+    }
+  }
+}

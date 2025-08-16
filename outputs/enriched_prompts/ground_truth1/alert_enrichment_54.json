@@ -1,0 +1,109 @@
+{
+  "alert": {
+    "signature": "ET MALWARE Zbot POST Request to C2",
+    "category": "Malware Command and Control Activity Detected",
+    "timestamp": "2025-04-22T08:56:00.769Z"
+  },
+  "connection": {
+    "identity": {
+      "source_ip": "192.168.3.25",
+      "source_port": "1053",
+      "destination_ip": "89.187.51.0",
+      "destination_port": "80",
+      "traffic_direction": "Egress",
+      "service": "http",
+      "transport_protocol": "tcp"
+    },
+    "statistics": {
+      "duration_sec": 0.0019,
+      "sent_bytes": 458,
+      "received_bytes": 285
+    },
+    "analysis": {
+      "connection_state": "Normal Connection (SF)",
+      "history_analysis": {
+        "label": "Normal Full Connection",
+        "summary": "A standard TCP session...",
+        "severity": "Informational"
+      },
+      "flow_analysis": {
+        "direction": "Symmetrical"
+      }
+    }
+  },
+  "evidence": {
+    "medium": {
+      "http": {
+        "analysis": {
+          "user_agent_category": "Outdated Browser",
+          "destination_analysis": "Domain Name Connection",
+          "transfer_volume": "Normal",
+          "content_risk": "No Suspicious Content",
+          "file_transfer_risk": "Benign Upload and Benign Download Detected"
+        },
+        "evidence": {
+          "connection_context": {
+            "methods_used": [
+              "POST"
+            ],
+            "user_agent_string": "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1)"
+          },
+          "findings": []
+        },
+        "statistics": {
+          "total_requests": 1,
+          "request_bytes": 265,
+          "response_bytes": 93,
+          "client_error_ratio": 0.0
+        }
+      }
+    },
+    "reference": {
+      "files": {
+        "analysis": {
+          "session_risk_summary": "No suspicious file activity detected",
+          "highest_threat_level": "Informational",
+          "evasion_techniques_detected": "No",
+          "suspicious_content_summary": "No suspicious content identified."
+        },
+        "statistics": {
+          "total_files_analyzed": 2,
+          "suspicious_files_count": 0,
+          "total_bytes_transferred_kb": 0.35
+        },
+        "evidence": {
+          "findings": [
+            {
+              "type": "FileAnalysisFinding",
+              "fuid": "FkKZ0Z3iOoPhF7RS0a",
+              "filename": null,
+              "direction": "Upload",
+              "severity": "Informational",
+              "risk_score": 5,
+              "size_bytes": 265,
+              "reasons": [],
+              "hashes": {
+                "md5": "83116a6d93ca25b93faf34ded2f959a8",
+                "sha1": "9284e0a817de790e9f4f4c8f4dfdc0ca8bc6233a"
+              }
+            },
+            {
+              "type": "FileAnalysisFinding",
+              "fuid": "F2UZwJ2Xvav89bSOl7",
+              "filename": null,
+              "direction": "Download",
+              "severity": "Informational",
+              "risk_score": 5,
+              "size_bytes": 93,
+              "reasons": [],
+              "hashes": {
+                "md5": "d36beaeb3e1c55838395a62afb4efb5d",
+                "sha1": "448a2d34cfb7d101b3072df7eb6fef11e41c83bc"
+              }
+            }
+          ]
+        }
+      }
+    }
+  }
+}

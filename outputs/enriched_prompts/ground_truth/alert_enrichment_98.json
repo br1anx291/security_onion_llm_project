@@ -1,0 +1,69 @@
+{
+  "alert": {
+    "signature": "ET INFO Dropbox.com Offsite File Backup in Use",
+    "category": "Potential Corporate Privacy Violation",
+    "timestamp": "2025-05-24T07:21:17.480Z"
+  },
+  "connection": {
+    "identity": {
+      "source_ip": "10.0.0.45",
+      "source_port": "50470",
+      "destination_ip": "108.160.162.112",
+      "destination_port": "443",
+      "traffic_direction": "Egress",
+      "service": "ssl",
+      "transport_protocol": "tcp"
+    },
+    "statistics": {
+      "duration_sec": 0.0102,
+      "sent_bytes": 594,
+      "received_bytes": 4187
+    },
+    "analysis": {
+      "connection_state": "Reset by Originator (RSTO)",
+      "history_analysis": {
+        "label": "Unrecognized Pattern",
+        "summary": "Requires manual review: 'ShADadR'.",
+        "severity": "Informational"
+      },
+      "flow_analysis": {
+        "direction": "download",
+        "ratio": 7
+      }
+    }
+  },
+  "evidence": {
+    "high": {
+      "ssl": {
+        "identity": {
+          "server_name": "notify2.dropbox.com"
+        },
+        "analysis": {
+          "server_reputation": "Unknown Reputation",
+          "certificate_status": "Invalid (Expired Certificate)",
+          "encryption_strength": "Weak (Outdated Protocol: TLSv10)",
+          "ja3_threat_match": "JA3 Not in Watchlist",
+          "ja3s_threat_match": "JA3S Not in Watchlist",
+          "handshake_status": "Successful"
+        },
+        "statistics": {
+          "connection_duration_sec": 0.0
+        },
+        "evidence": {
+          "ja3_hash": "482a11a20da1629b77aaadf640478d13",
+          "ja3s_hash": "bcf3a836c82d12ee988005fb0c011445",
+          "tls_version": "TLSv10",
+          "tls_cipher": "TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA",
+          "raw_validation_statuses": [
+            "certificate has expired"
+          ],
+          "certificate_chain_fingerprints": [
+            "bdca9a1aa7519037fa354003f724bb52eecd05238c3649626228654a0f1fb01d",
+            "973a41276ffd01e027a2aad49e34c37846d3e976ff6a620b6712e33832041aa6",
+            "3a2fbe92891e57fe05d57087f48e730f17e5a5f53ef403d618e5b74d7a7e6ecb"
+          ]
+        }
+      }
+    }
+  }
+}

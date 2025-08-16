@@ -1,0 +1,34 @@
+{
+  "alert": {
+    "signature": "ET DNS Query for .cc TLD",
+    "category": "Potentially Bad Traffic",
+    "timestamp": "2025-06-05T11:56:08.479Z"
+  },
+  "connection": {
+    "identity": {
+      "source_ip": "192.168.10.9",
+      "source_port": "60033",
+      "destination_ip": "192.168.10.3",
+      "destination_port": "53",
+      "traffic_direction": "Lateral",
+      "service": "dns",
+      "transport_protocol": "udp"
+    },
+    "statistics": {
+      "duration_sec": 0.0032,
+      "sent_bytes": 66,
+      "received_bytes": 264
+    },
+    "analysis": {
+      "connection_state": "Normal Connection (SF)",
+      "history_analysis": {
+        "label": "Unrecognized Pattern",
+        "summary": "Requires manual review: 'Dd'.",
+        "severity": "Informational"
+      },
+      "flow_analysis": {
+        "direction": "Symmetrical"
+      }
+    }
+  }
+}

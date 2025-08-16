@@ -1,0 +1,112 @@
+{
+  "alert": {
+    "signature": "ET INFO Outdated Flash Version M1",
+    "category": "Potential Corporate Privacy Violation",
+    "timestamp": "2025-05-24T07:23:55.262Z"
+  },
+  "connection": {
+    "identity": {
+      "source_ip": "10.0.0.45",
+      "source_port": "57880",
+      "destination_ip": "216.58.210.134",
+      "destination_port": "80",
+      "traffic_direction": "Egress",
+      "service": "http",
+      "transport_protocol": "tcp"
+    },
+    "statistics": {
+      "duration_sec": 0.0895,
+      "sent_bytes": 987,
+      "received_bytes": 78962
+    },
+    "analysis": {
+      "connection_state": "Reset by Originator (RSTO)",
+      "history_analysis": {
+        "label": "Unrecognized Pattern",
+        "summary": "Requires manual review: 'ShADadR'.",
+        "severity": "Informational"
+      },
+      "flow_analysis": {
+        "direction": "download",
+        "ratio": 80
+      }
+    }
+  },
+  "evidence": {
+    "medium": {
+      "http": {
+        "analysis": {
+          "user_agent_category": "Outdated Browser",
+          "destination_analysis": "Domain Name Connection",
+          "transfer_volume": "Normal",
+          "content_risk": "No Suspicious Content",
+          "file_transfer_risk": "Benign Download Detected"
+        },
+        "evidence": {
+          "connection_context": {
+            "methods_used": [
+              "GET"
+            ],
+            "user_agent_string": "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.1; Trident/4.0; SLCC2; .NET CLR 2.0.50727; Media Center PC 6.0; .NET4.0C; .NET4.0E)"
+          },
+          "findings": []
+        },
+        "statistics": {
+          "total_requests": 2,
+          "request_bytes": 0,
+          "response_bytes": 146652,
+          "client_error_ratio": 0.0
+        }
+      }
+    },
+    "reference": {
+      "files": {
+        "analysis": {
+          "session_risk_summary": "No suspicious file activity detected",
+          "highest_threat_level": "Informational",
+          "evasion_techniques_detected": "No",
+          "suspicious_content_summary": "No suspicious content identified."
+        },
+        "statistics": {
+          "total_files_analyzed": 2,
+          "suspicious_files_count": 0,
+          "total_bytes_transferred_kb": 143.21
+        },
+        "evidence": {
+          "findings": [
+            {
+              "type": "FileAnalysisFinding",
+              "fuid": "FK0oqm16ly3qtBuXSb",
+              "filename": null,
+              "direction": "Download",
+              "severity": "Informational",
+              "risk_score": 5,
+              "size_bytes": 104677,
+              "reasons": [],
+              "hashes": {
+                "md5": "2f1502929e6ab2b8f7d11fe52a4fda65",
+                "sha1": "48210d91f02e48915a97bda8dac18b35ab5012df"
+              },
+              "file_type_reported": "application/javascript"
+            },
+            {
+              "type": "FileAnalysisFinding",
+              "fuid": "FXjDWa1sRi76Xc7Hr",
+              "filename": null,
+              "direction": "Download",
+              "severity": "Informational",
+              "risk_score": 5,
+              "size_bytes": 41975,
+              "reasons": [],
+              "hashes": {
+                "md5": "99a2714869431d3d43c1b1960d463404",
+                "sha1": "85720fa94c66197aa94cd2ac2e2a4a4cac3612df"
+              },
+              "file_type_reported": "application/x-shockwave-flash"
+            }
+          ]
+        }
+      }
+    }
+  }
+}

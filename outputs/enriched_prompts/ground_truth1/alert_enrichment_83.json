@@ -1,0 +1,63 @@
+{
+  "alert": {
+    "signature": "ET INFO External IP Address Lookup Domain (ipify .org) in TLS SNI",
+    "category": "Misc activity",
+    "timestamp": "2025-05-25T06:34:41.415Z"
+  },
+  "connection": {
+    "identity": {
+      "source_ip": "192.168.10.9",
+      "source_port": "4107",
+      "destination_ip": "54.235.148.27",
+      "destination_port": "443",
+      "traffic_direction": "Egress",
+      "service": "ssl",
+      "transport_protocol": "tcp"
+    },
+    "statistics": {
+      "duration_sec": 3.3456,
+      "sent_bytes": 657,
+      "received_bytes": 3726
+    },
+    "analysis": {
+      "connection_state": "Normal Connection (SF)",
+      "history_analysis": {
+        "label": "Unrecognized Pattern",
+        "summary": "Requires manual review: 'ShADagdTfF'.",
+        "severity": "Informational"
+      },
+      "flow_analysis": {
+        "direction": "download",
+        "ratio": 6
+      }
+    }
+  },
+  "evidence": {
+    "low": {
+      "ssl": {
+        "identity": {
+          "server_name": "api.ipify.org"
+        },
+        "analysis": {
+          "server_reputation": "Likely Benign Infrastructure",
+          "certificate_status": "Trusted",
+          "encryption_strength": "Strong (Using None)",
+          "ja3_threat_match": "JA3 Not in Watchlist",
+          "ja3s_threat_match": "JA3S Not in Watchlist",
+          "handshake_status": "Failed"
+        },
+        "statistics": {
+          "connection_duration_sec": 0.0
+        },
+        "evidence": {
+          "ja3_hash": "0ffee3ba8e615ad22535e7f771690a28",
+          "ja3s_hash": null,
+          "tls_version": null,
+          "tls_cipher": null,
+          "raw_validation_statuses": [],
+          "certificate_chain_fingerprints": null
+        }
+      }
+    }
+  }
+}
