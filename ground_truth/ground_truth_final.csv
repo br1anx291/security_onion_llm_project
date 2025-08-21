@@ -1,0 +1,201 @@
+timestamp,alert_name,category,severity,source_ip,source_port,destination_ip,destination_port,transport,original_label,classification_label
+2025-05-25T09:57:23.721Z,ET SCAN Suspicious inbound to mySQL port 3306,Potentially Bad Traffic,2,172.16.0.1,55191,192.168.10.50,3306,TCP,PortScan,TP
+2025-06-05T11:55:30.707Z,ET INFO Session Traversal Utilities for NAT (STUN Binding Request),Misc activity,3,192.168.10.5,54760,192.225.158.2,3478,UDP,BENIGN,FP
+2025-06-05T11:49:57.158Z,ET INFO Session Traversal Utilities for NAT (STUN Binding Request),Misc activity,3,192.168.10.17,37078,54.172.47.69,3478,UDP,BENIGN,FP
+2025-05-25T09:37:35.494Z,ET MALWARE Spoofed MSIE 7 User-Agent Likely Ponmocup,A Network Trojan was detected,1,172.16.0.1,58604,192.168.10.50,80,TCP,"DDoS, DoS Hulk, DoS slowloris, Web Attack - XSS",TP
+2025-05-25T09:57:23.540Z,ET SCAN Suspicious inbound to MSSQL port 1433,Potentially Bad Traffic,2,172.16.0.1,45371,192.168.10.50,1433,TCP,PortScan,TP
+2025-05-25T09:57:50.728Z,ET SCAN Suspicious inbound to MSSQL port 1433,Potentially Bad Traffic,2,172.16.0.1,36114,192.168.10.50,1433,TCP,PortScan,TP
+2025-05-25T09:06:44.753Z,ET SCAN Potential SSH Scan OUTBOUND,Attempted Information Leak,2,172.16.0.1,48678,192.168.10.50,22,TCP,SSH-Patator,TP
+2025-05-25T09:28:19.040Z,ET MALWARE Spoofed MSIE 7 User-Agent Likely Ponmocup,A Network Trojan was detected,1,172.16.0.1,43802,192.168.10.50,80,TCP,"DoS GoldenEye, DoS Hulk",TP
+2025-05-25T09:06:26.728Z,ET SCAN Potential SSH Scan OUTBOUND,Attempted Information Leak,2,172.16.0.1,46470,192.168.10.50,22,TCP,SSH-Patator,TP
+2025-06-05T11:55:24.910Z,ET JA3 Hash - [Abuse.ch] Possible Adware,Unknown Traffic,3,192.168.10.5,62886,206.126.112.143,443,TCP,BENIGN,FP
+2025-05-25T09:06:51.639Z,ET SCAN Potential SSH Scan OUTBOUND,Attempted Information Leak,2,172.16.0.1,49482,192.168.10.50,22,TCP,SSH-Patator,TP
+2025-05-25T09:06:48.572Z,ET SCAN Potential SSH Scan OUTBOUND,Attempted Information Leak,2,172.16.0.1,49188,192.168.10.50,22,TCP,SSH-Patator,TP
+2025-05-25T09:27:29.694Z,ET MALWARE Spoofed MSIE 7 User-Agent Likely Ponmocup,A Network Trojan was detected,1,172.16.0.1,48384,192.168.10.50,80,TCP,DoS Hulk,TP
+2025-05-25T09:57:24.975Z,ET SCAN Potential SSH Scan OUTBOUND,Attempted Information Leak,2,172.16.0.1,64231,192.168.10.50,22,TCP,PortScan,TP
+2025-05-25T09:26:54.649Z,ET MALWARE Spoofed MSIE 7 User-Agent Likely Ponmocup,A Network Trojan was detected,1,172.16.0.1,34746,192.168.10.50,80,TCP,"DDoS, DoS GoldenEye, DoS Hulk, DoS Slowhttptest",TP
+2025-05-25T09:27:03.373Z,ET MALWARE Spoofed MSIE 7 User-Agent Likely Ponmocup,A Network Trojan was detected,1,172.16.0.1,37252,192.168.10.50,80,TCP,"DDoS, DoS GoldenEye, DoS Hulk, DoS Slowhttptest",TP
+2025-05-25T09:06:57.478Z,ET SCAN Potential SSH Scan OUTBOUND,Attempted Information Leak,2,172.16.0.1,50498,192.168.10.50,22,TCP,SSH-Patator,TP
+2025-05-25T09:27:34.139Z,ET MALWARE Spoofed MSIE 7 User-Agent Likely Ponmocup,A Network Trojan was detected,1,172.16.0.1,55032,192.168.10.50,80,TCP,"DDoS, DoS Hulk, DoS slowloris",TP
+2025-05-25T09:57:48.913Z,ET SCAN Suspicious inbound to MSSQL port 1433,Potentially Bad Traffic,2,172.16.0.1,46785,192.168.10.50,1433,TCP,PortScan,TP
+2025-05-25T09:06:49.796Z,ET SCAN Potential SSH Scan OUTBOUND,Attempted Information Leak,2,172.16.0.1,49300,192.168.10.50,22,TCP,SSH-Patator,TP
+2025-05-25T09:57:34.703Z,ET SCAN Suspicious inbound to Oracle SQL port 1521,Potentially Bad Traffic,2,172.16.0.1,56318,192.168.10.50,1521,TCP,PortScan,TP
+2025-07-02T02:29:20.903Z,GPL NETBIOS SMB IPC$ unicode share access,Generic Protocol Command Decode,3,192.168.10.25,53545,192.168.10.19,139,TCP,BENIGN,FP
+2025-05-25T09:26:54.478Z,ET MALWARE Spoofed MSIE 7 User-Agent Likely Ponmocup,A Network Trojan was detected,1,172.16.0.1,33920,192.168.10.50,80,TCP,"DDoS, DoS GoldenEye, DoS Hulk, DoS Slowhttptest, Web Attack - Brute Force",TP
+2025-05-25T09:57:34.518Z,ET SCAN Suspicious inbound to PostgreSQL port 5432,Potentially Bad Traffic,2,172.16.0.1,45830,192.168.10.50,5432,TCP,PortScan,TP
+2025-05-25T09:06:40.958Z,ET SCAN Potential SSH Scan OUTBOUND,Attempted Information Leak,2,172.16.0.1,48190,192.168.10.50,22,TCP,SSH-Patator,TP
+2025-05-25T09:06:45.119Z,ET SCAN Potential SSH Scan OUTBOUND,Attempted Information Leak,2,172.16.0.1,48734,192.168.10.50,22,TCP,SSH-Patator,TP
+2025-05-25T09:57:23.783Z,ET SCAN Suspicious inbound to PostgreSQL port 5432,Potentially Bad Traffic,2,172.16.0.1,55191,192.168.10.50,5432,TCP,PortScan,TP
+2025-05-25T09:06:40.088Z,ET SCAN Potential SSH Scan OUTBOUND,Attempted Information Leak,2,172.16.0.1,48074,192.168.10.50,22,TCP,SSH-Patator,TP
+2025-05-25T09:57:32.806Z,ET SCAN Suspicious inbound to PostgreSQL port 5432,Potentially Bad Traffic,2,172.16.0.1,53610,192.168.10.50,5432,TCP,PortScan,TP
+2025-07-02T02:33:55.447Z,ET WEB_SERVER Script tag in URI Possible Cross Site Scripting Attempt,Web Application Attack,1,172.16.0.1,56994,192.168.10.50,80,TCP,"DDoS, DoS Hulk, DoS slowloris, Web Attack - XSS",TP
+2025-05-25T06:30:38.316Z,ET INFO Suspicious Domain (polyfill .io) in TLS SNI,Potentially Bad Traffic,2,192.168.10.5,49424,151.101.22.109,443,TCP,BENIGN,FP
+2025-06-05T11:54:39.344Z,ET JA3 Hash - [Abuse.ch] Possible Adware,Unknown Traffic,3,192.168.10.5,56083,173.241.242.220,443,TCP,BENIGN,FP
+2025-05-25T09:07:07.268Z,ET SCAN Potential SSH Scan OUTBOUND,Attempted Information Leak,2,172.16.0.1,52066,192.168.10.50,22,TCP,SSH-Patator,TP
+2025-05-25T09:57:24.929Z,ET SCAN Behavioral Unusually fast Terminal Server Traffic Potential Scan or Infection (Outbound),Misc activity,3,172.16.0.1,39070,192.168.10.50,3389,TCP,PortScan,TP
+2025-05-25T09:27:27.509Z,ET MALWARE Spoofed MSIE 7 User-Agent Likely Ponmocup,A Network Trojan was detected,1,172.16.0.1,43552,192.168.10.50,80,TCP,DoS Hulk,TP
+2025-05-25T09:57:26.343Z,ET SCAN Potential SSH Scan OUTBOUND,Attempted Information Leak,2,172.16.0.1,54966,192.168.10.50,22,TCP,PortScan,TP
+2025-05-25T09:27:27.684Z,ET MALWARE Spoofed MSIE 7 User-Agent Likely Ponmocup,A Network Trojan was detected,1,172.16.0.1,39936,192.168.10.50,80,TCP,"DDoS, DoS GoldenEye, DoS Hulk",TP
+2025-05-25T09:06:59.859Z,ET SCAN Potential SSH Scan OUTBOUND,Attempted Information Leak,2,172.16.0.1,50982,192.168.10.50,22,TCP,SSH-Patator,TP
+2025-05-25T09:38:03.572Z,ET MALWARE Spoofed MSIE 7 User-Agent Likely Ponmocup,A Network Trojan was detected,1,172.16.0.1,55710,192.168.10.50,80,TCP,"DDoS, DoS Hulk, DoS slowloris",TP
+2025-05-25T09:56:58.519Z,ET SCAN Potential SSH Scan OUTBOUND,Attempted Information Leak,2,172.16.0.1,42102,192.168.10.50,22,TCP,PortScan,TP
+2025-05-25T09:57:24.480Z,ET SCAN Potential SSH Scan OUTBOUND,Attempted Information Leak,2,172.16.0.1,57689,192.168.10.50,22,TCP,PortScan,TP
+2025-05-25T06:43:18.042Z,ET WEB_SERVER Script tag in URI Possible Cross Site Scripting Attempt,Web Application Attack,1,172.16.0.1,56306,192.168.10.50,80,TCP,"DDoS, DoS Hulk, DoS slowloris, Web Attack - XSS",TP
+2025-06-05T11:54:09.297Z,ET JA3 Hash - [Abuse.ch] Possible Adware,Unknown Traffic,3,192.168.10.5,53506,162.208.22.34,443,TCP,BENIGN,FP
+2025-05-25T09:55:28.464Z,ET DNS Query for .cc TLD,Potentially Bad Traffic,2,192.168.10.8,63539,192.168.10.3,53,UDP,BENIGN,FP
+2025-05-25T09:57:25.814Z,ET SCAN Rapid IMAP Connections - Possible Brute Force Attack,Misc activity,3,172.16.0.1,62223,192.168.10.50,143,TCP,PortScan,TP
+2025-05-25T09:27:15.985Z,ET MALWARE Spoofed MSIE 7 User-Agent Likely Ponmocup,A Network Trojan was detected,1,172.16.0.1,42302,192.168.10.50,80,TCP,"DDoS, DoS GoldenEye, DoS Hulk",TP
+2025-05-25T08:27:35.430Z,ET INFO Session Traversal Utilities for NAT (STUN Binding Request),Misc activity,3,192.168.10.5,54760,192.225.158.2,3478,UDP,BENIGN,FP
+2025-05-25T09:05:24.666Z,ET INFO Session Traversal Utilities for NAT (STUN Binding Request),Misc activity,3,192.168.10.12,50564,52.23.111.175,3478,UDP,BENIGN,FP
+2025-05-25T09:27:06.215Z,ET MALWARE Spoofed MSIE 7 User-Agent Likely Ponmocup,A Network Trojan was detected,1,172.16.0.1,41166,192.168.10.50,80,TCP,"DDoS, DoS GoldenEye, DoS Hulk",TP
+2025-05-25T09:57:25.640Z,ET SCAN Rapid POP3S Connections - Possible Brute Force Attack,Misc activity,3,172.16.0.1,34110,192.168.10.50,995,TCP,PortScan,TP
+2025-05-25T09:57:23.816Z,ET SCAN Suspicious inbound to mySQL port 3306,Potentially Bad Traffic,2,172.16.0.1,42784,192.168.10.50,3306,TCP,PortScan,TP
+2025-07-02T02:23:52.516Z,ET WEB_SERVER Script tag in URI Possible Cross Site Scripting Attempt,Web Application Attack,1,172.16.0.1,55632,192.168.10.50,80,TCP,"DDoS, DoS Hulk, DoS slowloris, Web Attack - XSS",TP
+2025-06-05T11:56:31.213Z,ET INFO Observed DNS Query to .biz TLD,Potentially Bad Traffic,2,192.168.10.14,62700,192.168.10.3,53,UDP,BENIGN,FP
+2025-05-25T09:58:18.259Z,ET DOS Terse HTTP GET Likely AnonMafiaIC DDoS tool,Attempted Denial of Service,2,172.16.0.1,52829,192.168.10.50,80,TCP,DDoS,TP
+2025-05-25T09:57:23.897Z,ET SCAN Potential SSH Scan OUTBOUND,Attempted Information Leak,2,172.16.0.1,34025,192.168.10.50,22,TCP,PortScan,TP
+2025-05-25T09:06:27.404Z,ET SCAN Potential SSH Scan OUTBOUND,Attempted Information Leak,2,172.16.0.1,46670,192.168.10.50,22,TCP,SSH-Patator,TP
+2025-05-25T09:26:50.263Z,ET MALWARE Spoofed MSIE 7 User-Agent Likely Ponmocup,A Network Trojan was detected,1,172.16.0.1,47620,192.168.10.50,80,TCP,DoS Hulk,TP
+2025-05-25T09:57:33.183Z,ET SCAN Suspicious inbound to mySQL port 3306,Potentially Bad Traffic,2,172.16.0.1,56798,192.168.10.50,3306,TCP,PortScan,TP
+2025-05-25T09:37:56.313Z,ET MALWARE Spoofed MSIE 7 User-Agent Likely Ponmocup,A Network Trojan was detected,1,172.16.0.1,48506,192.168.10.50,80,TCP,DoS Hulk,TP
+2025-05-25T09:57:41.018Z,ET SCAN Potential VNC Scan 5800-5820,Attempted Information Leak,2,172.16.0.1,53049,192.168.10.50,5801,TCP,PortScan,TP
+2025-07-02T02:33:53.380Z,ET WEB_SERVER Script tag in URI Possible Cross Site Scripting Attempt,Web Application Attack,1,172.16.0.1,54268,192.168.10.50,80,TCP,"DDoS, DoS Hulk, DoS slowloris, Web Attack - Brute Force, Web Attack - XSS",TP
+2025-05-25T09:57:23.604Z,ET SCAN Suspicious inbound to mySQL port 3306,Potentially Bad Traffic,2,172.16.0.1,45002,192.168.10.50,3306,TCP,PortScan,TP
+2025-05-25T06:37:18.181Z,ET SCAN Potential SSH Scan OUTBOUND,Attempted Information Leak,2,192.168.10.8,60817,192.168.10.17,22,TCP,BENIGN,FP
+2025-06-05T11:56:38.465Z,ET SCAN Potential SSH Scan OUTBOUND,Attempted Information Leak,2,192.168.10.9,6651,192.168.10.50,22,TCP,BENIGN,FP
+2025-05-25T06:35:37.380Z,ET SCAN Potential SSH Scan OUTBOUND,Attempted Information Leak,2,192.168.10.17,46313,192.168.10.50,22,TCP,BENIGN,FP
+2025-05-25T09:57:23.634Z,ET SCAN Suspicious inbound to MSSQL port 1433,Potentially Bad Traffic,2,172.16.0.1,45002,192.168.10.50,1433,TCP,PortScan,TP
+2025-06-05T11:55:20.350Z,ET JA3 Hash - [Abuse.ch] Possible Adware,Unknown Traffic,3,192.168.10.5,61770,107.178.240.89,443,TCP,BENIGN,FP
+2025-05-25T09:28:22.013Z,ET MALWARE Spoofed MSIE 7 User-Agent Likely Ponmocup,A Network Trojan was detected,1,172.16.0.1,48230,192.168.10.50,80,TCP,DoS Hulk,TP
+2025-05-25T09:57:32.803Z,ET SCAN Potential VNC Scan 5800-5820,Attempted Information Leak,2,172.16.0.1,54992,192.168.10.50,5815,TCP,PortScan,TP
+2025-05-25T09:06:52.752Z,ET SCAN Potential SSH Scan OUTBOUND,Attempted Information Leak,2,172.16.0.1,49626,192.168.10.50,22,TCP,SSH-Patator,TP
+2025-07-02T02:28:10.522Z,GPL EXPLOIT Microsoft cmd.exe banner,Successful Administrator Privilege Gain,1,192.168.10.8,1260,205.174.165.73,444,TCP,Infiltration,TP
+2025-05-25T09:57:23.848Z,ET SCAN Suspicious inbound to Oracle SQL port 1521,Potentially Bad Traffic,2,172.16.0.1,42784,192.168.10.50,1521,TCP,PortScan,TP
+2025-05-25T09:27:22.998Z,ET MALWARE Spoofed MSIE 7 User-Agent Likely Ponmocup,A Network Trojan was detected,1,172.16.0.1,58116,192.168.10.50,80,TCP,"DDoS, DoS Hulk, DoS slowloris, Web Attack - XSS",TP
+2025-06-05T11:54:22.243Z,ET JA3 Hash - [Abuse.ch] Possible Adware,Unknown Traffic,3,192.168.10.5,54829,173.241.242.220,443,TCP,BENIGN,FP
+2025-05-25T09:57:26.250Z,ET SCAN Behavioral Unusual Port 1433 traffic Potential Scan or Infection,Misc activity,3,172.16.0.1,62784,192.168.10.50,1433,TCP,PortScan,TP
+2025-05-25T09:57:32.777Z,ET SCAN Suspicious inbound to Oracle SQL port 1521,Potentially Bad Traffic,2,172.16.0.1,60972,192.168.10.50,1521,TCP,PortScan,TP
+2025-06-05T11:48:38.259Z,ET JA3 Hash - [Abuse.ch] Possible Adware,Unknown Traffic,3,192.168.10.5,49413,68.67.180.44,443,TCP,BENIGN,FP
+2025-05-25T09:26:49.157Z,ET MALWARE Spoofed MSIE 7 User-Agent Likely Ponmocup,A Network Trojan was detected,1,172.16.0.1,48642,192.168.10.50,80,TCP,"DoS Hulk, DoS Slowhttptest",TP
+2025-05-25T09:57:35.087Z,ET SCAN Suspicious inbound to MSSQL port 1433,Potentially Bad Traffic,2,172.16.0.1,47408,192.168.10.50,1433,TCP,PortScan,TP
+2025-05-25T09:57:41.372Z,ET SCAN Potential SSH Scan OUTBOUND,Attempted Information Leak,2,172.16.0.1,38502,192.168.10.50,22,TCP,PortScan,TP
+2025-07-02T02:23:24.561Z,ET INFO Observed DNS Query to .biz TLD,Potentially Bad Traffic,2,192.168.10.3,61739,192.168.10.1,53,UDP,BENIGN,FP
+2025-05-25T09:57:23.476Z,ET SCAN Suspicious inbound to Oracle SQL port 1521,Potentially Bad Traffic,2,172.16.0.1,59478,192.168.10.50,1521,TCP,PortScan,TP
+2025-05-25T09:51:13.082Z,ET USER_AGENTS Microsoft Device Metadata Retrieval Client User-Agent,Misc activity,3,192.168.10.5,49221,23.194.182.93,80,TCP,BENIGN,FP
+2025-05-25T09:26:57.808Z,ET MALWARE Spoofed MSIE 7 User-Agent Likely Ponmocup,A Network Trojan was detected,1,172.16.0.1,42684,192.168.10.50,80,TCP,"DDoS, DoS GoldenEye, DoS Hulk",TP
+2025-05-25T09:28:00.795Z,ET MALWARE Spoofed MSIE 7 User-Agent Likely Ponmocup,A Network Trojan was detected,1,172.16.0.1,33334,192.168.10.50,80,TCP,"DDoS, DoS GoldenEye, DoS Hulk, DoS slowloris",TP
+2025-05-25T09:57:33.454Z,ET SCAN Suspicious inbound to MSSQL port 1433,Potentially Bad Traffic,2,172.16.0.1,53352,192.168.10.50,1433,TCP,PortScan,TP
+2025-05-25T09:28:49.464Z,ET MALWARE Spoofed MSIE 7 User-Agent Likely Ponmocup,A Network Trojan was detected,1,172.16.0.1,60192,192.168.10.50,80,TCP,"DDoS, DoS GoldenEye, DoS Hulk, DoS slowloris",TP
+2025-05-25T08:25:21.041Z,ET JA3 Hash - [Abuse.ch] Possible Adware,Unknown Traffic,3,192.168.10.5,52310,192.229.173.136,443,TCP,BENIGN,FP
+2025-05-25T09:39:18.775Z,ET MALWARE Spoofed MSIE 7 User-Agent Likely Ponmocup,A Network Trojan was detected,1,172.16.0.1,45052,192.168.10.50,80,TCP,"DoS GoldenEye, DoS Hulk, Web Attack - Brute Force",TP
+2025-05-25T09:06:29.020Z,ET SCAN Potential SSH Scan OUTBOUND,Attempted Information Leak,2,172.16.0.1,46938,192.168.10.50,22,TCP,SSH-Patator,TP
+2025-05-25T08:27:38.079Z,ET JA3 Hash - [Abuse.ch] Possible Adware,Unknown Traffic,3,192.168.10.5,63020,35.186.253.0,443,TCP,BENIGN,FP
+2025-05-25T09:28:17.000Z,ET MALWARE Spoofed MSIE 7 User-Agent Likely Ponmocup,A Network Trojan was detected,1,172.16.0.1,41570,192.168.10.50,80,TCP,"DDoS, DoS GoldenEye, DoS Hulk",TP
+2025-05-25T09:57:30.650Z,ET SCAN Potential SSH Scan OUTBOUND,Attempted Information Leak,2,172.16.0.1,60846,192.168.10.50,22,TCP,PortScan,TP
+2025-05-25T06:32:20.576Z,ET INFO GNU/Linux APT User-Agent Outbound likely related to package management,Not Suspicious Traffic,3,192.168.10.19,36959,91.189.88.149,80,TCP,BENIGN,FP
+2025-05-25T09:04:39.641Z,ET SCAN Potential FTP Brute-Force attempt response,Unsuccessful User Privilege Gain,1,192.168.10.50,21,172.16.0.1,58016,TCP,BENIGN,FP
+2025-05-25T06:33:29.905Z,ET WEB_SERVER SELECT USER SQL Injection Attempt in URI,Web Application Attack,1,172.16.0.1,36214,192.168.10.50,80,TCP,"DDoS, DoS GoldenEye, DoS Hulk, DoS Slowhttptest, Web Attack - Sql Injection",TP
+2025-05-25T09:26:28.101Z,ET MALWARE Spoofed MSIE 7 User-Agent Likely Ponmocup,A Network Trojan was detected,1,172.16.0.1,39936,192.168.10.50,80,TCP,"DDoS, DoS GoldenEye, DoS Hulk",TP
+2025-05-25T08:21:40.546Z,ET JA3 Hash - [Abuse.ch] Possible Adware,Unknown Traffic,3,192.168.10.5,50959,162.208.20.178,443,TCP,BENIGN,FP
+2025-06-05T11:55:08.177Z,ET JA3 Hash - [Abuse.ch] Possible Adware,Unknown Traffic,3,192.168.10.5,59511,107.178.247.57,443,TCP,BENIGN,FP
+2025-05-25T09:57:41.071Z,ET SCAN Suspicious inbound to mySQL port 3306,Potentially Bad Traffic,2,172.16.0.1,49025,192.168.10.50,3306,TCP,PortScan,TP
+2025-06-05T11:55:24.175Z,ET JA3 Hash - [Abuse.ch] Possible Adware,Unknown Traffic,3,192.168.10.5,62518,23.92.189.247,443,TCP,BENIGN,FP
+2025-05-25T08:18:47.150Z,ET INFO GNU/Linux APT User-Agent Outbound likely related to package management,Not Suspicious Traffic,3,192.168.10.50,42368,91.189.95.83,80,TCP,BENIGN,FP
+2025-07-02T02:23:53.145Z,ET WEB_SERVER Script tag in URI Possible Cross Site Scripting Attempt,Web Application Attack,1,172.16.0.1,56306,192.168.10.50,80,TCP,"DDoS, DoS Hulk, DoS slowloris, Web Attack - XSS",TP
+2025-07-02T02:34:00.588Z,ET WEB_SERVER Script tag in URI Possible Cross Site Scripting Attempt,Web Application Attack,1,172.16.0.1,59042,192.168.10.50,80,TCP,"DDoS, DoS GoldenEye, DoS Hulk, DoS slowloris, Web Attack - XSS",TP
+2025-05-25T09:57:34.311Z,ET SCAN Suspicious inbound to MSSQL port 1433,Potentially Bad Traffic,2,172.16.0.1,36614,192.168.10.50,1433,TCP,PortScan,TP
+2025-05-25T09:06:56.808Z,ET SCAN Potential SSH Scan OUTBOUND,Attempted Information Leak,2,172.16.0.1,50286,192.168.10.50,22,TCP,SSH-Patator,TP
+2025-06-05T11:55:16.288Z,ET USER_AGENTS Microsoft Device Metadata Retrieval Client User-Agent,Misc activity,3,192.168.10.14,54187,23.194.110.7,80,TCP,BENIGN,FP
+2025-05-25T09:06:47.993Z,ET SCAN Potential SSH Scan OUTBOUND,Attempted Information Leak,2,172.16.0.1,49052,192.168.10.50,22,TCP,SSH-Patator,TP
+2025-05-25T09:57:23.503Z,ET SCAN Suspicious inbound to mySQL port 3306,Potentially Bad Traffic,2,172.16.0.1,45371,192.168.10.50,3306,TCP,PortScan,TP
+2025-05-25T09:27:53.355Z,ET MALWARE Spoofed MSIE 7 User-Agent Likely Ponmocup,A Network Trojan was detected,1,172.16.0.1,44466,192.168.10.50,80,TCP,"DoS GoldenEye, DoS Hulk, Web Attack - Brute Force",TP
+2025-05-25T06:43:22.165Z,ET WEB_SERVER Script tag in URI Possible Cross Site Scripting Attempt,Web Application Attack,1,172.16.0.1,59042,192.168.10.50,80,TCP,"DDoS, DoS GoldenEye, DoS Hulk, DoS slowloris, Web Attack - XSS",TP
+2025-05-25T08:18:47.262Z,ET INFO GNU/Linux APT User-Agent Outbound likely related to package management,Not Suspicious Traffic,3,192.168.10.12,52410,91.189.88.162,80,TCP,BENIGN,FP
+2025-05-25T09:26:52.604Z,ET MALWARE Spoofed MSIE 7 User-Agent Likely Ponmocup,A Network Trojan was detected,1,172.16.0.1,56068,192.168.10.50,80,TCP,"DDoS, DoS Hulk, DoS slowloris",TP
+2025-05-25T09:06:50.898Z,ET SCAN Potential SSH Scan OUTBOUND,Attempted Information Leak,2,172.16.0.1,49396,192.168.10.50,22,TCP,SSH-Patator,TP
+2025-05-25T09:06:45.301Z,ET SCAN Potential SSH Scan OUTBOUND,Attempted Information Leak,2,172.16.0.1,48754,192.168.10.50,22,TCP,SSH-Patator,TP
+2025-05-25T09:57:48.958Z,ET SCAN Suspicious inbound to Oracle SQL port 1521,Potentially Bad Traffic,2,172.16.0.1,46785,192.168.10.50,1521,TCP,PortScan,TP
+2025-05-25T09:06:26.617Z,ET SCAN Potential SSH Scan OUTBOUND,Attempted Information Leak,2,172.16.0.1,46408,192.168.10.50,22,TCP,SSH-Patator,TP
+2025-06-05T11:55:16.640Z,ET JA3 Hash - [Abuse.ch] Possible Adware,Unknown Traffic,3,192.168.10.5,61196,151.101.209.108,443,TCP,BENIGN,FP
+2025-05-25T09:27:51.376Z,ET MALWARE Spoofed MSIE 7 User-Agent Likely Ponmocup,A Network Trojan was detected,1,172.16.0.1,42536,192.168.10.50,80,TCP,"DDoS, DoS GoldenEye, DoS Hulk",TP
+2025-07-02T02:27:13.489Z,ET SCAN NMAP OS Detection Probe,Attempted Information Leak,2,192.168.10.8,38868,192.168.10.5,34906,UDP,BENIGN,FP
+2025-06-05T11:52:16.085Z,ET JA3 Hash - [Abuse.ch] Possible Adware,Unknown Traffic,3,192.168.10.5,51635,23.194.181.29,443,TCP,BENIGN,FP
+2025-05-25T09:57:33.615Z,ET SCAN Suspicious inbound to MSSQL port 1433,Potentially Bad Traffic,2,172.16.0.1,56422,192.168.10.50,1433,TCP,PortScan,TP
+2025-05-25T09:27:01.808Z,ET MALWARE Spoofed MSIE 7 User-Agent Likely Ponmocup,A Network Trojan was detected,1,172.16.0.1,59326,192.168.10.50,80,TCP,"DDoS, DoS GoldenEye, DoS Hulk, DoS slowloris",TP
+2025-05-25T09:26:49.162Z,ET MALWARE Spoofed MSIE 7 User-Agent Likely Ponmocup,A Network Trojan was detected,1,172.16.0.1,48676,192.168.10.50,80,TCP,"DoS Hulk, DoS Slowhttptest",TP
+2025-05-25T09:04:45.504Z,ET SCAN Potential SSH Scan OUTBOUND,Attempted Information Leak,2,192.168.10.51,53936,192.168.10.50,22,TCP,BENIGN,FP
+2025-07-02T02:23:24.454Z,ET INFO Observed DNS Query to .biz TLD,Potentially Bad Traffic,2,192.168.10.19,19087,192.168.10.3,53,UDP,BENIGN,FP
+2025-05-25T09:26:57.960Z,ET MALWARE Spoofed MSIE 7 User-Agent Likely Ponmocup,A Network Trojan was detected,1,172.16.0.1,43132,192.168.10.50,80,TCP,"DDoS, DoS GoldenEye, DoS Hulk",TP
+2025-05-25T09:28:20.424Z,ET MALWARE Spoofed MSIE 7 User-Agent Likely Ponmocup,A Network Trojan was detected,1,172.16.0.1,47144,192.168.10.50,80,TCP,DoS Hulk,TP
+2025-05-25T09:57:23.724Z,ET SCAN Suspicious inbound to MSSQL port 1433,Potentially Bad Traffic,2,172.16.0.1,55191,192.168.10.50,1433,TCP,PortScan,TP
+2025-05-25T08:27:20.576Z,ET JA3 Hash - [Abuse.ch] Possible Adware,Unknown Traffic,3,192.168.10.5,60958,74.217.63.35,443,TCP,BENIGN,FP
+2025-05-25T09:57:24.929Z,ET SCAN Behavioral Unusually fast Terminal Server Traffic Potential Scan or Infection (Inbound),Detection of a Network Scan,3,172.16.0.1,39070,192.168.10.50,3389,TCP,PortScan,TP
+2025-05-25T08:24:55.395Z,ET JA3 Hash - [Abuse.ch] Possible Adware,Unknown Traffic,3,192.168.10.5,52065,63.251.98.12,443,TCP,BENIGN,FP
+2025-05-25T09:57:26.545Z,ET SCAN Behavioral Unusual Port 1434 traffic Potential Scan or Infection,Misc activity,3,172.16.0.1,35613,192.168.10.50,1434,TCP,PortScan,TP
+2025-05-25T09:26:52.301Z,ET MALWARE Spoofed MSIE 7 User-Agent Likely Ponmocup,A Network Trojan was detected,1,172.16.0.1,56860,192.168.10.50,80,TCP,"DDoS, DoS Hulk, DoS slowloris",TP
+2025-05-25T08:25:28.090Z,ET JA3 Hash - [Abuse.ch] Possible Adware,Unknown Traffic,3,192.168.10.5,52853,52.2.159.241,443,TCP,BENIGN,FP
+2025-05-25T09:27:06.897Z,ET MALWARE Spoofed MSIE 7 User-Agent Likely Ponmocup,A Network Trojan was detected,1,172.16.0.1,47024,192.168.10.50,80,TCP,"DoS Hulk, Web Attack - Brute Force",TP
+2025-05-25T08:27:25.909Z,ET JA3 Hash - [Abuse.ch] Possible Adware,Unknown Traffic,3,192.168.10.5,61526,158.69.125.199,443,TCP,BENIGN,FP
+2025-05-25T09:57:34.518Z,ET SCAN Suspicious inbound to Oracle SQL port 1521,Potentially Bad Traffic,2,172.16.0.1,53970,192.168.10.50,1521,TCP,PortScan,TP
+2025-05-25T06:37:10.153Z,GPL EXPLOIT Microsoft cmd.exe banner,Successful Administrator Privilege Gain,1,192.168.10.8,1260,205.174.165.73,444,TCP,Infiltration,TP
+2025-05-25T09:27:19.874Z,ET MALWARE Spoofed MSIE 7 User-Agent Likely Ponmocup,A Network Trojan was detected,1,172.16.0.1,52868,192.168.10.50,80,TCP,"DDoS, DoS Hulk",TP
+2025-05-25T09:27:51.367Z,ET MALWARE Spoofed MSIE 7 User-Agent Likely Ponmocup,A Network Trojan was detected,1,172.16.0.1,42402,192.168.10.50,80,TCP,"DDoS, DoS Hulk",TP
+2025-05-25T09:26:54.903Z,ET MALWARE Spoofed MSIE 7 User-Agent Likely Ponmocup,A Network Trojan was detected,1,172.16.0.1,34152,192.168.10.50,80,TCP,"DDoS, DoS GoldenEye, DoS Hulk, DoS Slowhttptest",TP
+2025-05-25T09:28:18.808Z,ET MALWARE Spoofed MSIE 7 User-Agent Likely Ponmocup,A Network Trojan was detected,1,172.16.0.1,43456,192.168.10.50,80,TCP,"DoS GoldenEye, DoS Hulk",TP
+2025-05-25T08:25:20.930Z,ET JA3 Hash - [Abuse.ch] Possible Adware,Unknown Traffic,3,192.168.10.5,52293,192.33.31.192,443,TCP,BENIGN,FP
+2025-05-25T09:57:24.752Z,ET SCAN Potential SSH Scan OUTBOUND,Attempted Information Leak,2,172.16.0.1,45423,192.168.10.50,22,TCP,PortScan,TP
+2025-06-05T11:56:32.286Z,ET SCAN Potential SSH Scan OUTBOUND,Attempted Information Leak,2,192.168.10.16,33568,192.168.10.50,22,TCP,BENIGN,FP
+2025-06-05T11:54:50.772Z,ET JA3 Hash - [Abuse.ch] Possible Adware,Unknown Traffic,3,192.168.10.5,56825,52.84.145.119,443,TCP,BENIGN,FP
+2025-05-25T09:57:23.418Z,ET SCAN Suspicious inbound to mySQL port 3306,Potentially Bad Traffic,2,172.16.0.1,59478,192.168.10.50,3306,TCP,PortScan,TP
+2025-05-25T09:57:49.626Z,ET SCAN Suspicious inbound to PostgreSQL port 5432,Potentially Bad Traffic,2,172.16.0.1,58056,192.168.10.50,5432,TCP,PortScan,TP
+2025-05-25T09:57:23.581Z,ET SCAN Suspicious inbound to Oracle SQL port 1521,Potentially Bad Traffic,2,172.16.0.1,45371,192.168.10.50,1521,TCP,PortScan,TP
+2025-05-25T09:06:37.110Z,ET SCAN Potential SSH Scan OUTBOUND,Attempted Information Leak,2,172.16.0.1,47618,192.168.10.50,22,TCP,SSH-Patator,TP
+2025-05-25T09:26:57.522Z,ET MALWARE Spoofed MSIE 7 User-Agent Likely Ponmocup,A Network Trojan was detected,1,172.16.0.1,42116,192.168.10.50,80,TCP,"DDoS, DoS GoldenEye, DoS Hulk",TP
+2025-05-25T09:57:41.634Z,ET SCAN Suspicious inbound to MSSQL port 1433,Potentially Bad Traffic,2,172.16.0.1,48416,192.168.10.50,1433,TCP,PortScan,TP
+2025-05-25T09:29:13.916Z,ET INFO Observed DNS Query to .biz TLD,Potentially Bad Traffic,2,192.168.10.8,54099,192.168.10.3,53,UDP,BENIGN,FP
+2025-06-05T11:53:23.835Z,ET SCAN Potential SSH Scan OUTBOUND,Attempted Information Leak,2,192.168.10.16,53104,192.168.10.50,22,TCP,BENIGN,FP
+2025-05-25T09:06:53.014Z,ET SCAN Potential SSH Scan OUTBOUND,Attempted Information Leak,2,172.16.0.1,49660,192.168.10.50,22,TCP,SSH-Patator,TP
+2025-05-25T09:26:55.786Z,ET MALWARE Spoofed MSIE 7 User-Agent Likely Ponmocup,A Network Trojan was detected,1,172.16.0.1,37462,192.168.10.50,80,TCP,"DDoS, DoS GoldenEye, DoS Hulk, DoS Slowhttptest",TP
+2025-07-02T02:34:00.588Z,ET WEB_SERVER Script tag in URI Possible Cross Site Scripting Attempt,Web Application Attack,1,172.16.0.1,59042,192.168.10.50,80,TCP,"DDoS, DoS GoldenEye, DoS Hulk, DoS slowloris, Web Attack - XSS",TP
+2025-05-25T09:31:55.949Z,ET SCAN Potential SSH Scan OUTBOUND,Attempted Information Leak,2,192.168.10.17,57797,192.168.10.50,22,TCP,BENIGN,FP
+2025-05-25T09:06:56.593Z,ET SCAN Potential SSH Scan OUTBOUND,Attempted Information Leak,2,172.16.0.1,50244,192.168.10.50,22,TCP,SSH-Patator,TP
+2025-05-25T09:27:25.032Z,ET MALWARE Spoofed MSIE 7 User-Agent Likely Ponmocup,A Network Trojan was detected,1,172.16.0.1,35476,192.168.10.50,80,TCP,"DDoS, DoS GoldenEye, DoS Hulk, DoS Slowhttptest",TP
+2025-05-25T09:26:54.602Z,ET MALWARE Spoofed MSIE 7 User-Agent Likely Ponmocup,A Network Trojan was detected,1,172.16.0.1,60322,192.168.10.50,80,TCP,"DDoS, DoS GoldenEye, DoS Hulk, DoS slowloris",TP
+2025-05-25T09:26:51.470Z,ET MALWARE Spoofed MSIE 7 User-Agent Likely Ponmocup,A Network Trojan was detected,1,172.16.0.1,54556,192.168.10.50,80,TCP,"DDoS, DoS Hulk, DoS slowloris",TP
+2025-05-25T09:26:57.880Z,ET MALWARE Spoofed MSIE 7 User-Agent Likely Ponmocup,A Network Trojan was detected,1,172.16.0.1,42850,192.168.10.50,80,TCP,"DDoS, DoS GoldenEye, DoS Hulk, Web Attack - Brute Force",TP
+2025-05-25T09:06:55.786Z,ET SCAN Potential SSH Scan OUTBOUND,Attempted Information Leak,2,172.16.0.1,50082,192.168.10.50,22,TCP,SSH-Patator,TP
+2025-05-25T06:37:10.153Z,ET MALWARE Windows dir Microsoft Windows DOS prompt command exit OUTBOUND,A Network Trojan was detected,1,192.168.10.8,1260,205.174.165.73,444,TCP,Infiltration,TP
+2025-05-25T09:57:23.624Z,ET SCAN Suspicious inbound to PostgreSQL port 5432,Potentially Bad Traffic,2,172.16.0.1,45002,192.168.10.50,5432,TCP,PortScan,TP
+2025-05-25T06:37:10.153Z,ET MALWARE Win32/Suspected Reverse Shell Connection,A Network Trojan was detected,1,192.168.10.8,1260,205.174.165.73,444,TCP,Infiltration,TP
+2025-05-25T09:26:45.504Z,ET MALWARE Spoofed MSIE 7 User-Agent Likely Ponmocup,A Network Trojan was detected,1,172.16.0.1,37664,192.168.10.50,80,TCP,"DDoS, DoS GoldenEye, DoS Hulk, DoS Slowhttptest",TP
+2025-05-25T09:06:48.264Z,ET SCAN Potential SSH Scan OUTBOUND,Attempted Information Leak,2,172.16.0.1,49118,192.168.10.50,22,TCP,SSH-Patator,TP
+2025-07-02T02:22:31.188Z,ET INFO Observed DNS Query to .biz TLD,Potentially Bad Traffic,2,192.168.10.15,50900,192.168.10.3,53,UDP,BENIGN,FP
+2025-05-25T09:57:25.813Z,ET SCAN Rapid POP3 Connections - Possible Brute Force Attack,Misc activity,3,172.16.0.1,62223,192.168.10.50,110,TCP,PortScan,TP
+2025-05-25T08:27:14.562Z,ET SCAN Potential SSH Scan OUTBOUND,Attempted Information Leak,2,192.168.10.15,51749,192.168.10.50,22,TCP,BENIGN,FP
+2025-05-25T09:06:59.849Z,ET SCAN Potential SSH Scan OUTBOUND,Attempted Information Leak,2,172.16.0.1,50958,192.168.10.50,22,TCP,SSH-Patator,TP
+2025-07-02T02:34:00.588Z,ET WEB_SERVER Script tag in URI Possible Cross Site Scripting Attempt,Web Application Attack,1,172.16.0.1,59042,192.168.10.50,80,TCP,"DDoS, DoS GoldenEye, DoS Hulk, DoS slowloris, Web Attack - XSS",TP
+2025-05-25T09:27:24.685Z,ET MALWARE Spoofed MSIE 7 User-Agent Likely Ponmocup,A Network Trojan was detected,1,172.16.0.1,36598,192.168.10.50,80,TCP,"DDoS, DoS GoldenEye, DoS Hulk, DoS Slowhttptest",TP
+2025-05-25T09:57:26.861Z,ET SCAN Potential SSH Scan OUTBOUND,Attempted Information Leak,2,172.16.0.1,36894,192.168.10.50,22,TCP,PortScan,TP
+2025-05-25T05:49:58.825Z,ET INFO Observed DNS Query to .biz TLD,Potentially Bad Traffic,2,192.168.10.15,50936,192.168.10.3,53,UDP,BENIGN,FP
+2025-05-25T09:26:55.090Z,ET MALWARE Spoofed MSIE 7 User-Agent Likely Ponmocup,A Network Trojan was detected,1,172.16.0.1,35552,192.168.10.50,80,TCP,"DDoS, DoS GoldenEye, DoS Hulk, DoS Slowhttptest, PortScan",TP
+2025-05-25T09:27:27.197Z,ET MALWARE Spoofed MSIE 7 User-Agent Likely Ponmocup,A Network Trojan was detected,1,172.16.0.1,42724,192.168.10.50,80,TCP,"DDoS, DoS GoldenEye, DoS Hulk",TP
+2025-05-25T08:26:45.786Z,ET JA3 Hash - [Abuse.ch] Possible Adware,Unknown Traffic,3,192.168.10.5,57114,64.147.131.201,443,TCP,BENIGN,FP
+2025-07-02T02:28:10.522Z,ET MALWARE Win32/Suspected Reverse Shell Connection,A Network Trojan was detected,1,192.168.10.8,1260,205.174.165.73,444,TCP,Infiltration,TP
+2025-05-25T09:06:39.704Z,ET SCAN Potential SSH Scan OUTBOUND,Attempted Information Leak,2,172.16.0.1,47992,192.168.10.50,22,TCP,SSH-Patator,TP
+2025-05-25T09:38:15.884Z,ET MALWARE Spoofed MSIE 7 User-Agent Likely Ponmocup,A Network Trojan was detected,1,172.16.0.1,58410,192.168.10.50,80,TCP,"DDoS, DoS Hulk, DoS slowloris",TP
+2025-05-25T09:26:50.501Z,ET MALWARE Spoofed MSIE 7 User-Agent Likely Ponmocup,A Network Trojan was detected,1,172.16.0.1,52036,192.168.10.50,80,TCP,"DDoS, DoS Hulk",TP
+2025-05-25T09:57:23.872Z,ET SCAN Suspicious inbound to PostgreSQL port 5432,Potentially Bad Traffic,2,172.16.0.1,42784,192.168.10.50,5432,TCP,PortScan,TP
+2025-05-25T09:57:25.640Z,ET SCAN Rapid IMAPS Connections - Possible Brute Force Attack,Misc activity,3,172.16.0.1,34110,192.168.10.50,993,TCP,PortScan,TP
+2025-05-25T09:56:58.829Z,ET SCAN Potential SSH Scan OUTBOUND,Attempted Information Leak,2,172.16.0.1,38162,192.168.10.50,22,TCP,PortScan,TP
+2025-05-25T09:57:41.583Z,ET SCAN Suspicious inbound to PostgreSQL port 5432,Potentially Bad Traffic,2,172.16.0.1,48416,192.168.10.50,5432,TCP,PortScan,TP
+2025-05-25T09:06:39.024Z,ET SCAN Potential SSH Scan OUTBOUND,Attempted Information Leak,2,172.16.0.1,47852,192.168.10.50,22,TCP,SSH-Patator,TP
+2025-05-25T09:57:23.620Z,ET SCAN Suspicious inbound to Oracle SQL port 1521,Potentially Bad Traffic,2,172.16.0.1,45002,192.168.10.50,1521,TCP,PortScan,TP
+2025-05-25T09:27:29.321Z,ET MALWARE Spoofed MSIE 7 User-Agent Likely Ponmocup,A Network Trojan was detected,1,172.16.0.1,45162,192.168.10.50,80,TCP,"DoS GoldenEye, DoS Hulk",TP
+2025-07-02T02:24:51.705Z,ET DNS Query for .to TLD,Potentially Bad Traffic,2,192.168.10.5,54907,192.168.10.3,53,UDP,BENIGN,FP
+2025-05-25T09:27:06.217Z,ET MALWARE Spoofed MSIE 7 User-Agent Likely Ponmocup,A Network Trojan was detected,1,172.16.0.1,45128,192.168.10.50,80,TCP,"DoS GoldenEye, DoS Hulk",TP
+2025-05-25T09:07:00.641Z,ET SCAN Potential SSH Scan OUTBOUND,Attempted Information Leak,2,172.16.0.1,51046,192.168.10.50,22,TCP,SSH-Patator,TP
+2025-05-25T09:58:49.358Z,ET DOS Terse HTTP GET Likely AnonMafiaIC DDoS tool,Attempted Denial of Service,2,172.16.0.1,30959,192.168.10.50,80,TCP,DDoS,TP
+2025-05-25T08:25:28.357Z,ET JA3 Hash - [Abuse.ch] Possible Adware,Unknown Traffic,3,192.168.10.5,52865,52.5.10.168,443,TCP,BENIGN,FP
+2025-05-25T09:57:34.897Z,ET SCAN Suspicious inbound to mySQL port 3306,Potentially Bad Traffic,2,172.16.0.1,52610,192.168.10.50,3306,TCP,PortScan,TP
+2025-05-25T09:26:55.447Z,ET MALWARE Spoofed MSIE 7 User-Agent Likely Ponmocup,A Network Trojan was detected,1,172.16.0.1,36480,192.168.10.50,80,TCP,"DDoS, DoS GoldenEye, DoS Hulk, DoS Slowhttptest, Web Attack - Brute Force",TP
+2025-05-25T09:57:34.370Z,ET SCAN Suspicious inbound to PostgreSQL port 5432,Potentially Bad Traffic,2,172.16.0.1,43932,192.168.10.50,5432,TCP,PortScan,TP
