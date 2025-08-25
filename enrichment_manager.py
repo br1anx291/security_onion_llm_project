@@ -420,9 +420,6 @@ class EnrichmentManager:
         alert_output = {
             "signature": rule_info.get('name', 'N/A'),
             "category": rule_info.get('category', 'N/A'),
-            # "rule_severity": metadata.get('signature_severity', ['N/A'])[0],
-            # "rule_confidence": metadata.get('confidence', ['N/A'])[0],
-            # "event_severity": event_info.get('severity_label', 'N/A').upper(),
             "timestamp": alert.get('@timestamp', 'N/A')
         }
 

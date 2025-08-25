@@ -4,17 +4,17 @@ import json
 import math
 from collections import Counter
 from typing import List, Dict, Any
-
+from .base_collector import BaseCollector
 # Cần cài đặt: pip install tldextract
 import tldextract
 
 # Lớp BaseCollector giả định
-class BaseCollector:
-    def __init__(self, zeek_logs_dir: str = None):
-        self.zeek_logs_dir = zeek_logs_dir
-    @property
-    def collector_name(self) -> str: raise NotImplementedError
-    def collect(self, log_lines: List[str]) -> Dict[str, Any] | None: raise NotImplementedError
+# class BaseCollector:
+#     def __init__(self, zeek_logs_dir: str = None):
+#         self.zeek_logs_dir = zeek_logs_dir
+#     @property
+#     def collector_name(self) -> str: raise NotImplementedError
+#     def collect(self, log_lines: List[str]) -> Dict[str, Any] | None: raise NotImplementedError
 
 class DnsCollector(BaseCollector):
     
