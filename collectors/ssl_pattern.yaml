@@ -1,0 +1,66 @@
+# Tệp cấu hình cho SslCollector
+# Cho phép cập nhật Threat Intel và các quy tắc mà không cần sửa code.
+
+threat_intel:
+  # Dấu vân tay JA3 của các client malware đã biết
+  known_malicious_ja3:
+    "e7d4dd046396654b42318a6bd69c5e27": "TrickBot"
+    "d8da247a3e3110522e4350f9684b553d": "Cobalt Strike"
+    "4d7a22491b84a27776107386818e3a89": "Metasploit"
+    "a95cf29d11593465851457e4235a4203": "Emotet"
+
+  # Dấu vân tay JA3S của các server C2 đã biết
+  known_malicious_ja3s:
+    "82365955f7547b74681308061413d939": "Cobalt Strike Server"
+    "6734139f405c687aaeab3415175b3386": "Metasploit Server"
+
+reputation:
+  # Các tên miền gốc (registered domain) được coi là đáng tin cậy
+  trusted_domains:
+    "google.com": "Trusted Provider"
+    "microsoft.com": "Trusted Provider"
+    "ubuntu.com": "Trusted Provider"
+    "facebook.net": "Trusted Provider"
+    "jquery.com": "Trusted CDN"
+    "typekit.net": "Trusted CDN"
+
+  # Từ khóa trong tên miền phụ (subdomain) hoặc tên miền để xác định adware/tracker
+  adware_keywords:
+    - 'ads'
+    - 'adserve'
+    - 'tracker'
+    - 'analytics'
+    - 'metrics'
+    - 'pixel'
+    - 'pubmatic'
+    - 'algovid'
+    - 'sitescout'
+
+  # Từ khóa cho các hạ tầng thường là lành tính
+  benign_keywords:
+    - 'cdn'
+    - 'static'
+    - 'assets'
+    - 'api'
+    - 'content'
+    - 'images'
+    - 'font'
+    - 'adobe'
+    - 'akamai'
+    - 'cloud'
+    - 'aws'
+
+security:
+  # Các giao thức bị coi là yếu (so khớp chính xác)
+  weak_protocols:
+    - 'SSLv3'
+    - 'TLSv10'
+    - 'TLSv11'
+
+  # Các bộ mã hóa bị coi là yếu (so khớp chính xác, không dùng chuỗi con)
+  weak_ciphers:
+    - 'TLS_RSA_WITH_RC4_128_MD5'
+    - 'TLS_RSA_WITH_RC4_128_SHA'
+    - 'TLS_RSA_EXPORT_WITH_RC4_40_MD5'
+    - 'TLS_RSA_WITH_DES_CBC_SHA'
+    - 'TLS_RSA_WITH_3DES_EDE_CBC_SHA'

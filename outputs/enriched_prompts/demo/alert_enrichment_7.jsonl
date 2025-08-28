@@ -1,0 +1,107 @@
+{
+    "alert": {
+        "signature": "ET WEB_SERVER Script tag in URI Possible Cross Site Scripting Attempt",
+        "category": "Web Application Attack",
+        "timestamp": "2025-08-15T18:45:50.526Z"
+    },
+    "connection": {
+        "identity": {
+            "source_ip": "192.168.110.131",
+            "source_port": "36006",
+            "destination_ip": "192.168.110.132",
+            "destination_port": "80",
+            "traffic_direction": "Lateral",
+            "service": "http",
+            "transport_protocol": "tcp"
+        },
+        "statistics": {
+            "duration_sec": 0.0422,
+            "sent_bytes": 136,
+            "received_bytes": 438
+        },
+        "analysis": {
+            "connection_state": "Normal Connection (SF)",
+            "history_analysis": {
+                "label": "Unrecognized Pattern",
+                "summary": "Requires manual review: 'ShADadFf'.",
+                "severity": "Informational"
+            },
+            "flow_analysis": {
+                "direction": "Symmetrical"
+            }
+        }
+    },
+    "evidence": {
+        "high": {
+            "http": {
+                "analysis": {
+                    "user_agent_category": "Scripting/Tool",
+                    "destination_analysis": "Direct-to-IP Connection",
+                    "transfer_volume": "Normal",
+                    "content_risk": "Suspicious Content Detected",
+                    "file_transfer_risk": "Benign Download Detected"
+                },
+                "evidence": {
+                    "connection_context": {
+                        "methods_used": [
+                            "GET"
+                        ],
+                        "user_agent_string": "curl/8.13.0",
+                        "agent_matched_keyword": "curl",
+                        "destination_ip": "192.168.110.132"
+                    },
+                    "findings": [
+                        {
+                            "type": "Content Finding",
+                            "source": "uri",
+                            "content": "/search.php?query=<script>alert('XSS_SUCCESSFUL')</script>",
+                            "reasons": [
+                                "Script Tag"
+                            ]
+                        }
+                    ]
+                },
+                "statistics": {
+                    "total_requests": 1,
+                    "request_bytes": 0,
+                    "response_bytes": 277,
+                    "client_error_ratio": 1.0
+                }
+            }
+        },
+        "reference": {
+            "files": {
+                "analysis": {
+                    "session_risk_summary": "No suspicious file activity detected",
+                    "highest_threat_level": "Informational",
+                    "evasion_techniques_detected": "No",
+                    "suspicious_content_summary": "No suspicious content identified."
+                },
+                "statistics": {
+                    "total_files_analyzed": 1,
+                    "suspicious_files_count": 0,
+                    "total_bytes_transferred_kb": 0.27
+                },
+                "evidence": {
+                    "findings": [
+                        {
+                            "type": "FileAnalysisFinding",
+                            "fuid": "FZDNpZ2AnmgJ4DbPme",
+                            "filename": null,
+                            "direction": "Download",
+                            "severity": "Informational",
+                            "risk_score": 5,
+                            "size_bytes": 277,
+                            "reasons": [],
+                            "hashes": {
+                                "md5": "de490b4ef7033a1a1b037c321c85ce26",
+                                "sha1": "394e8f8a8deef1d7af86cd67beebe3f7174453b0"
+                            },
+                            "file_type_reported": "text/html"
+                        }
+                    ]
+                }
+            }
+        }
+    }
+}

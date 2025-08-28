@@ -1,0 +1,26 @@
+{
+    "alert": {
+            ...
+    },
+    "connection": {
+            ... 
+    },
+    "evidence": {
+        "high": {
+            "http": {
+                ...
+            },
+            "dns": {
+                ...
+            }
+        },
+        "reference": {
+            "files": {
+                ...
+            },
+            "ssl": {
+                ...
+            }
+        }
+    }
+}
