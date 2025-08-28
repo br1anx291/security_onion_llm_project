@@ -96,8 +96,8 @@ class FilesCollector(BaseCollector):
                 }
                 
                 # Thêm các thông tin chi tiết nếu có
-                if hashes := {k: v for k, v in {'md5': log_entry.get('md5'), 'sha1': log_entry.get('sha1')}.items() if v}:
-                    file_finding['hashes'] = hashes
+                # if hashes := {k: v for k, v in {'md5': log_entry.get('md5'), 'sha1': log_entry.get('sha1')}.items() if v}:
+                #     file_finding['hashes'] = hashes
                 if reported_mime: file_finding['file_type_reported'] = reported_mime
                 if analysis_mime: file_finding['file_type_actual'] = analysis_mime
                 if 'entropy' in log_entry: file_finding['entropy'] = round(log_entry['entropy'], 2)

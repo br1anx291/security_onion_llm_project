@@ -1,6 +1,6 @@
 # security_onion_llm_project/main_realtime.py
-
-
+#
+from io import StringIO
 import json
 import logging
 from enrichment_manager import EnrichmentManager
@@ -15,22 +15,12 @@ import pandas as pd
 LOG_FORMAT = "%(asctime)s [%(threadName)-12.12s] [%(levelname)-5.5s]  %(message)s"
 logging.basicConfig(level=logging.INFO, format=LOG_FORMAT)
 
-
-# ALERTS_FILE_PATH = "./so_alerts/ground_truth/200_alerts.json"
-# FINAL_ANALYSIS_OUTPUT_PATH = "./user_prompt/ground_truth/200_alerts.json"
-# name_alert = '1'
-# ALERTS_FILE_PATH = f"./so_test_alerts/ground_truth/{name_alert}.json"
-# FINAL_ANALYSIS_OUTPUT_PATH = f"./user_prompt/{name_alert}.json"
-# name_alert = 'files_alert'
-# ALERTS_FILE_PATH = f"./so_test_alerts/{name_alert}.json"
-# FINAL_ANALYSIS_OUTPUT_PATH = f"./user_prompt/{name_alert}.json"
 TEST_MODE = False
 
 name_alert = 'ground_truth'
 ALERTS_FILE_PATH = f"./so_alerts/{name_alert}.jsonl"
-ENRICHED_PROMPTS_DIR = "./outputs/enriched_prompts/ground_truth1"
-FINAL_ANALYSIS_OUTPUT_PATH = f"./outputs/final_analysis/ground_truth1/{name_alert}_analysis.jsonl"
-
+ENRICHED_PROMPTS_DIR = "./outputs/enriched_prompts/ground_truth"
+FINAL_ANALYSIS_OUTPUT_PATH = f"./outputs/final_analysis/ground_truth/{name_alert}_analysis.jsonl"
 
 MAX_WORKERS = 10
  
@@ -44,7 +34,7 @@ def get_next_alert_index(directory: str) -> int:
 
     max_index = 0
     prefix = 'alert_enrichment_'
-    suffix = '.json' # Sửa thành .json cho nhất quán với json.dump(indent=4)
+    suffix = '.jsonl' # Sửa thành .json cho nhất quán với json.dump(indent=4)
 
     for filename in os.listdir(directory):
         if filename.startswith(prefix) and filename.endswith(suffix):
@@ -63,8 +53,6 @@ def get_next_alert_index(directory: str) -> int:
 
 ## <<< THAY ĐỔI BẮT ĐẦU >>>
 def process_and_write_alert(
-    # manager: EnrichmentManager, llm_client: LLMClient, alert: dict, index: int, 
-    # output_file_handle, lock: threading.Lock
         manager: EnrichmentManager, llm_client: LLMClient, alert_row: pd.Series, index: int, 
     output_file_handle, lock: threading.Lock
 ):
@@ -111,35 +99,58 @@ def process_and_write_alert(
         # with open(example_path, "r", encoding='utf-8') as f:
         #     example_content = f.read()
         # final_system_prompt = system_prompt_template.replace("{{EXAMPLE_PLACEHOLDER}}", example_content)
-        prompt_as_json_string = json.dumps(enriched_prompt_dict) # Không cần indent khi gửi cho LLM
         
-        llm_result = None
-        if TEST_MODE is True:
-            logging.info(f"Worker #{index}: Chạy ở chế độ TEST, bỏ qua gọi LLM.")
-            llm_result = {
-                "summary": "This is a test result.",
-                "severity": "TEST",
-                "recommendation": "No action needed, this is a test."
+        llm_analysis_result  = None
+        if 'connection' not in enriched_prompt_dict and 'evidence' not in enriched_prompt_dict:
+            # Trường hợp xấu nhất: Không có bất kỳ bằng chứng nào.
+            logging.warning(f"Worker #{index}: Alert thiếu CẢ 'connection' VÀ 'evidence'. Tự động phân loại là False Positive.")
+            
+            alert_name = alert.get('rule', {}).get('name', 'N/A')
+            llm_analysis_result = {
+                "result": {
+                    "reasoning": {
+                        "thought_process": "Initial check: The context is missing the 'connection' and/or 'evidence' objects. As per CRITICAL RULE #3, without corroborating signals, the alert must be classified as 'False Positive'. Bypassing full analysis.",
+                        "analyze_alert": f"The alert signature '{alert_name}' suggests a potential threat, but this is only a claim that requires corroboration.",
+                        "analyze_signals": "No corroborating signals were found. Neither connection details nor specific evidence (HTTP, DNS, etc.) could be retrieved for this event.",
+                        "synthesize_reasoning": "The event triggered an alert, but a search for contextual data yielded no supporting evidence. The activity is therefore considered unproven and benign by definition."
+                    },
+                    "conclusion": {
+                        "classification": "False Positive",
+                        "confidence_score": 1.0,
+                        "reasoning_summary": "Classified as False Positive due to a complete lack of corroborating evidence from network logs."
+                    }
+                }
             }
         else:
-            logging.info(f"Worker #{index}: Gửi yêu cầu đến LLM...")            
-            start_llm = time.monotonic()
-            llm_result = llm_client.get_classification(prompt_as_json_string)
-            end_llm = time.monotonic()
-        
-            if not llm_result:
-                logging.error(f"Worker #{index}: LLM không trả về kết quả hợp lệ.")
-                return
-        
-            logging.info(f"Worker #{index}: LLM inference mất {end_llm - start_llm:.2f} giây.")
+            logging.info(f"Worker #{index}: Alert có đủ bằng chứng. Gửi đến LLM để phân tích sâu.")
+            prompt_as_json_string = json.dumps(enriched_prompt_dict) # Không cần indent khi gửi cho LLM
+            if TEST_MODE is True:
+                logging.info(f"Worker #{index}: Chạy ở chế độ TEST, bỏ qua gọi LLM.")
+                llm_analysis_result  = {
+                    "summary": "This is a test result.",
+                    "severity": "TEST",
+                    "recommendation": "No action needed, this is a test."
+                }
+            else:
+                logging.info(f"Worker #{index}: Gửi yêu cầu đến LLM...")            
+                start_llm = time.monotonic()
+                llm_analysis_result  = llm_client.get_classification(prompt_as_json_string)
+                end_llm = time.monotonic()
+            
+                if not llm_analysis_result:
+                    logging.error(f"Worker #{index}: LLM không trả về kết quả hợp lệ.")
+                    return
+            
+                logging.info(f"Worker #{index}: LLM inference mất {end_llm - start_llm:.2f} giây.")
 
+            
         # 3. Tạo bản ghi kết quả
         output_record = {
             "alert_index": index,
             "processed_at": datetime.now().isoformat(),
             "original_alert_signature": alert.get('rule', {}).get('name', 'N/A'),
             "enriched_prompt_file": prompt_output_path, # Thêm đường dẫn đến file prompt để tiện tra cứu
-            "llm_analysis": llm_result
+            "llm_analysis": llm_analysis_result 
         }
         
         # 4. Ghi kết quả vào file
@@ -151,7 +162,7 @@ def process_and_write_alert(
     except Exception as e:
         logging.error(f"Worker #{index}: Lỗi không xác định khi xử lý alert.", exc_info=True)
 
-# Hàm follow() và main() giữ nguyên không thay đổi
+
 def follow(the_file):
     """Generator mô phỏng hành vi 'tail -f'."""
     the_file.seek(0, 2)  # Đi đến cuối file
@@ -183,8 +194,6 @@ def main():
              open(FINAL_ANALYSIS_OUTPUT_PATH, 'a', encoding='utf-8') as output_file, \
              ThreadPoolExecutor(max_workers=MAX_WORKERS, thread_name_prefix='Worker') as executor:
             
-            # Bỏ qua các dòng đã có sẵn trong file log, chỉ xử lý dòng mới
-            # Nếu bạn muốn xử lý cả các dòng cũ, hãy xóa dòng này.
             logging.info("Đã mở file log, di chuyển đến cuối file để giám sát các alert mới...")
             input_file.seek(0, 2)
             
@@ -210,7 +219,8 @@ def main():
                 #     logging.warning(f"Bỏ qua dòng không hợp lệ: {line.strip()}")
                 try:
                     # Chuyển đổi từ JSON string thành DataFrame để xử lý
-                    new_alerts_df = pd.read_json(line, lines=True)
+                    # new_alerts_df = pd.read_json(line, lines=True)
+                    new_alerts_df = pd.read_json(StringIO(line), lines=True)
                     
                     # Lặp qua từng hàng (mỗi hàng là một alert) và giao việc
                     for index, alert_row in new_alerts_df.iterrows():

@@ -51,7 +51,7 @@ local_zeek_zip_path = "../so_logs/gz/"
 local_zeek_unzip_path = "../so_logs/log/"
 
 # Alertutput paths
-alert_output_path = '../so_alerts/alerts_all.json'
+alert_output_path = '../so_alerts/alerts.json'
 correlated_output_path = '../so_alerts/enrich_alerts_ids2017_thur.csv'
 unmatched_output_path = '../so_alerts/unmatched_alerts.csv'
 unmatched_zeek_output_path ="../so_alerts/logs/unmatched_zeek.log"

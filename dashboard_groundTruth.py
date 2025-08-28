@@ -17,8 +17,8 @@ st.set_page_config(layout="wide", page_title="Robust Alert Triage")
 name_alert = f'ground_truth'
 RAW_ALERTS_FILE = f"./so_alerts/{name_alert}.jsonl"
 OUTPUTS_BASE_DIR = "./outputs"
-FINAL_ANALYSIS_DIR = f"{OUTPUTS_BASE_DIR}/final_analysis/ground_truth1"
-ENRICHED_PROMPTS_DIR = f"{OUTPUTS_BASE_DIR}/enriched_prompts/ground_truth1/"
+FINAL_ANALYSIS_DIR = f"{OUTPUTS_BASE_DIR}/final_analysis/ground_truth"
+ENRICHED_PROMPTS_DIR = f"{OUTPUTS_BASE_DIR}/enriched_prompts/ground_truth/"
 
 LLM_ANALYSIS_FILE = f"./{FINAL_ANALYSIS_DIR}/{name_alert}_analysis.jsonl"
 CONTEXT_FOLDER = ENRICHED_PROMPTS_DIR
@@ -154,7 +154,8 @@ def load_and_merge_data(raw_file, analysis_file):
     print("--- [DEBUG] KẾT THÚC HÀM load_and_merge_data ---")
     print("="*50 + "\n")
 
-    merged.sort(key=lambda x: x['timestamp'], reverse=True)
+    # merged.sort(key=lambda x: x['alert_index'], reverse=True)
+    merged.sort(key=lambda x: x['alert_index'])
     return merged
 
 # ★★★ BẮT ĐẦU THAY ĐỔI ★★★

@@ -149,27 +149,59 @@ class DnsCollector(BaseCollector):
             })
 
         # --- PHẦN 3: XÂY DỰNG OUTPUT CUỐI CÙNG THEO FORMAT MỚI ---
-        if not findings: return None # Không có gì đáng ngờ, không cần trả về output
+        if not findings and failed_queries_count == 0:
+    # Nếu không có finding nào và không có lỗi, đây là traffic sạch, không cần output
+            return None
 
-        # Xây dựng phần tóm tắt "analysis" dựa trên các "findings" đã có
-        analysis_summary = {
-            "query_pattern": "Normal Patterns", "query_integrity": "Normal",
-            "tld_risk": "Normal TLDs", "ttl_behavior": "Normal TTLs"
+        # --- BẮT ĐẦU THAY ĐỔI LOGIC XÂY DỰNG ANALYSIS ---
+
+        # 1. Khởi tạo các quan sát khách quan
+        observed_attrs = {
+            "pattern": "Normal",
+            "integrity": f"Normal ({failed_queries_count / total_queries:.0%} failure rate)",
+            "tld_risk": "Normal",
+            "ttl_behavior": "Normal"
         }
-        has_dga = False
-        has_beaconing = False
-        for f in findings:
-            if f['type'] == 'PatternFinding' and 'Repetitive' in f['reasons'][0]: has_beaconing = True
-            if f['type'] == 'AttributeFinding' and 'Entropy' in f['reasons'][0]: has_dga = True
-            if f['type'] == 'PatternFinding' and 'Failure' in f['reasons'][0]: analysis_summary['query_integrity'] = "High Failure Ratio"
-            if f['type'] == 'AttributeFinding' and 'TLD' in f['reasons'][0]: analysis_summary['tld_risk'] = "Suspicious TLDs Used"
-            if f['type'] == 'AttributeFinding' and 'TTL' in f['reasons'][0]: analysis_summary['ttl_behavior'] = "Low TTL Detected"
-        
-        if has_dga and has_beaconing: analysis_summary['query_pattern'] = "Repetitive Beaconing & DGA Detected"
-        elif has_dga: analysis_summary['query_pattern'] = "DGA Detected"
-        elif has_beaconing: analysis_summary['query_pattern'] = "Repetitive Beaconing Detected"
 
-        # Xây dựng cấu trúc JSON cuối cùng
+        # 2. Ghi nhận các cờ tín hiệu từ findings
+        has_dga = any('Entropy' in f['reasons'][0] for f in findings if f['type'] == 'AttributeFinding')
+        has_repetitive = any('Repetitive' in f['reasons'][0] for f in findings if f['type'] == 'PatternFinding')
+        has_high_failure = any('Failure' in f['reasons'][0] for f in findings if f['type'] == 'PatternFinding')
+        has_suspicious_tld = any('TLD' in f['reasons'][0] for f in findings if f['type'] == 'AttributeFinding')
+        low_ttl_finding = next((f for f in findings if 'TTL' in f['reasons'][0]), None)
+
+        # 3. Cập nhật các quan sát dựa trên cờ
+        if has_dga: observed_attrs['pattern'] = "High Entropy (DGA-like)"
+        elif has_repetitive: observed_attrs['pattern'] = "Repetitive (Beaconing-like)"
+
+        if has_suspicious_tld: observed_attrs['tld_risk'] = "Contains Monitored TLDs"
+        if low_ttl_finding: observed_attrs['ttl_behavior'] = f"Low (Value: {low_ttl_finding['content']}s)"
+
+        # 4. Xây dựng câu đánh giá tổng thể (overall_assessment)
+        assessment = "Likely Benign: No significant threat indicators found."
+        high_confidence_indicators = has_dga or has_high_failure or has_repetitive
+
+        if high_confidence_indicators:
+            reasons = []
+            if has_dga: reasons.append("DGA-like patterns")
+            if has_high_failure: reasons.append("a high failure rate")
+            if has_repetitive: reasons.append("repetitive beaconing")
+            assessment = f"Potential Threat: Activity exhibits suspicious patterns, including {', '.join(reasons)}."
+        elif low_ttl_finding or has_suspicious_tld:
+            assessment = "Benign Anomaly Likely: Low-confidence anomalies were observed (e.g., low TTL or monitored TLDs), but no strong threat patterns were detected."
+
+        # 5. Tạo khối analysis cuối cùng
+        analysis_summary = {
+            "overall_assessment": assessment,
+            "observed_query_pattern": observed_attrs['pattern'],
+            "observed_integrity": observed_attrs['integrity'],
+            "observed_tld_risk": observed_attrs['tld_risk'],
+            "observed_ttl_behavior": observed_attrs['ttl_behavior']
+        }
+
+        # --- KẾT THÚC THAY ĐỔI LOGIC XÂY DỰNG ANALYSIS ---
+
+        # Xây dựng cấu trúc JSON cuối cùng (giữ nguyên phần còn lại)
         return {
             "analysis": analysis_summary,
             "evidence": {

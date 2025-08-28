@@ -10,9 +10,9 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from elasticsearch import Elasticsearch
 from config import ZEEK_LOGS_DIR, CONN_LOG_TIME_WINDOW_SECONDS, MAX_WORKERS
 from log_helper import find_log_files
-from collectors.conn2_collector import ConnCollector
+from collectors.conn_collector import ConnCollector
 from collectors.dns_collector import DnsCollector
-from collectors.http2_collector import HttpCollector
+from collectors.http_collector import HttpCollector
 from collectors.files_collector import FilesCollector
 from collectors.ssl_collector import SslCollector
 
@@ -33,7 +33,7 @@ class EnrichmentManager:
             
             # DNS: 
             # Kết hợp cả 2 hành vi nguy hiểm nhất: DGA và Beaconing.
-            {"collector": "dns", "path": "analysis.query_pattern", "check": "equals", "value": "Repetitive Beaconing & DGA Detected"},
+             {"collector": "dns", "path": "analysis.overall_assessment", "check": "startswith", "value": "Potential Threat"},
             
             # FILES: Mức độ nghiêm trọng tổng thể của phiên được đánh giá là Critical.
             # Thường xảy ra khi một file có nhiều chỉ số rủi ro cao kết hợp (ví dụ: vừa né tránh, vừa là file thực thi).
@@ -42,10 +42,7 @@ class EnrichmentManager:
             {"collector": "files", "path": "evidence.findings[*].risk_score", "check": "gte", "value": 90},
             
             # SSL: 
-            # Dấu vân tay client (JA3) khớp với CSDL mã độc đã biết
-            {"collector": "ssl", "path": "analysis.ja3_threat_match", "check": "startswith", "value": "JA3 Matched Malware:"},
-            # SSL: Dấu vân tay server (JA3S) khớp với CSDL C2 đã biết.
-            {"collector": "ssl", "path": "analysis.ja3s_threat_match", "check": "startswith", "value": "JA3S Matched C2 Server:"},
+            {"collector": "ssl", "path": "analysis.overall_assessment", "check": "startswith", "value": "High Confidence Threat"},
         ],
         "HIGH": [
             # CONN: Phân tích history cho thấy các hành vi quét mạng hoặc tấn công rõ ràng.
@@ -60,14 +57,13 @@ class EnrichmentManager:
             {"collector": "http", "path": "analysis.file_transfer_risk", "check": "startswith", "value": "Suspicious Download"},
             
             # SSL: 
-            # Chứng chỉ có vấn đề nghiêm trọng (hết hạn, tự ký, không tin cậy).
-            {"collector": "ssl", "path": "analysis.certificate_status", "check": "startswith", "value": "Invalid"},
+            {"collector": "ssl", "path": "analysis.overall_assessment", "check": "startswith", "value": "Suspicious Anomaly"},
                     
             # DNS: 
             # Phát hiện DGA
-            { "collector": "dns", "path": "analysis.query_pattern", "check": "equals", "value": "DGA Detected"},
+            {"collector": "dns", "path": "analysis.observed_query_pattern", "check": "equals", "value": "High Entropy (DGA-like)"},
             # DNS: Phát hiện beaconing
-            { "collector": "dns", "path": "analysis.query_pattern", "check": "equals", "value": "Repetitive Beaconing Detected"},
+            {"collector": "dns", "path": "analysis.observed_query_pattern", "check": "equals", "value": "Repetitive (Beaconing-like)"},
             
             # FILES: 
             # Phát hiện có kỹ thuật né tránh được sử dụng.
@@ -88,10 +84,7 @@ class EnrichmentManager:
             
             
             # DNS: 
-            # Tỷ lệ truy vấn thất bại cao. Có thể là DGA đang tìm C2 hoặc lỗi cấu hình.
-            { "collector": "dns", "path": "analysis.query_integrity", "check": "equals", "value": "High Failure Ratio" },
-            # Sử dụng các TLD thường bị lạm dụng.
-            { "collector": "dns", "path": "analysis.tld_risk", "check": "equals", "value": "Suspicious TLDs Used" },
+            {"collector": "dns", "path": "analysis.observed_tld_risk", "check": "equals", "value": "Contains Monitored TLDs" },
             
             # FILES: 
             # Có ít nhất một file đáng ngờ được phát hiện trong phiên.
@@ -102,14 +95,11 @@ class EnrichmentManager:
             {"collector": "files", "path": "evidence.findings[*].reasons", "check": "contains", "value": "SUSPICIOUS_MIME"},
 
             # SSL: 
-            # Sử dụng giao thức hoặc bộ mật mã yếu
-            {"collector": "ssl", "path": "analysis.encryption_strength", "check": "startswith", "value": "Weak"},
-            # Tên miền máy chủ (SNI) bị phân loại là Adware/Tracker.
-            {"collector": "ssl", "path": "analysis.server_reputation", "check": "equals", "value": "Adware/Tracker"},
+           {"collector": "ssl", "path": "analysis.overall_assessment", "check": "startswith", "value": "Informational"},
         ],
         "LOW": [
             # DNS: Phát hiện TTL thấp
-            {"collector": "dns","path": "analysis.ttl_behavior","check": "equals","value": "Low TTL Detected"},
+            {"collector": "dns", "path": "analysis.observed_ttl_behavior", "check": "startswith", "value": "Low"},
             # SSL: Bắt tay (handshake) thất bại. Có thể do lỗi mạng hoặc cấu hình.
             {"collector": "ssl", "path": "analysis.handshake_status", "check": "equals", "value": "Failed"},
         ]

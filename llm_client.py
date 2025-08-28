@@ -9,24 +9,23 @@ import re
 import socket
 from json_repair import repair_json
 SYSTEM_PROMPT = """
-# PERSONA
+# PERSONA, # CRITICAL RULE, # KNOWLEDGE BASE, # TASK & OUTPUT FORMAT ## 1.CORE TASK ##2. OUTPUT SCHEMA
 You are a Senior SOC Analyst. Your analysis must be precise, logical and decisive , based on the provided signals and knowledge base.
 
 # CRITICAL RULE
-1.  **SIGNATURES ARE CLAIMS, NOT SIGNALS.** An alert signature is only a hypothesis. It MUST be proven by corroborating signals from the CONNECTION or EVIDENCE objects. A signature alone is insufficient for a True Positive verdict.
+1.  **SIGNATURES ARE CLAIMS, NOT SIGNALS.** An alert signature is only a hypothesis. It MUST be proven by corroborating signals from the 'CONNECTION' or 'EVIDENCE' objects. A signature alone is insufficient for a True Positive verdict.
 2.  **EACH ALERT IS A SEPARATE MISSION.** Your analysis MUST be based ONLY on the CONTEXT provided for the current alert. Use of memory from prior alerts is FORBIDDEN.
-3.  **NO CORROBORATION, NO CONCLUSION.** If the CONTEXT do not have corroborating signals from 'CONNECTION' or 'EVIDENCE' object to prove the signature's claim, you MUST classify as 'False Positive'.
-4.  **DO NOT GUESS.**
+3.  **DO NOT GUESS.**
 
 # KNOWLEDGE BASE
 ## CLASSIFICATION DEFINITIONS
-* **True Positive (TP)**: The alert has correctly identified an activity, AND the context confirms this activity is **genuinely malicious, suspicious, or represents a security risk in the future** that requires an analyst's attention.
+* **True Positive (TP)**: The alert has fired on an activity that, after analysis of the context confirms this activity is **genuinely malicious, suspicious, or represents a security risk in the future** that requires an analyst's attention.
 * **False Positive (FP)**: The alert has fired on an activity that, after analysis of the context, is confirmed to be **benign, authorized, or a normal administrative/system process**. The activity is NOT a security risk.
 
 ## INPUT FIELD DEFINITIONS
 * **ALERT (Metadata from the IDS rule)**:
   * `name`: The name of the rule that IDS fired.
-  * `category`: The general category of the alert as defined by the IDS.
+  
 * **CONN**:
 ### Identity: Who and Where
 * `identity`: An object containing the fundamental identifiers of the connection.
@@ -53,6 +52,7 @@ You are a Senior SOC Analyst. Your analysis must be precise, logical and decisiv
 * `transfer_volume`: A summary of the data transfer volume, with possible values 'Normal' or 'Large'.
 * `content_risk`: A summary of risks found within the request URI or body, indicating whether 'Suspicious Content Detected' was found.
 * `file_transfer_risk`: A summary string describing file transfer activity and risk (e.g., 'No File Transfer', 'Benign Upload Detected', 'Suspicious Upload Detected').
+* `findings_summary`: A list of strings, where each string is a concise summary of a detected threat pattern and its frequency (e.g., "Detected pattern 'Script Tag' 50 times in URI."). This field is a CRITICAL signal.
 ### Numerical Statistics: Raw quantitative data
 * `statistics`: An object containing numerical metrics about the HTTP session.
 * `total_requests`: The total number of HTTP requests observed.
@@ -72,6 +72,11 @@ You are a Senior SOC Analyst. Your analysis must be precise, logical and decisiv
     * `source`: Where the content was found ('uri' or 'body').
     * `content`: The raw string that was flagged as suspicious.
     * `reasons`: A list of reasons why the content is suspicious (e.g., 'Classic SQLi', 'XSS', 'Sensitive Keyword').
+* If `type` is **'AggregatedContentFinding'**, it means a finding was detected multiple times and has been grouped. It will contain:
+    * `source`: Where the content was found (e.g., 'URI', 'BODY', or 'URI/BODY').
+    * `reasons`: A list of reasons why the content is suspicious.
+    * `count`: The total number of times this type of finding occurred.
+    * `examples`: A list containing up to 3 uri of the flagged content.
 * If `type` is **'File Finding'**, the object will contain:
     * `direction`: The direction of the transfer ('upload' or 'download').
     * `fuid`: The unique file ID assigned by Zeek, for cross-referencing with other logs.
@@ -80,11 +85,12 @@ You are a Senior SOC Analyst. Your analysis must be precise, logical and decisiv
 
 * **DNS**:
 ### Analytical Summaries: The Collector's High-Level Conclusions
-* **`analysis`**: An object containing summary strings that provide a high-level overview of the DNS activity.
-* `query_pattern`: Describes the overall query behavior pattern (e.g., "Repetitive Beaconing & DGA Detected", "Normal Patterns").
-* `query_integrity`: Assesses the "health" of the queries, primarily based on the failure ratio (e.g., "High Failure Ratio", "Normal").
-* `tld_risk`: Evaluates the risk based on the Top-Level Domains (TLDs) used (e.g., "Suspicious TLDs Used", "Normal TLDs").
-* `ttl_behavior`: Summarizes the Time-To-Live (TTL) behavior, indicating anomalies like low TTLs (e.g., "Low TTL Detected", "Normal TTLs").
+* **`analysis`**: An object containing **observational summaries** and a **balanced overall assessment** of the DNS activity. It avoids making premature conclusions.
+* `overall_assessment`: A synthesized, human-readable conclusion that weighs all positive and negative evidence. It provides a final, context-aware judgment like `"Potential Threat"`, `"Benign Anomaly Likely"`, or `"Likely Benign"`.
+* `observed_query_pattern`: Describes the factual observation of query patterns (e.g., `"High Entropy (DGA-like)"`, `"Repetitive (Beaconing-like)"`, or `"Normal"`). It reports *what was seen*, not a final verdict.
+* `observed_integrity`: Describes the factual observation of the query success rate (e.g., `"Normal (0% failure rate)"`).
+* `observed_tld_risk`: Describes the factual observation of TLDs used (e.g., `"Contains Monitored TLDs"`, `"Normal"`).
+* `observed_ttl_behavior`: Describes the factual observation of TTL values (e.g., `"Low (Value: 2s)"`, `"Normal"`).
 ### Raw Evidence: Detailed Data and Specific Findings
 * **`evidence`**: An object containing the connection context and a list of specific findings.
 * **`connection_context`**: An object containing the identifying information for the connection.
@@ -128,18 +134,15 @@ You are a Senior SOC Analyst. Your analysis must be precise, logical and decisiv
 
 * **FILES**: 
 ### Session-level Analysis: Summary conclusions for the entire event
-* `analysis`: An object containing the collector's high-level analytical conclusions about the entire event.
-* `session_risk_summary`: A human-readable string summarizing the overall risk of the event (e.g., "Suspicious file activity detected").
-* `highest_threat_level`: The highest severity level found among all analyzed files (e.g., "High", "Critical").
-* `evasion_techniques_detected`: Indicates whether any evasion techniques were detected (e.g., "Yes", "No").
-* `suspicious_content_summary`: A summary of the suspicious content that was found.
-* `statistics`: An object containing aggregate numerical statistics about the event.
-* `total_files_analyzed`: The total number of individual files analyzed.
-* `suspicious_files_count`: The count of files flagged with a severity of 'Medium' or higher.
-* `total_bytes_transferred_kb`: The total size of all transferred files, in kilobytes.
+  * **`analysis`**: An object containing **observational summaries** and a **balanced overall assessment** of the TLS session's security posture.
+  * `overall_assessment`: **(Trường quan trọng nhất)** A synthesized, human-readable conclusion that weighs all evidence, including certificate issues and threat intelligence matches. It provides a final, context-aware judgment like `"High Confidence Threat"`, `"Suspicious Anomaly"`, or `"Likely Benign"`.
+  * `observed_certificate_issues`: A list of factual issues found with the certificate chain (e.g., `["Self-Signed Certificate", "Expired Certificate"]`). It reports *what was seen* without declaring the entire certificate "Invalid".
+  * `observed_weak_protocols`: A list of weak TLS protocol versions observed (e.g., `["TLSv1.0", "SSLv3"]`).
+  * `observed_weak_ciphers`: A list of weak cipher suites observed.
+  * `handshake_status`: Indicates whether the TLS handshake was 'Successful' or 'Failed'.
 ### Per-File Evidence: Detailed evidence for each file
-* `evidence`: An object containing the detailed evidence to support the conclusions above.
-* `findings`: **(Major Change)** A list, where each object is a detailed analysis record for a single file (replaces the previous `analyzed_files_summary`).
+* **`evidence`**: An object containing the detailed evidence to support the conclusions above.
+* **`findings`**: A list, where each object is a detailed analysis record for a single file (replaces the previous `analyzed_files_summary`).
 ### Fields within each 'finding' object
 Each object in the `findings` list is a flat record containing all information about a single file.
 * `type`: The type of finding, always "FileAnalysisFinding" for this collector.
@@ -171,11 +174,11 @@ Analyze the provided CONTEXT. Your response MUST be a SINGLE, FLAWLESS, and **PE
     "reasoning": {
       "thought_process": "string", // Step 1 * CRITICAL CHECK: First, check if the 'connection' or 'evidence' objects exist in the CONTEXT. If BOTH are missing, you MUST stop immediately and classify as 'Fasle Positive'. If they exist, proceed to list all signals. Then, identify the most significant signals and formulate a hypothesis."
       "analyze_alert": "string",   // Step 2 * Briefly explain the alert signature's general meaning and purpose.
-      "analyze_signals": "string",// Step 3 * Systematically analyze all signals you identified in Step 1: explain its security relevance and explicitly state how it supports or contradicts your stated hypothesis. This process forms a chain of reasoning, listing and analyzing evidence from raw signals to a conclusion in JSON Object.
+      "analyze_signals": "string",// Step 3 * Systematically analyze all signals you identified in Step 1: Explain that singals security relevance and explicitly state how it supports or contradicts your stated hypothesis. This process forms a chain of reasoning, analyzing signals into evidence for STEP 4.
       "synthesize_reasoning": "string" // Step 4 * Synthesize all evidence into a chronological narrative. Explain how the event likely occurred from start to finish.
     },
     "conclusion": {
-      "classification": "string", // Based on your synthesis of reasoning, classify this alert as "True Positive", "False Positive".
+      "classification": "string", // Based on the above analysis. CLASSIFY. Your answer MUST be one of the following two options only: True Positive or False Positive. NO EXPLANATION. DO NOT ADD ANY OTHER WORDS.
       "confidence_score": "number", // Provide a confidence score from 0.0 (very uncertain) to 1.0 (very certain).
       "reasoning_summary": "string" // Provide a brief, one-sentence summary of your final conclusion.
     }
@@ -199,14 +202,14 @@ USER_PROMPT = """
 # CONFIGURATION * CẤU HÌNH
 # ==============================================================================
 # Chuyển thành True để gọi API qua ngrok (public), False để gọi API trong mạng nội bộ (local)
-USE_REMOTE = False
+USE_REMOTE = True
 # --* Cấu hình cho môi trường REMOTE (Ngrok) ---
-remote_url = 'https://c6986d2420fd.ngrok-free.app/'
+remote_url = 'https://eb7f46532797.ngrok-free.app/'
 REMOTE_API_URL = f"{remote_url}v1/chat/completions"
 REMOTE_MODEL_NAME = "meta-llama-3-8b-instruct"
 
 
-ipv4 = '192.168.1.129'
+ipv4 = '172.16.11.16'
 LOCAL_API_URL = f"http://{ipv4}:8080/v1/chat/completions"
 LOCAL_MODEL_NAME = "D:\FPT_CAPSTONE\2025CAPSTONE\1_Source_Code\security_onion_llm_project\llm_model\Meta-Llama-3-8B-Instruct.Q4_K_M.gguf"
     
@@ -282,34 +285,70 @@ class LLMClient:
     def extract_json(self, message_content: str) -> dict | None:
         """
         Trích xuất JSON từ một chuỗi, ưu tiên tìm trong khối mã markdown.
+        **Nâng cấp:** Nếu JSON là một danh sách, hàm sẽ tự động lấy phần tử cuối cùng.
         """
+        json_string = None
         try:
             # Mẫu regex để tìm khối mã JSON (có hoặc không có chữ "json")
-            # re.DOTALL cho phép '.' khớp với cả ký tự xuống dòng
-            match = re.search(r"```(json)?\s*({.*?})\s*```", message_content, re.DOTALL)
+            match = re.search(r"```(json)?\s*([\[{].*?[\]}])\s*```", message_content, re.DOTALL)
             
             if match:
-                # Lấy nội dung trong cặp dấu ngoặc nhọn {} đã được bắt
+                # Lấy nội dung JSON (có thể là object hoặc array)
                 json_string = match.group(2)
             else:
-                # Nếu không tìm thấy khối mã, quay lại phương pháp cũ
-                json_start = message_content.find('{')
-                json_end = message_content.rfind('}')
-                if json_start == -1 or json_end == -1:
-                    logging.error("No JSON block found in LLM response.")
-                    return None
-                json_string = message_content[json_start : json_end + 1]
+                # Nếu không tìm thấy khối mã, tìm JSON đầu tiên và cuối cùng
+                # Cải tiến để tìm cả array `[` và object `{`
+                first_char_pos = min(
+                    (pos for pos in (message_content.find('{'), message_content.find('[')) if pos != -1),
+                    default=-1
+                )
+                last_char_pos = max(message_content.rfind('}'), message_content.rfind(']'))
 
-            return json.loads(json_string)
+                if first_char_pos == -1 or last_char_pos == -1:
+                    logging.error("No JSON block or valid JSON characters found in LLM response.")
+                    return None
+                json_string = message_content[first_char_pos : last_char_pos + 1]
+
+            # Cố gắng parse chuỗi JSON đã trích xuất
+            parsed_data = json.loads(json_string)
 
         except json.JSONDecodeError as e:
+            if not json_string:
+                logging.error(f"Failed to extract any potential JSON string. Error: {e}")
+                return None
             logging.warning(f"Initial JSON decode failed: {e}. Attempting auto-correction...")
             try:
-                # Sử dụng hàm sửa lỗi đã có của bạn
                 repaired_string = repair_json(json_string)
                 logging.info("Successfully repaired JSON. Re-parsing the repaired string.")
-                return json.loads(repaired_string)
+                parsed_data = json.loads(repaired_string)
             except Exception as final_e:
                 logging.error(f"Failed to parse JSON even after repair. Final error: {final_e}")
                 logging.error(f"Original faulty content: {json_string}")
                 return None
+        
+        ## =======================================================
+        ## LOGIC MỚI ĐỂ XỬ LÝ DANH SÁCH (ARRAY)
+        ## =======================================================
+        if isinstance(parsed_data, list):
+            logging.info("Parsed JSON is a list. Extracting the last element.")
+            # Kiểm tra xem danh sách có rỗng không
+            if not parsed_data:
+                logging.warning("Parsed JSON is an empty list.")
+                return None
+            
+            # Lấy phần tử cuối cùng, giả định đó là kết quả thực tế
+            last_item = parsed_data[-1]
+            if isinstance(last_item, dict):
+                return last_item
+            else:
+                logging.warning(f"The last item in the JSON list is not a dictionary (type: {type(last_item)}).")
+                return None
+
+        elif isinstance(parsed_data, dict):
+            # Nếu là dictionary thì đây là trường hợp bình thường
+            return parsed_data
+        
+        else:
+            # Xử lý trường hợp JSON hợp lệ nhưng không phải object hay list (ví dụ: "hello", 123)
+            logging.warning(f"Parsed JSON is not a dictionary or a list (type: {type(parsed_data)}).")
+            return None

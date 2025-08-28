@@ -20,7 +20,7 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(me
 POLL_INTERVAL = 5
 STATE_FILE = "state.json"
 LOCAL_TZ = pytz.timezone('Asia/Ho_Chi_Minh')
-INDEXING_DELAY_BUFFER = timedelta(seconds=60)
+INDEXING_DELAY_BUFFER = timedelta(seconds=65)
 UTC = pytz.utc # Định nghĩa múi giờ UTC để sử dụng
 
 # (Các hàm không thay đổi giữ nguyên)

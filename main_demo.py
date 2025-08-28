@@ -16,18 +16,10 @@ LOG_FORMAT = "%(asctime)s [%(threadName)-12.12s] [%(levelname)-5.5s]  %(message)
 logging.basicConfig(level=logging.INFO, format=LOG_FORMAT)
 
 
-# ALERTS_FILE_PATH = "./so_alerts/ground_truth/200_alerts.json"
-# FINAL_ANALYSIS_OUTPUT_PATH = "./user_prompt/ground_truth/200_alerts.json"
-# name_alert = '1'
-# ALERTS_FILE_PATH = f"./so_test_alerts/ground_truth/{name_alert}.json"
-# FINAL_ANALYSIS_OUTPUT_PATH = f"./user_prompt/{name_alert}.json"
-# name_alert = 'files_alert'
-# ALERTS_FILE_PATH = f"./so_test_alerts/{name_alert}.json"
-# FINAL_ANALYSIS_OUTPUT_PATH = f"./user_prompt/{name_alert}.json"
 TEST_MODE = False
 # name_alert = f'alerts_all-{time.strftime("%Y-%m-%d")}'
 # name_alert = 'alerts_all-2025-08-13'
-name_alert = f'demo1'
+name_alert = f'demo'
 
 ALERTS_FILE_PATH = f"./so_alerts/{name_alert}.jsonl"
 ENRICHED_PROMPTS_DIR = "./outputs/enriched_prompts/demo"
@@ -45,7 +37,7 @@ def get_next_alert_index(directory: str) -> int:
 
     max_index = 0
     prefix = 'alert_enrichment_'
-    suffix = '.json' # Sửa thành .json cho nhất quán với json.dump(indent=4)
+    suffix = '.jsonl' # Sửa thành .json cho nhất quán với json.dump(indent=4)
 
     for filename in os.listdir(directory):
         if filename.startswith(prefix) and filename.endswith(suffix):
