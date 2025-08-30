@@ -7,7 +7,7 @@ import logging
 
 # --- CẤU HÌNH BƯỚC 1 ---
 CSV_FILES_PATTERN = '*_ISCX.csv'
-ALERTS_FILE = 'all_alerts.json'
+ALERTS_FILE = 'alerts_CICIDS2017.json'
 OUTPUT_MAPPED_FILE = 'mapped_alerts.csv'
 
 PROTOCOL_MAP = {'TCP': 6, 'UDP': 17, 'ICMP': 1}
