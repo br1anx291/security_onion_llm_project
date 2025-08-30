@@ -1,0 +1,90 @@
+{
+    "alert": {
+        "signature": "ET INFO HTTP Request to a *.top domain",
+        "category": "Potentially Bad Traffic",
+        "timestamp": "2025-05-25T08:29:45.433Z"
+    },
+    "connection": {
+        "identity": {
+            "source_ip": "192.168.10.17",
+            "source_port": "51555",
+            "destination_ip": "89.30.102.108",
+            "destination_port": "80",
+            "traffic_direction": "Egress",
+            "service": "http",
+            "transport_protocol": "tcp"
+        },
+        "statistics": {
+            "duration_sec": 0.0,
+            "sent_bytes": 431,
+            "received_bytes": 663
+        },
+        "analysis": {
+            "connection_state": "Normal Connection (SF)",
+            "flow_analysis": {
+                "direction": "Symmetrical"
+            }
+        }
+    },
+    "evidence": {
+        "medium": {
+            "http": {
+                "analysis": {
+                    "user_agent_category": "Outdated Browser",
+                    "destination_analysis": "Domain Name Connection",
+                    "content_risk": "No Suspicious Content",
+                    "file_transfer_risk": "Benign Download Detected"
+                },
+                "evidence": {
+                    "connection_context": {
+                        "methods_used": [
+                            "GET"
+                        ],
+                        "user_agent_string": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:31.0) Gecko/20100101 Firefox/31.0"
+                    },
+                    "findings": []
+                },
+                "statistics": {
+                    "total_requests": 1,
+                    "request_bytes": 0,
+                    "response_bytes": 43,
+                    "client_error_ratio": 0.0
+                }
+            }
+        },
+        "reference": {
+            "files": {
+                "analysis": {
+                    "session_risk_summary": "No suspicious file activity detected",
+                    "highest_threat_level": "Informational",
+                    "evasion_techniques_detected": "No",
+                    "suspicious_content_summary": "No suspicious content identified."
+                },
+                "statistics": {
+                    "total_files_analyzed": 1,
+                    "suspicious_files_count": 0,
+                    "total_bytes_transferred_kb": 0.04
+                },
+                "evidence": {
+                    "findings": [
+                        {
+                            "type": "FileAnalysisFinding",
+                            "fuid": "FpYjtt2u1Po2sweME4",
+                            "filename": null,
+                            "direction": "Download",
+                            "severity": "Informational",
+                            "risk_score": 5,
+                            "size_bytes": 43,
+                            "reasons": [],
+                            "hashes": {
+                                "md5": "325472601571f31e1bf00674c368d335",
+                                "sha1": "2daeaa8b5f19f0bc209d976c02bd6acb51b00b0a"
+                            },
+                            "file_type_reported": "image/gif"
+                        }
+                    ]
+                }
+            }
+        }
+    }
+}

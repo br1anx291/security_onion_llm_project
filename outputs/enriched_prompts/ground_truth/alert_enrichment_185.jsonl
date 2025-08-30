@@ -1,0 +1,96 @@
+{
+    "alert": {
+        "signature": "ET INFO Observed Discord Domain in DNS Lookup (discordapp .com)",
+        "category": "Misc activity",
+        "timestamp": "2025-05-25T09:03:59.461Z"
+    },
+    "connection": {
+        "identity": {
+            "source_ip": "192.168.10.3",
+            "source_port": "60712",
+            "destination_ip": "192.168.10.1",
+            "destination_port": "53",
+            "traffic_direction": "Lateral",
+            "service": "dns",
+            "transport_protocol": "udp"
+        },
+        "statistics": {
+            "duration_sec": 41.1059,
+            "sent_bytes": 648,
+            "received_bytes": 1768
+        },
+        "analysis": {
+            "connection_state": "Normal Connection (SF)",
+            "flow_analysis": {
+                "direction": "Symmetrical"
+            }
+        }
+    },
+    "evidence": {
+        "critical": {
+            "dns": {
+                "analysis": {
+                    "overall_assessment": "Potential Threat: Activity exhibits suspicious patterns, including DGA-like patterns.",
+                    "observed_query_pattern": "High Entropy (DGA-like)",
+                    "observed_integrity": "Normal (0% failure rate)",
+                    "observed_tld_risk": "Normal",
+                    "observed_ttl_behavior": "Low (Value: 5s)"
+                },
+                "evidence": {
+                    "connection_context": {
+                        "source_ip": "192.168.10.3",
+                        "destination_dns_server": "192.168.10.1"
+                    },
+                    "findings": [
+                        {
+                            "type": "AttributeFinding",
+                            "source": "answer_record",
+                            "content": 5,
+                            "reasons": [
+                                "Low TTL (5 < 60)"
+                            ]
+                        },
+                        {
+                            "type": "AttributeFinding",
+                            "source": "query_subdomain",
+                            "content": "img.alicdn.com.danuoyi.alicdn.com",
+                            "reasons": [
+                                "High Shannon Entropy (3.37 > 3.0)"
+                            ]
+                        },
+                        {
+                            "type": "AttributeFinding",
+                            "source": "query_subdomain",
+                            "content": "blocklists.settings.services.mozilla.com",
+                            "reasons": [
+                                "High Shannon Entropy (3.40 > 3.0)"
+                            ]
+                        },
+                        {
+                            "type": "AttributeFinding",
+                            "source": "query_subdomain",
+                            "content": "service.weather.microsoft.com",
+                            "reasons": [
+                                "High Shannon Entropy (3.09 > 3.0)"
+                            ]
+                        },
+                        {
+                            "type": "AttributeFinding",
+                            "source": "query_subdomain",
+                            "content": "ocsp-ds.ws.symantec.com.edgekey.net",
+                            "reasons": [
+                                "High Shannon Entropy (3.37 > 3.0)"
+                            ]
+                        }
+                    ]
+                },
+                "statistics": {
+                    "total_queries": 12,
+                    "distinct_queries": 12,
+                    "failed_queries_ratio": 0.0,
+                    "distinct_answers": 36
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,57 @@
+{
+    "alert": {
+        "signature": "ET INFO HTTP Request to a *.tw domain",
+        "category": "Potentially Bad Traffic",
+        "timestamp": "2025-05-25T06:33:11.032Z"
+    },
+    "connection": {
+        "identity": {
+            "source_ip": "192.168.10.51",
+            "source_port": "38849",
+            "destination_ip": "60.199.140.96",
+            "destination_port": "80",
+            "traffic_direction": "Egress",
+            "service": "http",
+            "transport_protocol": "tcp"
+        },
+        "statistics": {
+            "duration_sec": 0.7304,
+            "sent_bytes": 291,
+            "received_bytes": 10002
+        },
+        "analysis": {
+            "connection_state": "Normal Connection (SF)",
+            "flow_analysis": {
+                "direction": "download",
+                "ratio": 34
+            }
+        }
+    },
+    "evidence": {
+        "medium": {
+            "http": {
+                "analysis": {
+                    "user_agent_category": "Outdated Browser",
+                    "destination_analysis": "Domain Name Connection",
+                    "content_risk": "No Suspicious Content",
+                    "file_transfer_risk": "No File Transfer"
+                },
+                "evidence": {
+                    "connection_context": {
+                        "methods_used": [
+                            "GET"
+                        ],
+                        "user_agent_string": "Mozilla/5.0 (X11; Ubuntu; Linux i686; rv:31.0) Gecko/20100101 Firefox/31.0"
+                    },
+                    "findings": []
+                },
+                "statistics": {
+                    "total_requests": 1,
+                    "request_bytes": 0,
+                    "response_bytes": 0,
+                    "client_error_ratio": 0.0
+                }
+            }
+        }
+    }
+}

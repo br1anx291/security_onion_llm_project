@@ -1,0 +1,65 @@
+{
+    "alert": {
+        "signature": "ET INFO External IP Lookup Domain (ipify .org) in DNS Lookup",
+        "category": "Misc activity",
+        "timestamp": "2025-05-25T08:27:21.628Z"
+    },
+    "connection": {
+        "identity": {
+            "source_ip": "192.168.10.5",
+            "source_port": "62104",
+            "destination_ip": "192.168.10.3",
+            "destination_port": "53",
+            "traffic_direction": "Lateral",
+            "service": "dns",
+            "transport_protocol": "udp"
+        },
+        "statistics": {
+            "duration_sec": 0.005,
+            "sent_bytes": 82,
+            "received_bytes": 832
+        },
+        "analysis": {
+            "connection_state": "Normal Connection (SF)",
+            "flow_analysis": {
+                "direction": "download",
+                "ratio": 10
+            }
+        }
+    },
+    "evidence": {
+        "low": {
+            "dns": {
+                "analysis": {
+                    "overall_assessment": "Benign Anomaly Likely: Low-confidence anomalies were observed (e.g., low TTL or monitored TLDs), but no strong threat patterns were detected.",
+                    "observed_query_pattern": "Normal",
+                    "observed_integrity": "Normal (0% failure rate)",
+                    "observed_tld_risk": "Normal",
+                    "observed_ttl_behavior": "Low (Value: 16s)"
+                },
+                "evidence": {
+                    "connection_context": {
+                        "source_ip": "192.168.10.5",
+                        "destination_dns_server": "192.168.10.3"
+                    },
+                    "findings": [
+                        {
+                            "type": "AttributeFinding",
+                            "source": "answer_record",
+                            "content": 16,
+                            "reasons": [
+                                "Low TTL (16 < 60)"
+                            ]
+                        }
+                    ]
+                },
+                "statistics": {
+                    "total_queries": 2,
+                    "distinct_queries": 1,
+                    "failed_queries_ratio": 0.0,
+                    "distinct_answers": 22
+                }
+            }
+        }
+    }
+}

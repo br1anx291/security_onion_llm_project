@@ -1,0 +1,53 @@
+{
+    "alert": {
+        "signature": "ET JA3 Hash - [Abuse.ch] Possible Adware",
+        "category": "Unknown Traffic",
+        "timestamp": "2025-05-25T08:27:21.670Z"
+    },
+    "connection": {
+        "identity": {
+            "source_ip": "192.168.10.5",
+            "source_port": "61168",
+            "destination_ip": "93.184.216.116",
+            "destination_port": "443",
+            "traffic_direction": "Egress",
+            "service": "ssl",
+            "transport_protocol": "tcp"
+        },
+        "statistics": {
+            "duration_sec": 0.1743,
+            "sent_bytes": 1147,
+            "received_bytes": 46908
+        },
+        "analysis": {
+            "connection_state": "Normal Connection (SF)",
+            "flow_analysis": {
+                "direction": "download",
+                "ratio": 41
+            }
+        }
+    },
+    "evidence": {
+        "low": {
+            "ssl": {
+                "analysis": {
+                    "overall_assessment": "Likely Benign: No significant threat indicators found in the TLS session.",
+                    "handshake_status": "Failed"
+                },
+                "statistics": {
+                    "connection_duration_sec": 0.0
+                },
+                "evidence": {
+                    "server_names": [
+                        "cdn.engine.4dsply.com"
+                    ],
+                    "ja3_details": [
+                        {
+                            "hash": "46efd49abcca8ea9baa932da68fdb529"
+                        }
+                    ]
+                }
+            }
+        }
+    }
+}

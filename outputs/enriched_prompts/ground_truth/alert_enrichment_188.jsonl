@@ -1,0 +1,87 @@
+{
+    "alert": {
+        "signature": "ET MALWARE Spoofed MSIE 7 User-Agent Likely Ponmocup",
+        "category": "A Network Trojan was detected",
+        "timestamp": "2025-05-25T09:26:55.113Z"
+    },
+    "connection": {
+        "identity": {
+            "source_ip": "172.16.0.1",
+            "source_port": "35614",
+            "destination_ip": "192.168.10.50",
+            "destination_port": "80",
+            "traffic_direction": "Lateral",
+            "service": "http",
+            "transport_protocol": "tcp"
+        },
+        "statistics": {
+            "duration_sec": 2.2376,
+            "sent_bytes": 524,
+            "received_bytes": 1983
+        },
+        "analysis": {
+            "connection_state": "Normal Connection (SF)",
+            "flow_analysis": {
+                "direction": "Symmetrical"
+            }
+        }
+    },
+    "evidence": {
+        "high": {
+            "http": {
+                "analysis": {
+                    "user_agent_category": "Normal Browser",
+                    "destination_analysis": "Direct-to-IP Connection",
+                    "content_risk": "No Suspicious Content",
+                    "file_transfer_risk": "Benign Upload Detected"
+                },
+                "evidence": {
+                    "connection_context": {
+                        "methods_used": [
+                            "FAKEVERB"
+                        ],
+                        "user_agent_string": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/33.0.1750.152 Safari/537.36Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_2) AppleWebKit/537.75.14 (KHTML, like Gecko) Version/7.0.3 Safari/537.75.14",
+                        "destination_ip": "205.174.165.68"
+                    },
+                    "findings": []
+                },
+                "statistics": {
+                    "total_requests": 1,
+                    "request_bytes": 11,
+                    "response_bytes": 0,
+                    "client_error_ratio": 0.0
+                }
+            }
+        },
+        "reference": {
+            "files": {
+                "analysis": {
+                    "session_risk_summary": "No suspicious file activity detected",
+                    "highest_threat_level": "Informational",
+                    "evasion_techniques_detected": "No",
+                    "suspicious_content_summary": "No suspicious content identified."
+                },
+                "statistics": {
+                    "total_files_analyzed": 1,
+                    "suspicious_files_count": 0,
+                    "total_bytes_transferred_kb": 0.01
+                },
+                "evidence": {
+                    "findings": [
+                        {
+                            "type": "FileAnalysisFinding",
+                            "fuid": "FtuR6HEzV9KjNm6El",
+                            "filename": null,
+                            "direction": "Upload",
+                            "severity": "Informational",
+                            "risk_score": 5,
+                            "size_bytes": 7,
+                            "reasons": [],
+                            "transfer_status": "Incomplete (Missing Bytes)"
+                        }
+                    ]
+                }
+            }
+        }
+    }
+}

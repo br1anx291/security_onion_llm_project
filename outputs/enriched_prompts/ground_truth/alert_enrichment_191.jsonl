@@ -1,0 +1,74 @@
+{
+    "alert": {
+        "signature": "ET WEB_SERVER Script tag in URI Possible Cross Site Scripting Attempt",
+        "category": "Web Application Attack",
+        "timestamp": "2025-07-02T02:34:00.588Z"
+    },
+    "connection": {
+        "identity": {
+            "source_ip": "172.16.0.1",
+            "source_port": "59042",
+            "destination_ip": "192.168.10.50",
+            "destination_port": "80",
+            "traffic_direction": "Lateral",
+            "service": "http",
+            "transport_protocol": "tcp"
+        },
+        "statistics": {
+            "duration_sec": 1.0471,
+            "sent_bytes": 48783,
+            "received_bytes": 183584
+        },
+        "analysis": {
+            "connection_state": "Normal Connection (SF)",
+            "flow_analysis": {
+                "direction": "Symmetrical"
+            }
+        }
+    },
+    "evidence": {
+        "high": {
+            "http": {
+                "analysis": {
+                    "user_agent_category": "Normal Browser",
+                    "destination_analysis": "Direct-to-IP Connection",
+                    "content_risk": "Suspicious Content Detected",
+                    "file_transfer_risk": "No File Transfer",
+                    "findings_summary": [
+                        "Detected pattern 'Script Tag' 50 times in URI."
+                    ]
+                },
+                "evidence": {
+                    "connection_context": {
+                        "methods_used": [
+                            "GET"
+                        ],
+                        "user_agent_string": "Mozilla/5.0 (X11; Linux x86_64; rv:45.0) Gecko/20100101 Firefox/45.0",
+                        "destination_ip": "205.174.165.68"
+                    },
+                    "findings": [
+                        {
+                            "type": "AggregatedContentFinding",
+                            "source": "URI",
+                            "reasons": [
+                                "Script Tag"
+                            ],
+                            "count": 50,
+                            "examples": [
+                                "/dv/vulnerabilities/xss_r/?name=<script>console.log('QNO4RNAMM20XKJM0PU70B8ET0SO2Y3NZW03MX8SW56VOA20MO1');console.log(document.cookie);</script>",
+                                "/dv/vulnerabilities/xss_r/?name=<script>console.log('EY928ML1XJMGNH9J0YIKC5HUBCQUTDMH5GJRJ7V6J1138A37UA');console.log(document.cookie);</script>",
+                                "/dv/vulnerabilities/xss_r/?name=<script>console.log('DLS6BIJN0NK7C8ET9U58KMAYWUOZ6OKORI2ACU67CCL21YFSF1');console.log(document.cookie);</script>"
+                            ]
+                        }
+                    ]
+                },
+                "statistics": {
+                    "total_requests": 101,
+                    "request_bytes": 0,
+                    "response_bytes": 0,
+                    "client_error_ratio": 0.0
+                }
+            }
+        }
+    }
+}

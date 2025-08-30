@@ -1,0 +1,29 @@
+{
+    "alert": {
+        "signature": "ET INFO External IP Lookup Domain (freegeiop .net in DNS lookup)",
+        "category": "Device Retrieving External IP Address Detected",
+        "timestamp": "2025-06-05T11:54:59.584Z"
+    },
+    "connection": {
+        "identity": {
+            "source_ip": "192.168.10.15",
+            "source_port": "58368",
+            "destination_ip": "192.168.10.3",
+            "destination_port": "53",
+            "traffic_direction": "Lateral",
+            "service": "dns",
+            "transport_protocol": "udp"
+        },
+        "statistics": {
+            "duration_sec": 0.0097,
+            "sent_bytes": 124,
+            "received_bytes": 126
+        },
+        "analysis": {
+            "connection_state": "Normal Connection (SF)",
+            "flow_analysis": {
+                "direction": "Symmetrical"
+            }
+        }
+    }
+}

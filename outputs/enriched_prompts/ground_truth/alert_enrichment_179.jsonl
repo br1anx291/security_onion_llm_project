@@ -1,0 +1,96 @@
+{
+    "alert": {
+        "signature": "ET INFO Suspicious Domain (polyfill .io) in DNS Lookup",
+        "category": "Potentially Bad Traffic",
+        "timestamp": "2025-06-05T11:54:20.177Z"
+    },
+    "connection": {
+        "identity": {
+            "source_ip": "192.168.10.3",
+            "source_port": "61649",
+            "destination_ip": "192.168.10.1",
+            "destination_port": "53",
+            "traffic_direction": "Lateral",
+            "service": "dns",
+            "transport_protocol": "udp"
+        },
+        "statistics": {
+            "duration_sec": 51.7291,
+            "sent_bytes": 516,
+            "received_bytes": 954
+        },
+        "analysis": {
+            "connection_state": "Normal Connection (SF)",
+            "flow_analysis": {
+                "direction": "Symmetrical"
+            }
+        }
+    },
+    "evidence": {
+        "critical": {
+            "dns": {
+                "analysis": {
+                    "overall_assessment": "Potential Threat: Activity exhibits suspicious patterns, including DGA-like patterns.",
+                    "observed_query_pattern": "High Entropy (DGA-like)",
+                    "observed_integrity": "Normal (0% failure rate)",
+                    "observed_tld_risk": "Normal",
+                    "observed_ttl_behavior": "Low (Value: 6s)"
+                },
+                "evidence": {
+                    "connection_context": {
+                        "source_ip": "192.168.10.3",
+                        "destination_dns_server": "192.168.10.1"
+                    },
+                    "findings": [
+                        {
+                            "type": "AttributeFinding",
+                            "source": "answer_record",
+                            "content": 6,
+                            "reasons": [
+                                "Low TTL (6 < 60)"
+                            ]
+                        },
+                        {
+                            "type": "AttributeFinding",
+                            "source": "query_subdomain",
+                            "content": "star-mini.c10r.facebook.com",
+                            "reasons": [
+                                "High Shannon Entropy (3.25 > 3.0)"
+                            ]
+                        },
+                        {
+                            "type": "AttributeFinding",
+                            "source": "query_subdomain",
+                            "content": "ocsp-ds.ws.symantec.com.edgekey.net",
+                            "reasons": [
+                                "High Shannon Entropy (3.37 > 3.0)"
+                            ]
+                        },
+                        {
+                            "type": "AttributeFinding",
+                            "source": "query_subdomain",
+                            "content": "pixel-origin.mathtag.com",
+                            "reasons": [
+                                "High Shannon Entropy (3.03 > 3.0)"
+                            ]
+                        },
+                        {
+                            "type": "AttributeFinding",
+                            "source": "query_subdomain",
+                            "content": "googleadapis.l.google.com",
+                            "reasons": [
+                                "High Shannon Entropy (3.09 > 3.0)"
+                            ]
+                        }
+                    ]
+                },
+                "statistics": {
+                    "total_queries": 10,
+                    "distinct_queries": 10,
+                    "failed_queries_ratio": 0.0,
+                    "distinct_answers": 15
+                }
+            }
+        }
+    }
+}
