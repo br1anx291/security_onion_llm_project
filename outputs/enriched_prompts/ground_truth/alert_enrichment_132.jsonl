@@ -1,0 +1,155 @@
+{
+    "alert": {
+        "signature": "ET INFO Windows OS Submitting USB Metadata to Microsoft",
+        "category": "Misc activity",
+        "timestamp": "2025-05-25T08:27:25.968Z"
+    },
+    "connection": {
+        "identity": {
+            "source_ip": "192.168.10.3",
+            "source_port": 58565,
+            "destination_ip": "40.112.213.22",
+            "destination_port": 80,
+            "traffic_direction": "Egress",
+            "service": "http",
+            "transport_protocol": "tcp"
+        },
+        "statistics": {
+            "duration_seconds": 1.3831
+        },
+        "analysis": {
+            "overall_assessment": "Informational: Standard connection recorded.",
+            "connection_state_desc": "Connection established and fully closed",
+            "flow_ratio": {
+                "upload_bytes": 7284,
+                "download_bytes": 7800,
+                "ratio": 0.9
+            }
+        }
+    },
+    "evidence": {
+        "reference": {
+            "http": {
+                "analysis": {
+                    "overall_assessment": "Benign: No significant threat indicators found.",
+                    "observed_user_agent_properties": [
+                        "Normal"
+                    ],
+                    "observed_destination": "Domain Name",
+                    "observed_content_patterns": [
+                        "None"
+                    ],
+                    "observed_file_transfers": {
+                        "uploads": "3 files (Benign)",
+                        "downloads": "None"
+                    }
+                },
+                "evidence": {
+                    "connection_context": {
+                        "methods_used": [
+                            "POST"
+                        ],
+                        "user_agent_string": "MICROSOFT_DEVICE_METADATA_RETRIEVAL_CLIENT"
+                    },
+                    "findings": [
+                        {
+                            "type": "FileTransfer",
+                            "direction": "upload",
+                            "fuid": "F5vKZX2s6NAKQ7f429",
+                            "filenames": [],
+                            "mime_types": [
+                                "application/xml"
+                            ]
+                        },
+                        {
+                            "type": "FileTransfer",
+                            "direction": "upload",
+                            "fuid": "FaYThU2IMYnACGWEa8",
+                            "filenames": [],
+                            "mime_types": [
+                                "application/xml"
+                            ]
+                        },
+                        {
+                            "type": "FileTransfer",
+                            "direction": "upload",
+                            "fuid": "FEvE8k4K8gDrrfYV11",
+                            "filenames": [],
+                            "mime_types": [
+                                "application/xml"
+                            ]
+                        }
+                    ]
+                },
+                "statistics": {
+                    "total_requests": 4,
+                    "request_bytes": 3864,
+                    "response_bytes": 0,
+                    "client_error_ratio": 0.0
+                }
+            },
+            "files": {
+                "analysis": {
+                    "session_risk_summary": "No suspicious file activity detected",
+                    "highest_threat_level": "Informational",
+                    "evasion_techniques_detected": false,
+                    "suspicious_content_summary": "0 file(s) flagged with Medium or higher severity."
+                },
+                "statistics": {
+                    "total_files_analyzed": 3,
+                    "suspicious_files_count": 0,
+                    "total_bytes_transferred_kb": 3.77
+                },
+                "evidence": {
+                    "findings": [
+                        {
+                            "type": "FileAnalysisFinding",
+                            "fuid": "FEvE8k4K8gDrrfYV11",
+                            "filename": null,
+                            "direction": "Upload",
+                            "severity": "Informational",
+                            "risk_score": 5,
+                            "size_bytes": 1242,
+                            "reasons": [],
+                            "file_type_reported": "application/xml",
+                            "hashes": {
+                                "md5": "e8815aa626cebc0e68523fe4946cbb9a",
+                                "sha1": "94fa2963244841c59ffffc271291b1e3953e88f6"
+                            }
+                        },
+                        {
+                            "type": "FileAnalysisFinding",
+                            "fuid": "FaYThU2IMYnACGWEa8",
+                            "filename": null,
+                            "direction": "Upload",
+                            "severity": "Informational",
+                            "risk_score": 5,
+                            "size_bytes": 1380,
+                            "reasons": [],
+                            "file_type_reported": "application/xml",
+                            "hashes": {
+                                "md5": "5e96f743d235a3c975b2b53c7761e591",
+                                "sha1": "e4126fa6e294b36b343c9dc073169ae1060c8543"
+                            }
+                        },
+                        {
+                            "type": "FileAnalysisFinding",
+                            "fuid": "F5vKZX2s6NAKQ7f429",
+                            "filename": null,
+                            "direction": "Upload",
+                            "severity": "Informational",
+                            "risk_score": 5,
+                            "size_bytes": 1242,
+                            "reasons": [],
+                            "file_type_reported": "application/xml",
+                            "hashes": {
+                                "md5": "9987889a62a1000f07d29128a7b7f2f4",
+                                "sha1": "65342225ddb5101508a74d7630c5239ccd8bc4d6"
+                            }
+                        }
+                    ]
+                }
+            }
+        }
+    }
+}

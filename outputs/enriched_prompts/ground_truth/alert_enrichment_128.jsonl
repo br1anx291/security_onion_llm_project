@@ -1,0 +1,64 @@
+{
+    "alert": {
+        "signature": "ET INFO GNU/Linux APT User-Agent Outbound likely related to package management",
+        "category": "Not Suspicious Traffic",
+        "timestamp": "2025-05-25T08:18:47.149Z"
+    },
+    "connection": {
+        "identity": {
+            "source_ip": "192.168.10.50",
+            "source_port": 33542,
+            "destination_ip": "91.189.88.161",
+            "destination_port": 80,
+            "traffic_direction": "Egress",
+            "service": "http",
+            "transport_protocol": "tcp"
+        },
+        "statistics": {
+            "duration_seconds": 0.0192
+        },
+        "analysis": {
+            "overall_assessment": "Informational: Standard connection recorded.",
+            "connection_state_desc": "Connection established and fully closed",
+            "flow_ratio": {
+                "upload_bytes": 217,
+                "download_bytes": 102458,
+                "ratio": 0.0
+            }
+        }
+    },
+    "evidence": {
+        "reference": {
+            "http": {
+                "analysis": {
+                    "overall_assessment": "Benign: No significant threat indicators found.",
+                    "observed_user_agent_properties": [
+                        "Normal"
+                    ],
+                    "observed_destination": "Domain Name",
+                    "observed_content_patterns": [
+                        "None"
+                    ],
+                    "observed_file_transfers": {
+                        "uploads": "None",
+                        "downloads": "None"
+                    }
+                },
+                "evidence": {
+                    "connection_context": {
+                        "methods_used": [
+                            "GET"
+                        ],
+                        "user_agent_string": "Debian APT-HTTP/1.3 (1.2.19)"
+                    }
+                },
+                "statistics": {
+                    "total_requests": 1,
+                    "request_bytes": 0,
+                    "response_bytes": 0,
+                    "client_error_ratio": 0.0
+                }
+            }
+        }
+    }
+}

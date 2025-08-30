@@ -7,23 +7,22 @@
     "connection": {
         "identity": {
             "source_ip": "172.16.0.1",
-            "source_port": "47134",
+            "source_port": 47134,
             "destination_ip": "192.168.10.50",
-            "destination_port": "80",
+            "destination_port": 80,
             "traffic_direction": "Lateral",
-            "service": null,
             "transport_protocol": "tcp"
         },
         "statistics": {
-            "duration_sec": 0.1163,
-            "sent_bytes": 321,
-            "received_bytes": 11596
+            "duration_seconds": 0.1163
         },
         "analysis": {
-            "connection_state": "Reset by Originator (RSTO)",
-            "flow_analysis": {
-                "direction": "download",
-                "ratio": 36
+            "overall_assessment": "Informational: Standard connection recorded.",
+            "connection_state_desc": "Connection closed by client (RST)",
+            "flow_ratio": {
+                "upload_bytes": 321,
+                "download_bytes": 11596,
+                "ratio": 0.0
             }
         }
     }

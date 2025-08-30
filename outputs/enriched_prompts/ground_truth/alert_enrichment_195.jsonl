@@ -7,23 +7,23 @@
     "connection": {
         "identity": {
             "source_ip": "172.16.0.1",
-            "source_port": "52829",
+            "source_port": 52829,
             "destination_ip": "192.168.10.50",
-            "destination_port": "80",
+            "destination_port": 80,
             "traffic_direction": "Lateral",
             "service": "http",
             "transport_protocol": "tcp"
         },
         "statistics": {
-            "duration_sec": 0.2735,
-            "sent_bytes": 20,
-            "received_bytes": 11595
+            "duration_seconds": 0.2735
         },
         "analysis": {
-            "connection_state": "Reset by Originator (RSTO)",
-            "flow_analysis": {
-                "direction": "download",
-                "ratio": 580
+            "overall_assessment": "Informational: Standard connection recorded.",
+            "connection_state_desc": "Connection closed by client (RST)",
+            "flow_ratio": {
+                "upload_bytes": 20,
+                "download_bytes": 11595,
+                "ratio": 0.0
             }
         }
     },
@@ -31,18 +31,25 @@
         "reference": {
             "http": {
                 "analysis": {
-                    "user_agent_category": "Unknown",
-                    "destination_analysis": "Domain Name Connection",
-                    "content_risk": "No Suspicious Content",
-                    "file_transfer_risk": "No File Transfer"
+                    "overall_assessment": "Benign: No significant threat indicators found.",
+                    "observed_user_agent_properties": [
+                        "Normal"
+                    ],
+                    "observed_destination": "Domain Name",
+                    "observed_content_patterns": [
+                        "None"
+                    ],
+                    "observed_file_transfers": {
+                        "uploads": "None",
+                        "downloads": "None"
+                    }
                 },
                 "evidence": {
                     "connection_context": {
                         "methods_used": [
                             "GET"
                         ]
-                    },
-                    "findings": []
+                    }
                 },
                 "statistics": {
                     "total_requests": 1,

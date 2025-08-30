@@ -1,0 +1,7 @@
+{
+    "alert": {
+        "signature": "ET INFO OpenSSL Demo CA - Internet Widgits Pty (O)",
+        "category": "Not Suspicious Traffic",
+        "timestamp": "2025-05-25T09:31:58.554Z"
+    }
+}

@@ -1,0 +1,73 @@
+{
+    "alert": {
+        "signature": "ET INFO Tencent Cloud Storage Domain in DNS Lookup (myqcloud .com)",
+        "category": "Misc activity",
+        "timestamp": "2025-05-25T09:05:11.758Z"
+    },
+    "connection": {
+        "identity": {
+            "source_ip": "192.168.10.8",
+            "source_port": 58540,
+            "destination_ip": "192.168.10.3",
+            "destination_port": 53,
+            "traffic_direction": "Lateral",
+            "service": "dns",
+            "transport_protocol": "udp"
+        },
+        "statistics": {
+            "duration_seconds": 0.1104
+        },
+        "analysis": {
+            "overall_assessment": "Informational: Standard connection recorded.",
+            "connection_state_desc": "Connection established and fully closed",
+            "flow_ratio": {
+                "upload_bytes": 102,
+                "download_bytes": 664,
+                "ratio": 0.2
+            }
+        }
+    },
+    "evidence": {
+        "critical": {
+            "dns": {
+                "analysis": {
+                    "overall_assessment": "Potential Threat: Activity exhibits DGA-like queries.",
+                    "observed_query_pattern": "High Entropy (DGA-like)",
+                    "observed_integrity": "Normal (0% failure rate)",
+                    "observed_tld_risk": "Normal",
+                    "observed_ttl_behavior": "Normal"
+                },
+                "evidence": {
+                    "connection_context": {
+                        "source_ip": "192.168.10.8",
+                        "destination_dns_server": "192.168.10.3"
+                    },
+                    "findings": [
+                        {
+                            "type": "AttributeFinding",
+                            "source": "query_subdomain",
+                            "content": "udata-10009275.image.myqcloud.com",
+                            "reasons": [
+                                "High Shannon Entropy (3.64)"
+                            ]
+                        },
+                        {
+                            "type": "AttributeFinding",
+                            "source": "query_subdomain",
+                            "content": "udata-10009275.image.myqcloud.com",
+                            "reasons": [
+                                "High Shannon Entropy (3.64)"
+                            ]
+                        }
+                    ]
+                },
+                "statistics": {
+                    "total_queries": 2,
+                    "distinct_queries": 1,
+                    "failed_queries_ratio": 0.0,
+                    "distinct_answers": 16
+                }
+            }
+        }
+    }
+}

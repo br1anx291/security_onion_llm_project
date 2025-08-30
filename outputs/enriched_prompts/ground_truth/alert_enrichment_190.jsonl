@@ -7,44 +7,50 @@
     "connection": {
         "identity": {
             "source_ip": "172.16.0.1",
-            "source_port": "34946",
+            "source_port": 34946,
             "destination_ip": "192.168.10.50",
-            "destination_port": "80",
+            "destination_port": 80,
             "traffic_direction": "Lateral",
             "service": "http",
             "transport_protocol": "tcp"
         },
         "statistics": {
-            "duration_sec": 2.3046,
-            "sent_bytes": 367,
-            "received_bytes": 11632
+            "duration_seconds": 2.3046
         },
         "analysis": {
-            "connection_state": "Reset by Originator (RSTO)",
-            "flow_analysis": {
-                "direction": "download",
-                "ratio": 32
+            "overall_assessment": "Informational: Standard connection recorded.",
+            "connection_state_desc": "Connection closed by client (RST)",
+            "flow_ratio": {
+                "upload_bytes": 367,
+                "download_bytes": 11632,
+                "ratio": 0.0
             }
         }
     },
     "evidence": {
-        "high": {
+        "reference": {
             "http": {
                 "analysis": {
-                    "user_agent_category": "Outdated Browser",
-                    "destination_analysis": "Direct-to-IP Connection",
-                    "content_risk": "No Suspicious Content",
-                    "file_transfer_risk": "No File Transfer"
+                    "overall_assessment": "Suspicious Anomaly: Session involves a direct-to-IP connection.",
+                    "observed_user_agent_properties": [
+                        "Outdated Browser Signature"
+                    ],
+                    "observed_destination": "Direct-to-IP (205.174.165.68)",
+                    "observed_content_patterns": [
+                        "None"
+                    ],
+                    "observed_file_transfers": {
+                        "uploads": "None",
+                        "downloads": "None"
+                    }
                 },
                 "evidence": {
                     "connection_context": {
                         "methods_used": [
                             "GET"
                         ],
-                        "user_agent_string": "Mozilla/5.0 (Windows; U; MSIE 7.0b; Macintosh; .NET CLR 3.0.7688; Intel Mac OS X 10_0_1)",
-                        "destination_ip": "205.174.165.68"
-                    },
-                    "findings": []
+                        "user_agent_string": "Mozilla/5.0 (Windows; U; MSIE 7.0b; Macintosh; .NET CLR 3.0.7688; Intel Mac OS X 10_0_1)"
+                    }
                 },
                 "statistics": {
                     "total_requests": 1,

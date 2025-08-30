@@ -1,0 +1,30 @@
+{
+    "alert": {
+        "signature": "ET INFO Pastebin-like Service Domain in DNS Lookup (jsfiddle .net)",
+        "category": "Misc activity",
+        "timestamp": "2025-05-25T09:57:37.916Z"
+    },
+    "connection": {
+        "identity": {
+            "source_ip": "192.168.10.15",
+            "source_port": 60744,
+            "destination_ip": "192.168.10.3",
+            "destination_port": 53,
+            "traffic_direction": "Lateral",
+            "service": "dns",
+            "transport_protocol": "udp"
+        },
+        "statistics": {
+            "duration_seconds": 0.0052
+        },
+        "analysis": {
+            "overall_assessment": "Informational: Standard connection recorded.",
+            "connection_state_desc": "Connection established and fully closed",
+            "flow_ratio": {
+                "upload_bytes": 148,
+                "download_bytes": 200,
+                "ratio": 0.7
+            }
+        }
+    }
+}

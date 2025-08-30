@@ -1,0 +1,54 @@
+{
+    "alert": {
+        "signature": "ET INFO External IP Address Lookup Domain (ipify .org) in TLS SNI",
+        "category": "Misc activity",
+        "timestamp": "2025-05-25T08:23:26.687Z"
+    },
+    "connection": {
+        "identity": {
+            "source_ip": "192.168.10.5",
+            "source_port": 51446,
+            "destination_ip": "54.243.147.114",
+            "destination_port": 443,
+            "traffic_direction": "Egress",
+            "service": "ssl",
+            "transport_protocol": "tcp"
+        },
+        "statistics": {
+            "duration_seconds": 18.0743
+        },
+        "analysis": {
+            "overall_assessment": "Suspicious: Connection failed with state 'S2', which may indicate scanning.",
+            "connection_state_desc": "Handshake started, closed by server before completion",
+            "flow_ratio": {
+                "upload_bytes": 760,
+                "download_bytes": 3715,
+                "ratio": 0.2
+            }
+        }
+    },
+    "evidence": {
+        "low": {
+            "ssl": {
+                "analysis": {
+                    "overall_assessment": "Benign: No significant threat indicators found.",
+                    "handshake_status": "Failed"
+                },
+                "statistics": {
+                    "connection_duration_sec": 0.0
+                },
+                "evidence": {
+                    "server_names": [
+                        "api.ipify.org"
+                    ],
+                    "ja3_details": [
+                        {
+                            "hash": "d3b972883dfbd24fd20fc200ad8ab22a",
+                            "threat_name": null
+                        }
+                    ]
+                }
+            }
+        }
+    }
+}

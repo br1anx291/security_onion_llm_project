@@ -1,0 +1,65 @@
+{
+    "alert": {
+        "signature": "ET INFO Abused Hosting Domain in DNS Lookup (azurewebsites .net)",
+        "category": "Misc activity",
+        "timestamp": "2025-07-02T02:22:30.577Z"
+    },
+    "connection": {
+        "identity": {
+            "source_ip": "192.168.10.3",
+            "source_port": 60503,
+            "destination_ip": "192.168.10.1",
+            "destination_port": 53,
+            "traffic_direction": "Lateral",
+            "service": "dns",
+            "transport_protocol": "udp"
+        },
+        "statistics": {
+            "duration_seconds": 16.741
+        },
+        "analysis": {
+            "overall_assessment": "Informational: Standard connection recorded.",
+            "connection_state_desc": "Connection established and fully closed",
+            "flow_ratio": {
+                "upload_bytes": 129,
+                "download_bytes": 269,
+                "ratio": 0.5
+            }
+        }
+    },
+    "evidence": {
+        "low": {
+            "dns": {
+                "analysis": {
+                    "overall_assessment": "Suspicious: Low-confidence anomalies observed (e.g., low TTL, monitored TLDs).",
+                    "observed_query_pattern": "Normal",
+                    "observed_integrity": "Normal (0% failure rate)",
+                    "observed_tld_risk": "Normal",
+                    "observed_ttl_behavior": "Low (2s)"
+                },
+                "evidence": {
+                    "connection_context": {
+                        "source_ip": "192.168.10.3",
+                        "destination_dns_server": "192.168.10.1"
+                    },
+                    "findings": [
+                        {
+                            "type": "AttributeFinding",
+                            "source": "answer_record",
+                            "content": "2",
+                            "reasons": [
+                                "Low TTL (2s)"
+                            ]
+                        }
+                    ]
+                },
+                "statistics": {
+                    "total_queries": 3,
+                    "distinct_queries": 3,
+                    "failed_queries_ratio": 0.0,
+                    "distinct_answers": 3
+                }
+            }
+        }
+    }
+}

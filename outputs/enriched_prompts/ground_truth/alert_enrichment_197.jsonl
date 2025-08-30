@@ -7,22 +7,23 @@
     "connection": {
         "identity": {
             "source_ip": "192.168.10.3",
-            "source_port": "62441",
+            "source_port": 62441,
             "destination_ip": "192.168.10.1",
-            "destination_port": "53",
+            "destination_port": 53,
             "traffic_direction": "Lateral",
             "service": "dns",
             "transport_protocol": "udp"
         },
         "statistics": {
-            "duration_sec": 52.4499,
-            "sent_bytes": 401,
-            "received_bytes": 911
+            "duration_seconds": 52.4499
         },
         "analysis": {
-            "connection_state": "Normal Connection (SF)",
-            "flow_analysis": {
-                "direction": "Symmetrical"
+            "overall_assessment": "Informational: Standard connection recorded.",
+            "connection_state_desc": "Connection established and fully closed",
+            "flow_ratio": {
+                "upload_bytes": 401,
+                "download_bytes": 911,
+                "ratio": 0.4
             }
         }
     },
@@ -30,11 +31,11 @@
         "critical": {
             "dns": {
                 "analysis": {
-                    "overall_assessment": "Potential Threat: Activity exhibits suspicious patterns, including DGA-like patterns.",
+                    "overall_assessment": "Potential Threat: Activity exhibits DGA-like queries.",
                     "observed_query_pattern": "High Entropy (DGA-like)",
                     "observed_integrity": "Normal (0% failure rate)",
-                    "observed_tld_risk": "Contains Monitored TLDs",
-                    "observed_ttl_behavior": "Low (Value: 22s)"
+                    "observed_tld_risk": "Suspicious",
+                    "observed_ttl_behavior": "Low (22s)"
                 },
                 "evidence": {
                     "connection_context": {
@@ -45,9 +46,9 @@
                         {
                             "type": "AttributeFinding",
                             "source": "answer_record",
-                            "content": 22,
+                            "content": "22",
                             "reasons": [
-                                "Low TTL (22 < 60)"
+                                "Low TTL (22s)"
                             ]
                         },
                         {
@@ -55,7 +56,7 @@
                             "source": "query_subdomain",
                             "content": "cocolog.kaiketsu.nifty.com",
                             "reasons": [
-                                "High Shannon Entropy (3.32 > 3.0)"
+                                "High Shannon Entropy (3.32)"
                             ]
                         },
                         {

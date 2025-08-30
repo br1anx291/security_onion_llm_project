@@ -1,0 +1,64 @@
+{
+    "alert": {
+        "signature": "ET HUNTING Invalid User-Agent - MSIE 9 on Windows NT 5",
+        "category": "Potentially Bad Traffic",
+        "timestamp": "2025-05-25T09:28:56.492Z"
+    },
+    "connection": {
+        "identity": {
+            "source_ip": "172.16.0.1",
+            "source_port": 41872,
+            "destination_ip": "192.168.10.50",
+            "destination_port": 80,
+            "traffic_direction": "Lateral",
+            "service": "http",
+            "transport_protocol": "tcp"
+        },
+        "statistics": {
+            "duration_seconds": 2.2759
+        },
+        "analysis": {
+            "overall_assessment": "Informational: Standard connection recorded.",
+            "connection_state_desc": "Connection closed by server (RST)",
+            "flow_ratio": {
+                "upload_bytes": 833,
+                "download_bytes": 11632,
+                "ratio": 0.1
+            }
+        }
+    },
+    "evidence": {
+        "reference": {
+            "http": {
+                "analysis": {
+                    "overall_assessment": "Suspicious Anomaly: Session involves a direct-to-IP connection.",
+                    "observed_user_agent_properties": [
+                        "Outdated Browser Signature"
+                    ],
+                    "observed_destination": "Direct-to-IP (205.174.165.68)",
+                    "observed_content_patterns": [
+                        "None"
+                    ],
+                    "observed_file_transfers": {
+                        "uploads": "None",
+                        "downloads": "None"
+                    }
+                },
+                "evidence": {
+                    "connection_context": {
+                        "methods_used": [
+                            "GET"
+                        ],
+                        "user_agent_string": "Mozilla/5.0 (compatible; MSIE 6.0; Windows NT.6.2; .NET CLR 3.4.11501; Win64; x64)"
+                    }
+                },
+                "statistics": {
+                    "total_requests": 2,
+                    "request_bytes": 0,
+                    "response_bytes": 0,
+                    "client_error_ratio": 0.0
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,7 @@
+{
+    "alert": {
+        "signature": "ET INFO GNU/Linux APT User-Agent Outbound likely related to package management",
+        "category": "Not Suspicious Traffic",
+        "timestamp": "2025-05-25T09:07:45.637Z"
+    }
+}

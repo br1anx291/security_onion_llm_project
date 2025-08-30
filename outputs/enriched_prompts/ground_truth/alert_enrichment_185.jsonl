@@ -7,22 +7,23 @@
     "connection": {
         "identity": {
             "source_ip": "192.168.10.3",
-            "source_port": "60712",
+            "source_port": 60712,
             "destination_ip": "192.168.10.1",
-            "destination_port": "53",
+            "destination_port": 53,
             "traffic_direction": "Lateral",
             "service": "dns",
             "transport_protocol": "udp"
         },
         "statistics": {
-            "duration_sec": 41.1059,
-            "sent_bytes": 648,
-            "received_bytes": 1768
+            "duration_seconds": 41.1059
         },
         "analysis": {
-            "connection_state": "Normal Connection (SF)",
-            "flow_analysis": {
-                "direction": "Symmetrical"
+            "overall_assessment": "Informational: Standard connection recorded.",
+            "connection_state_desc": "Connection established and fully closed",
+            "flow_ratio": {
+                "upload_bytes": 648,
+                "download_bytes": 1768,
+                "ratio": 0.4
             }
         }
     },
@@ -30,11 +31,11 @@
         "critical": {
             "dns": {
                 "analysis": {
-                    "overall_assessment": "Potential Threat: Activity exhibits suspicious patterns, including DGA-like patterns.",
+                    "overall_assessment": "Potential Threat: Activity exhibits DGA-like queries.",
                     "observed_query_pattern": "High Entropy (DGA-like)",
                     "observed_integrity": "Normal (0% failure rate)",
                     "observed_tld_risk": "Normal",
-                    "observed_ttl_behavior": "Low (Value: 5s)"
+                    "observed_ttl_behavior": "Low (5s)"
                 },
                 "evidence": {
                     "connection_context": {
@@ -45,9 +46,9 @@
                         {
                             "type": "AttributeFinding",
                             "source": "answer_record",
-                            "content": 5,
+                            "content": "5",
                             "reasons": [
-                                "Low TTL (5 < 60)"
+                                "Low TTL (5s)"
                             ]
                         },
                         {
@@ -55,7 +56,7 @@
                             "source": "query_subdomain",
                             "content": "img.alicdn.com.danuoyi.alicdn.com",
                             "reasons": [
-                                "High Shannon Entropy (3.37 > 3.0)"
+                                "High Shannon Entropy (3.37)"
                             ]
                         },
                         {
@@ -63,7 +64,7 @@
                             "source": "query_subdomain",
                             "content": "blocklists.settings.services.mozilla.com",
                             "reasons": [
-                                "High Shannon Entropy (3.40 > 3.0)"
+                                "High Shannon Entropy (3.40)"
                             ]
                         },
                         {
@@ -71,7 +72,7 @@
                             "source": "query_subdomain",
                             "content": "service.weather.microsoft.com",
                             "reasons": [
-                                "High Shannon Entropy (3.09 > 3.0)"
+                                "High Shannon Entropy (3.09)"
                             ]
                         },
                         {
@@ -79,7 +80,7 @@
                             "source": "query_subdomain",
                             "content": "ocsp-ds.ws.symantec.com.edgekey.net",
                             "reasons": [
-                                "High Shannon Entropy (3.37 > 3.0)"
+                                "High Shannon Entropy (3.37)"
                             ]
                         }
                     ]

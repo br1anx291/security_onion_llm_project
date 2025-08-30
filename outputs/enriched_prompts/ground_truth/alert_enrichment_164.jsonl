@@ -1,0 +1,66 @@
+{
+    "alert": {
+        "signature": "ET INFO OpenSSL Demo CA - Internet Widgits Pty (O)",
+        "category": "Not Suspicious Traffic",
+        "timestamp": "2025-05-25T09:31:59.487Z"
+    },
+    "connection": {
+        "identity": {
+            "source_ip": "172.16.0.1",
+            "source_port": 44990,
+            "destination_ip": "192.168.10.51",
+            "destination_port": 444,
+            "traffic_direction": "Lateral",
+            "service": "ssl",
+            "transport_protocol": "tcp"
+        },
+        "statistics": {
+            "duration_seconds": 0.258
+        },
+        "analysis": {
+            "overall_assessment": "Informational: Standard connection recorded.",
+            "connection_state_desc": "Connection established and fully closed",
+            "flow_ratio": {
+                "upload_bytes": 517,
+                "download_bytes": 1306,
+                "ratio": 0.4
+            }
+        }
+    },
+    "evidence": {
+        "low": {
+            "ssl": {
+                "analysis": {
+                    "overall_assessment": "Benign: No significant threat indicators found.",
+                    "handshake_status": "Failed"
+                },
+                "statistics": {
+                    "connection_duration_sec": 0.0
+                },
+                "evidence": {
+                    "tls_versions_used": [
+                        "TLSv12"
+                    ],
+                    "ciphers_used": [
+                        "TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384"
+                    ],
+                    "certificate_chain_fingerprints": [
+                        "f6789842db245527b7df9a98966cfe733f206ba9c8e2b47cc0818bd1710eedc4"
+                    ],
+                    "ja3_details": [
+                        {
+                            "hash": "7c657f99ee40e9602437b4c56bcc4c16",
+                            "threat_name": null
+                        }
+                    ],
+                    "ja3s_details": [
+                        {
+                            "hash": "f6e234011390444c303f74d09d87322d",
+                            "threat_name": null
+                        }
+                    ]
+                }
+            }
+        }
+    }
+}

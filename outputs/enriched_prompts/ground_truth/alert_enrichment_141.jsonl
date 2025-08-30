@@ -1,0 +1,64 @@
+{
+    "alert": {
+        "signature": "ET INFO HTTP Request to a *.tw domain",
+        "category": "Potentially Bad Traffic",
+        "timestamp": "2025-05-25T06:33:11.672Z"
+    },
+    "connection": {
+        "identity": {
+            "source_ip": "192.168.10.51",
+            "source_port": 48484,
+            "destination_ip": "60.199.243.54",
+            "destination_port": 80,
+            "traffic_direction": "Egress",
+            "service": "http",
+            "transport_protocol": "tcp"
+        },
+        "statistics": {
+            "duration_seconds": 0.7324
+        },
+        "analysis": {
+            "overall_assessment": "Informational: Standard connection recorded.",
+            "connection_state_desc": "Connection established and fully closed",
+            "flow_ratio": {
+                "upload_bytes": 278,
+                "download_bytes": 26520,
+                "ratio": 0.0
+            }
+        }
+    },
+    "evidence": {
+        "reference": {
+            "http": {
+                "analysis": {
+                    "overall_assessment": "Benign: No significant threat indicators found.",
+                    "observed_user_agent_properties": [
+                        "Outdated Browser Signature"
+                    ],
+                    "observed_destination": "Domain Name",
+                    "observed_content_patterns": [
+                        "None"
+                    ],
+                    "observed_file_transfers": {
+                        "uploads": "None",
+                        "downloads": "None"
+                    }
+                },
+                "evidence": {
+                    "connection_context": {
+                        "methods_used": [
+                            "GET"
+                        ],
+                        "user_agent_string": "Mozilla/5.0 (X11; Ubuntu; Linux i686; rv:31.0) Gecko/20100101 Firefox/31.0"
+                    }
+                },
+                "statistics": {
+                    "total_requests": 1,
+                    "request_bytes": 0,
+                    "response_bytes": 0,
+                    "client_error_ratio": 0.0
+                }
+            }
+        }
+    }
+}

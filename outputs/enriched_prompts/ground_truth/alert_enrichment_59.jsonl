@@ -1,0 +1,73 @@
+{
+    "alert": {
+        "signature": "ET INFO Abused Hosting Domain in DNS Lookup (azurewebsites .net)",
+        "category": "Misc activity",
+        "timestamp": "2025-07-02T02:27:21.545Z"
+    },
+    "connection": {
+        "identity": {
+            "source_ip": "192.168.10.9",
+            "source_port": 64358,
+            "destination_ip": "192.168.10.3",
+            "destination_port": 53,
+            "traffic_direction": "Lateral",
+            "service": "dns",
+            "transport_protocol": "udp"
+        },
+        "statistics": {
+            "duration_seconds": 0.0003
+        },
+        "analysis": {
+            "overall_assessment": "Informational: Standard connection recorded.",
+            "connection_state_desc": "Connection established and fully closed",
+            "flow_ratio": {
+                "upload_bytes": 104,
+                "download_bytes": 258,
+                "ratio": 0.4
+            }
+        }
+    },
+    "evidence": {
+        "critical": {
+            "dns": {
+                "analysis": {
+                    "overall_assessment": "Potential Threat: Activity exhibits DGA-like queries.",
+                    "observed_query_pattern": "High Entropy (DGA-like)",
+                    "observed_integrity": "Normal (0% failure rate)",
+                    "observed_tld_risk": "Normal",
+                    "observed_ttl_behavior": "Normal"
+                },
+                "evidence": {
+                    "connection_context": {
+                        "source_ip": "192.168.10.9",
+                        "destination_dns_server": "192.168.10.3"
+                    },
+                    "findings": [
+                        {
+                            "type": "AttributeFinding",
+                            "source": "query_subdomain",
+                            "content": "ssl.apicentralus.azurewebsites.net",
+                            "reasons": [
+                                "High Shannon Entropy (3.32)"
+                            ]
+                        },
+                        {
+                            "type": "AttributeFinding",
+                            "source": "query_subdomain",
+                            "content": "ssl.apicentralus.azurewebsites.net",
+                            "reasons": [
+                                "High Shannon Entropy (3.32)"
+                            ]
+                        }
+                    ]
+                },
+                "statistics": {
+                    "total_queries": 2,
+                    "distinct_queries": 1,
+                    "failed_queries_ratio": 0.0,
+                    "distinct_answers": 0
+                }
+            }
+        }
+    }
+}

@@ -7,22 +7,22 @@
     "connection": {
         "identity": {
             "source_ip": "172.16.0.1",
-            "source_port": "46785",
+            "source_port": 46785,
             "destination_ip": "192.168.10.50",
-            "destination_port": "1433",
+            "destination_port": 1433,
             "traffic_direction": "Lateral",
-            "service": null,
             "transport_protocol": "tcp"
         },
         "statistics": {
-            "duration_sec": 0.0,
-            "sent_bytes": 0,
-            "received_bytes": 0
+            "duration_seconds": 0.0
         },
         "analysis": {
-            "connection_state": "Connection Rejected (REJ)",
-            "flow_analysis": {
-                "direction": "Symmetrical"
+            "overall_assessment": "Suspicious: Connection failed with state 'REJ', which may indicate scanning.",
+            "connection_state_desc": "Connection rejected by server",
+            "flow_ratio": {
+                "upload_bytes": 0,
+                "download_bytes": 0,
+                "ratio": "N/A"
             }
         }
     }

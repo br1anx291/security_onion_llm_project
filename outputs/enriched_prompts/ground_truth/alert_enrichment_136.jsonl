@@ -1,0 +1,30 @@
+{
+    "alert": {
+        "signature": "ET DNS Query for .su TLD (Soviet Union) Often Malware Related",
+        "category": "Potentially Bad Traffic",
+        "timestamp": "2025-05-25T06:32:48.811Z"
+    },
+    "connection": {
+        "identity": {
+            "source_ip": "192.168.10.19",
+            "source_port": 30579,
+            "destination_ip": "192.168.10.3",
+            "destination_port": 53,
+            "traffic_direction": "Lateral",
+            "service": "dns",
+            "transport_protocol": "udp"
+        },
+        "statistics": {
+            "duration_seconds": 0.0192
+        },
+        "analysis": {
+            "overall_assessment": "Informational: Standard connection recorded.",
+            "connection_state_desc": "Connection established and fully closed",
+            "flow_ratio": {
+                "upload_bytes": 50,
+                "download_bytes": 186,
+                "ratio": 0.3
+            }
+        }
+    }
+}

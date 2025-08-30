@@ -7,23 +7,23 @@
     "connection": {
         "identity": {
             "source_ip": "192.168.10.5",
-            "source_port": "61168",
+            "source_port": 61168,
             "destination_ip": "93.184.216.116",
-            "destination_port": "443",
+            "destination_port": 443,
             "traffic_direction": "Egress",
             "service": "ssl",
             "transport_protocol": "tcp"
         },
         "statistics": {
-            "duration_sec": 0.1743,
-            "sent_bytes": 1147,
-            "received_bytes": 46908
+            "duration_seconds": 0.1743
         },
         "analysis": {
-            "connection_state": "Normal Connection (SF)",
-            "flow_analysis": {
-                "direction": "download",
-                "ratio": 41
+            "overall_assessment": "Informational: Standard connection recorded.",
+            "connection_state_desc": "Connection established and fully closed",
+            "flow_ratio": {
+                "upload_bytes": 1147,
+                "download_bytes": 46908,
+                "ratio": 0.0
             }
         }
     },
@@ -31,7 +31,7 @@
         "low": {
             "ssl": {
                 "analysis": {
-                    "overall_assessment": "Likely Benign: No significant threat indicators found in the TLS session.",
+                    "overall_assessment": "Benign: No significant threat indicators found.",
                     "handshake_status": "Failed"
                 },
                 "statistics": {
@@ -43,7 +43,8 @@
                     ],
                     "ja3_details": [
                         {
-                            "hash": "46efd49abcca8ea9baa932da68fdb529"
+                            "hash": "46efd49abcca8ea9baa932da68fdb529",
+                            "threat_name": null
                         }
                     ]
                 }

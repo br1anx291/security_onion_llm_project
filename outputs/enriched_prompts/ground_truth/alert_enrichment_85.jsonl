@@ -1,0 +1,107 @@
+{
+    "alert": {
+        "signature": "ET INFO Vulnerable Java Version 1.8.x Detected",
+        "category": "Potentially Bad Traffic",
+        "timestamp": "2025-05-25T08:18:47.838Z"
+    },
+    "connection": {
+        "identity": {
+            "source_ip": "192.168.10.9",
+            "source_port": 1108,
+            "destination_ip": "23.50.75.27",
+            "destination_port": 80,
+            "traffic_direction": "Egress",
+            "service": "http",
+            "transport_protocol": "tcp"
+        },
+        "statistics": {
+            "duration_seconds": 0.0038
+        },
+        "analysis": {
+            "overall_assessment": "Informational: Standard connection recorded.",
+            "connection_state_desc": "Connection closed by client (RST)",
+            "flow_ratio": {
+                "upload_bytes": 296,
+                "download_bytes": 0,
+                "ratio": "N/A"
+            }
+        }
+    },
+    "evidence": {
+        "reference": {
+            "http": {
+                "analysis": {
+                    "overall_assessment": "Suspicious Anomaly: Session involves a scripting tool user agent.",
+                    "observed_user_agent_properties": [
+                        "Scripting/Tool Signature"
+                    ],
+                    "observed_destination": "Domain Name",
+                    "observed_content_patterns": [
+                        "None"
+                    ],
+                    "observed_file_transfers": {
+                        "uploads": "1 files (Benign)",
+                        "downloads": "None"
+                    }
+                },
+                "evidence": {
+                    "connection_context": {
+                        "methods_used": [
+                            "POST"
+                        ],
+                        "user_agent_string": "Java/1.8.0_121"
+                    },
+                    "findings": [
+                        {
+                            "type": "FileTransfer",
+                            "direction": "upload",
+                            "fuid": "FgVYH84oo2UjIsbukj",
+                            "filenames": [],
+                            "mime_types": [
+                                "application/ocsp-request"
+                            ]
+                        }
+                    ]
+                },
+                "statistics": {
+                    "total_requests": 1,
+                    "request_bytes": 83,
+                    "response_bytes": 0,
+                    "client_error_ratio": 0.0
+                }
+            },
+            "files": {
+                "analysis": {
+                    "session_risk_summary": "No suspicious file activity detected",
+                    "highest_threat_level": "Informational",
+                    "evasion_techniques_detected": false,
+                    "suspicious_content_summary": "0 file(s) flagged with Medium or higher severity."
+                },
+                "statistics": {
+                    "total_files_analyzed": 1,
+                    "suspicious_files_count": 0,
+                    "total_bytes_transferred_kb": 0.08
+                },
+                "evidence": {
+                    "findings": [
+                        {
+                            "type": "FileAnalysisFinding",
+                            "fuid": "FgVYH84oo2UjIsbukj",
+                            "filename": null,
+                            "direction": "Upload",
+                            "severity": "Informational",
+                            "risk_score": 5,
+                            "size_bytes": 83,
+                            "reasons": [],
+                            "file_type_reported": "application/ocsp-request",
+                            "hashes": {
+                                "md5": "7850edb53fbcc9e253a37fc3315783fd",
+                                "sha1": "342d4faae106ed90879c0e8694ec634df22a7efe"
+                            }
+                        }
+                    ]
+                }
+            }
+        }
+    }
+}

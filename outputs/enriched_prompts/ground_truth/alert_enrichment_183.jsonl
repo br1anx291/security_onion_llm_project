@@ -7,34 +7,42 @@
     "connection": {
         "identity": {
             "source_ip": "192.168.10.51",
-            "source_port": "38849",
+            "source_port": 38849,
             "destination_ip": "60.199.140.96",
-            "destination_port": "80",
+            "destination_port": 80,
             "traffic_direction": "Egress",
             "service": "http",
             "transport_protocol": "tcp"
         },
         "statistics": {
-            "duration_sec": 0.7304,
-            "sent_bytes": 291,
-            "received_bytes": 10002
+            "duration_seconds": 0.7304
         },
         "analysis": {
-            "connection_state": "Normal Connection (SF)",
-            "flow_analysis": {
-                "direction": "download",
-                "ratio": 34
+            "overall_assessment": "Informational: Standard connection recorded.",
+            "connection_state_desc": "Connection established and fully closed",
+            "flow_ratio": {
+                "upload_bytes": 291,
+                "download_bytes": 10002,
+                "ratio": 0.0
             }
         }
     },
     "evidence": {
-        "medium": {
+        "reference": {
             "http": {
                 "analysis": {
-                    "user_agent_category": "Outdated Browser",
-                    "destination_analysis": "Domain Name Connection",
-                    "content_risk": "No Suspicious Content",
-                    "file_transfer_risk": "No File Transfer"
+                    "overall_assessment": "Benign: No significant threat indicators found.",
+                    "observed_user_agent_properties": [
+                        "Outdated Browser Signature"
+                    ],
+                    "observed_destination": "Domain Name",
+                    "observed_content_patterns": [
+                        "None"
+                    ],
+                    "observed_file_transfers": {
+                        "uploads": "None",
+                        "downloads": "None"
+                    }
                 },
                 "evidence": {
                     "connection_context": {
@@ -42,8 +50,7 @@
                             "GET"
                         ],
                         "user_agent_string": "Mozilla/5.0 (X11; Ubuntu; Linux i686; rv:31.0) Gecko/20100101 Firefox/31.0"
-                    },
-                    "findings": []
+                    }
                 },
                 "statistics": {
                     "total_requests": 1,

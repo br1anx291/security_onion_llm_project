@@ -1,0 +1,69 @@
+{
+    "alert": {
+        "signature": "ET INFO OpenSSL Demo CA - Internet Widgits Pty (O)",
+        "category": "Not Suspicious Traffic",
+        "timestamp": "2025-05-25T09:24:42.996Z"
+    },
+    "connection": {
+        "identity": {
+            "source_ip": "192.168.10.16",
+            "source_port": 33278,
+            "destination_ip": "46.166.142.173",
+            "destination_port": 443,
+            "traffic_direction": "Egress",
+            "service": "ssl",
+            "transport_protocol": "tcp"
+        },
+        "statistics": {
+            "duration_seconds": 0.0042
+        },
+        "analysis": {
+            "overall_assessment": "Informational: Standard connection recorded.",
+            "connection_state_desc": "Connection established and fully closed",
+            "flow_ratio": {
+                "upload_bytes": 350,
+                "download_bytes": 1571,
+                "ratio": 0.2
+            }
+        }
+    },
+    "evidence": {
+        "reference": {
+            "ssl": {
+                "analysis": {
+                    "overall_assessment": "Benign: No significant threat indicators found.",
+                    "handshake_status": "Successful"
+                },
+                "statistics": {
+                    "connection_duration_sec": 0.0
+                },
+                "evidence": {
+                    "server_names": [
+                        "www.imagebam.com"
+                    ],
+                    "tls_versions_used": [
+                        "TLSv12"
+                    ],
+                    "ciphers_used": [
+                        "TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256"
+                    ],
+                    "certificate_chain_fingerprints": [
+                        "5a38ab5dcb4709ad0130f933481b8924f2c18a2d57217587a3c7047cceeb92a5"
+                    ],
+                    "ja3_details": [
+                        {
+                            "hash": "0ffee3ba8e615ad22535e7f771690a28",
+                            "threat_name": null
+                        }
+                    ],
+                    "ja3s_details": [
+                        {
+                            "hash": "389ed42c02ebecc32e73aa31def07e14",
+                            "threat_name": null
+                        }
+                    ]
+                }
+            }
+        }
+    }
+}

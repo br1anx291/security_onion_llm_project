@@ -1,0 +1,29 @@
+{
+    "alert": {
+        "signature": "ET INFO External IP Address Lookup Domain (ipify .org) in TLS SNI",
+        "category": "Misc activity",
+        "timestamp": "2025-05-25T08:27:21.636Z"
+    },
+    "connection": {
+        "identity": {
+            "source_ip": "192.168.10.5",
+            "source_port": 61158,
+            "destination_ip": "54.235.148.27",
+            "destination_port": 443,
+            "traffic_direction": "Egress",
+            "transport_protocol": "tcp"
+        },
+        "statistics": {
+            "duration_seconds": 0.2054
+        },
+        "analysis": {
+            "overall_assessment": "Informational: Standard connection recorded.",
+            "connection_state_desc": "Connection established and fully closed",
+            "flow_ratio": {
+                "upload_bytes": 585,
+                "download_bytes": 3714,
+                "ratio": 0.2
+            }
+        }
+    }
+}

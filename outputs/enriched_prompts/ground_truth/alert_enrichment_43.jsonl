@@ -1,0 +1,118 @@
+{
+    "alert": {
+        "signature": "ET INFO Windows OS Submitting USB Metadata to Microsoft",
+        "category": "Misc activity",
+        "timestamp": "2025-05-25T08:27:21.518Z"
+    },
+    "connection": {
+        "identity": {
+            "source_ip": "192.168.10.14",
+            "source_port": 54182,
+            "destination_ip": "40.80.145.78",
+            "destination_port": 80,
+            "traffic_direction": "Egress",
+            "service": "http",
+            "transport_protocol": "tcp"
+        },
+        "statistics": {
+            "duration_seconds": 2.0399
+        },
+        "analysis": {
+            "overall_assessment": "Informational: Standard connection recorded.",
+            "connection_state_desc": "Connection closed by server (RST)",
+            "flow_ratio": {
+                "upload_bytes": 15784,
+                "download_bytes": 15608,
+                "ratio": 1.0
+            }
+        }
+    },
+    "evidence": {
+        "reference": {
+            "http": {
+                "analysis": {
+                    "overall_assessment": "Benign: No significant threat indicators found.",
+                    "observed_user_agent_properties": [
+                        "Normal"
+                    ],
+                    "observed_destination": "Domain Name",
+                    "observed_content_patterns": [
+                        "None"
+                    ],
+                    "observed_file_transfers": {
+                        "uploads": "1 files (Benign)",
+                        "downloads": "None"
+                    }
+                },
+                "evidence": {
+                    "connection_context": {
+                        "methods_used": [
+                            "POST"
+                        ],
+                        "user_agent_string": "MICROSOFT_DEVICE_METADATA_RETRIEVAL_CLIENT"
+                    },
+                    "findings": [
+                        {
+                            "type": "FileTransfer",
+                            "direction": "upload",
+                            "fuid": "FZN00O2aK1Vc29uZlj",
+                            "filenames": [],
+                            "mime_types": [
+                                "application/xml"
+                            ]
+                        }
+                    ]
+                },
+                "statistics": {
+                    "total_requests": 1,
+                    "request_bytes": 1242,
+                    "response_bytes": 0,
+                    "client_error_ratio": 0.0
+                }
+            },
+            "files": {
+                "analysis": {
+                    "session_risk_summary": "No suspicious file activity detected",
+                    "highest_threat_level": "Informational",
+                    "evasion_techniques_detected": false,
+                    "suspicious_content_summary": "0 file(s) flagged with Medium or higher severity."
+                },
+                "statistics": {
+                    "total_files_analyzed": 2,
+                    "suspicious_files_count": 0,
+                    "total_bytes_transferred_kb": 1.21
+                },
+                "evidence": {
+                    "findings": [
+                        {
+                            "type": "FileAnalysisFinding",
+                            "fuid": "FZN00O2aK1Vc29uZlj",
+                            "filename": null,
+                            "direction": "Upload",
+                            "severity": "Informational",
+                            "risk_score": 5,
+                            "size_bytes": 1242,
+                            "reasons": [],
+                            "file_type_reported": "application/xml",
+                            "hashes": {
+                                "md5": "b212eab6b823f3f90a4ff6155c24eedd",
+                                "sha1": "b81c6aecbfd0679c403cf881d1e5919320537db6"
+                            }
+                        },
+                        {
+                            "type": "FileAnalysisFinding",
+                            "fuid": "FZN00O2aK1Vc29uZlj",
+                            "filename": null,
+                            "direction": "Upload",
+                            "severity": "Informational",
+                            "risk_score": 5,
+                            "size_bytes": 0,
+                            "reasons": [],
+                            "transfer_status": "Incomplete (Missing Bytes)"
+                        }
+                    ]
+                }
+            }
+        }
+    }
+}

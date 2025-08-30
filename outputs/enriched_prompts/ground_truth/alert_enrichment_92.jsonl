@@ -1,0 +1,73 @@
+{
+    "alert": {
+        "signature": "ET INFO Abused Hosting Domain in DNS Lookup (azurewebsites .net)",
+        "category": "Misc activity",
+        "timestamp": "2025-07-02T02:27:21.545Z"
+    },
+    "connection": {
+        "identity": {
+            "source_ip": "192.168.10.3",
+            "source_port": 60779,
+            "destination_ip": "192.168.10.1",
+            "destination_port": 53,
+            "traffic_direction": "Lateral",
+            "service": "dns",
+            "transport_protocol": "udp"
+        },
+        "statistics": {
+            "duration_seconds": 21.6761
+        },
+        "analysis": {
+            "overall_assessment": "Informational: Standard connection recorded.",
+            "connection_state_desc": "Connection established and fully closed",
+            "flow_ratio": {
+                "upload_bytes": 264,
+                "download_bytes": 935,
+                "ratio": 0.3
+            }
+        }
+    },
+    "evidence": {
+        "critical": {
+            "dns": {
+                "analysis": {
+                    "overall_assessment": "Potential Threat: Activity exhibits DGA-like queries.",
+                    "observed_query_pattern": "High Entropy (DGA-like)",
+                    "observed_integrity": "Normal (0% failure rate)",
+                    "observed_tld_risk": "Normal",
+                    "observed_ttl_behavior": "Low (1s)"
+                },
+                "evidence": {
+                    "connection_context": {
+                        "source_ip": "192.168.10.3",
+                        "destination_dns_server": "192.168.10.1"
+                    },
+                    "findings": [
+                        {
+                            "type": "AttributeFinding",
+                            "source": "answer_record",
+                            "content": "1",
+                            "reasons": [
+                                "Low TTL (1s)"
+                            ]
+                        },
+                        {
+                            "type": "AttributeFinding",
+                            "source": "query_subdomain",
+                            "content": "log-zone-b-1304148952.us-west-1.elb.amazonaws.com",
+                            "reasons": [
+                                "High Shannon Entropy (4.11)"
+                            ]
+                        }
+                    ]
+                },
+                "statistics": {
+                    "total_queries": 5,
+                    "distinct_queries": 5,
+                    "failed_queries_ratio": 0.0,
+                    "distinct_answers": 30
+                }
+            }
+        }
+    }
+}

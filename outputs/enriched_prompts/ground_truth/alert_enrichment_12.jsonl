@@ -1,0 +1,30 @@
+{
+    "alert": {
+        "signature": "ET INFO Observed Discord Domain in DNS Lookup (discordapp .com)",
+        "category": "Misc activity",
+        "timestamp": "2025-05-25T09:03:59.462Z"
+    },
+    "connection": {
+        "identity": {
+            "source_ip": "192.168.10.5",
+            "source_port": 65052,
+            "destination_ip": "192.168.10.3",
+            "destination_port": 53,
+            "traffic_direction": "Lateral",
+            "service": "dns",
+            "transport_protocol": "udp"
+        },
+        "statistics": {
+            "duration_seconds": 0.008
+        },
+        "analysis": {
+            "overall_assessment": "Informational: Standard connection recorded.",
+            "connection_state_desc": "Connection established and fully closed",
+            "flow_ratio": {
+                "upload_bytes": 132,
+                "download_bytes": 260,
+                "ratio": 0.5
+            }
+        }
+    }
+}

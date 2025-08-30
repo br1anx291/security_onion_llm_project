@@ -1,0 +1,74 @@
+{
+    "alert": {
+        "signature": "ET INFO Dropbox.com Offsite File Backup in Use",
+        "category": "Potential Corporate Privacy Violation",
+        "timestamp": "2025-07-02T02:26:48.116Z"
+    },
+    "connection": {
+        "identity": {
+            "source_ip": "192.168.10.9",
+            "source_port": 6206,
+            "destination_ip": "162.125.4.5",
+            "destination_port": 443,
+            "traffic_direction": "Egress",
+            "service": "ssl",
+            "transport_protocol": "tcp"
+        },
+        "statistics": {
+            "duration_seconds": 0.0009
+        },
+        "analysis": {
+            "overall_assessment": "Informational: Standard connection recorded.",
+            "connection_state_desc": "Connection established and fully closed",
+            "flow_ratio": {
+                "upload_bytes": 534,
+                "download_bytes": 4545,
+                "ratio": 0.1
+            }
+        }
+    },
+    "evidence": {
+        "reference": {
+            "ssl": {
+                "analysis": {
+                    "overall_assessment": "Benign: No significant threat indicators found.",
+                    "observed_certificate_issues": [
+                        "Expired Certificate"
+                    ],
+                    "handshake_status": "Successful"
+                },
+                "statistics": {
+                    "connection_duration_sec": 0.0
+                },
+                "evidence": {
+                    "server_names": [
+                        "photos-4.dropbox.com"
+                    ],
+                    "tls_versions_used": [
+                        "TLSv12"
+                    ],
+                    "ciphers_used": [
+                        "TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384"
+                    ],
+                    "certificate_chain_fingerprints": [
+                        "3a2fbe92891e57fe05d57087f48e730f17e5a5f53ef403d618e5b74d7a7e6ecb",
+                        "5f2acc217d9145dcaa2ac9bf36b01bc1c0356d48252823540a7531c02998b9b0",
+                        "973a41276ffd01e027a2aad49e34c37846d3e976ff6a620b6712e33832041aa6"
+                    ],
+                    "ja3_details": [
+                        {
+                            "hash": "0ffee3ba8e615ad22535e7f771690a28",
+                            "threat_name": null
+                        }
+                    ],
+                    "ja3s_details": [
+                        {
+                            "hash": "a39e18564e32e1822751c4af0bfba817",
+                            "threat_name": null
+                        }
+                    ]
+                }
+            }
+        }
+    }
+}

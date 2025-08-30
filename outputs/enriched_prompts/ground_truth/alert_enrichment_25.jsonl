@@ -1,0 +1,29 @@
+{
+    "alert": {
+        "signature": "ET MALWARE Win32/Suspected Reverse Shell Connection",
+        "category": "A Network Trojan was detected",
+        "timestamp": "2025-07-02T02:28:10.522Z"
+    },
+    "connection": {
+        "identity": {
+            "source_ip": "192.168.10.8",
+            "source_port": 1260,
+            "destination_ip": "205.174.165.73",
+            "destination_port": 444,
+            "traffic_direction": "Egress",
+            "transport_protocol": "tcp"
+        },
+        "statistics": {
+            "duration_seconds": 59.397
+        },
+        "analysis": {
+            "overall_assessment": "Suspicious: Connection failed with state 'S3', which may indicate scanning.",
+            "connection_state_desc": "Handshake started, no final ACK from client",
+            "flow_ratio": {
+                "upload_bytes": 126082,
+                "download_bytes": 282,
+                "ratio": 447.1
+            }
+        }
+    }
+}

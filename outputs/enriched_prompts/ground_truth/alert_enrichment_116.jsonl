@@ -1,0 +1,79 @@
+{
+    "alert": {
+        "signature": "ET WEB_SERVER Script tag in URI Possible Cross Site Scripting Attempt",
+        "category": "Web Application Attack",
+        "timestamp": "2025-05-25T06:43:22.165Z"
+    },
+    "connection": {
+        "identity": {
+            "source_ip": "172.16.0.1",
+            "source_port": 59042,
+            "destination_ip": "192.168.10.50",
+            "destination_port": 80,
+            "traffic_direction": "Lateral",
+            "service": "http",
+            "transport_protocol": "tcp"
+        },
+        "statistics": {
+            "duration_seconds": 1.1422
+        },
+        "analysis": {
+            "overall_assessment": "Informational: Standard connection recorded.",
+            "connection_state_desc": "Connection established and fully closed",
+            "flow_ratio": {
+                "upload_bytes": 48783,
+                "download_bytes": 183584,
+                "ratio": 0.3
+            }
+        }
+    },
+    "evidence": {
+        "reference": {
+            "http": {
+                "analysis": {
+                    "overall_assessment": "High Confidence Threat: Session contains indicators of Cross-Site Scripting (XSS) patterns.",
+                    "observed_user_agent_properties": [
+                        "Normal"
+                    ],
+                    "observed_destination": "Direct-to-IP (205.174.165.68)",
+                    "observed_content_patterns": [
+                        "Script Tag"
+                    ],
+                    "observed_file_transfers": {
+                        "uploads": "None",
+                        "downloads": "None"
+                    }
+                },
+                "evidence": {
+                    "connection_context": {
+                        "methods_used": [
+                            "GET"
+                        ],
+                        "user_agent_string": "Mozilla/5.0 (X11; Linux x86_64; rv:45.0) Gecko/20100101 Firefox/45.0"
+                    },
+                    "findings": [
+                        {
+                            "type": "AggregatedContentFinding",
+                            "count": 50,
+                            "examples": [
+                                "/dv/vulnerabilities/xss_r/?name=<script>console.log('PNQKI4GBCW4O0UM5IM04PD9O3UQDSSWZUUB7C0FT249GB6778S');console.log(document.cookie);</script>",
+                                "/dv/vulnerabilities/xss_r/?name=<script>console.log('81FRS3GPPBAKYWJA0PEBUYX9TTXPXHB2MT43SBI4EV3HCUE5IJ');console.log(document.cookie);</script>",
+                                "/dv/vulnerabilities/xss_r/?name=<script>console.log('2BHWZA65C3PWWXWC7AS7R7CSL1994OWWFILOCVRCFGDEYNITV9');console.log(document.cookie);</script>"
+                            ],
+                            "source": "URI",
+                            "reasons": [
+                                "Script Tag"
+                            ]
+                        }
+                    ]
+                },
+                "statistics": {
+                    "total_requests": 101,
+                    "request_bytes": 0,
+                    "response_bytes": 0,
+                    "client_error_ratio": 0.0
+                }
+            }
+        }
+    }
+}

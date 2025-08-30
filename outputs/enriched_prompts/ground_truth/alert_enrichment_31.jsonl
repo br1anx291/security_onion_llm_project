@@ -1,0 +1,30 @@
+{
+    "alert": {
+        "signature": "ET SCAN Potential SSH Scan",
+        "category": "Attempted Information Leak",
+        "timestamp": "2025-05-25T09:06:26.235Z"
+    },
+    "connection": {
+        "identity": {
+            "source_ip": "172.16.0.1",
+            "source_port": 46284,
+            "destination_ip": "192.168.10.50",
+            "destination_port": 22,
+            "traffic_direction": "Lateral",
+            "service": "ssh",
+            "transport_protocol": "tcp"
+        },
+        "statistics": {
+            "duration_seconds": 0.0947
+        },
+        "analysis": {
+            "overall_assessment": "Informational: Standard connection recorded.",
+            "connection_state_desc": "Connection established and fully closed",
+            "flow_ratio": {
+                "upload_bytes": 2008,
+                "download_bytes": 2745,
+                "ratio": 0.7
+            }
+        }
+    }
+}

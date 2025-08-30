@@ -1,0 +1,7 @@
+{
+    "alert": {
+        "signature": "ET INFO Pastebin-like Service Domain in DNS Lookup (jsfiddle .net)",
+        "category": "Misc activity",
+        "timestamp": "2025-05-25T09:57:37.916Z"
+    }
+}

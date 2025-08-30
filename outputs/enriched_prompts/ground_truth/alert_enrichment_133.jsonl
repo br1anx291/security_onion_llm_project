@@ -1,0 +1,29 @@
+{
+    "alert": {
+        "signature": "ET MALWARE Spoofed MSIE 7 User-Agent Likely Ponmocup",
+        "category": "A Network Trojan was detected",
+        "timestamp": "2025-05-25T09:27:58.346Z"
+    },
+    "connection": {
+        "identity": {
+            "source_ip": "172.16.0.1",
+            "source_port": 56512,
+            "destination_ip": "192.168.10.50",
+            "destination_port": 80,
+            "traffic_direction": "Lateral",
+            "transport_protocol": "tcp"
+        },
+        "statistics": {
+            "duration_seconds": 19.96
+        },
+        "analysis": {
+            "overall_assessment": "Informational: Standard connection recorded.",
+            "connection_state_desc": "Unknown State (OTH)",
+            "flow_ratio": {
+                "upload_bytes": 367,
+                "download_bytes": 0,
+                "ratio": "N/A"
+            }
+        }
+    }
+}

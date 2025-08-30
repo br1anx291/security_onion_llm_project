@@ -20,11 +20,11 @@ logging.basicConfig(level=logging.INFO, format=LOG_FORMAT)
 
 # 2. General Settings
 MAX_WORKERS = 10
-TEST_MODE = False
+TEST_MODE = True
 
 # --- ONLY CHANGE THIS VARIABLE TO SWITCH MODES ---
 # Valid values: 'realtime', 'demo', 'ground_truth'
-MODE = 'demo'
+MODE = 'ground_truth'
 # ----------------------------------------------------
 
 # Determine the alert filename based on the selected MODE

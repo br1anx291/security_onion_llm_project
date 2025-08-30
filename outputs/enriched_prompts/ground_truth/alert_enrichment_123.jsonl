@@ -1,0 +1,30 @@
+{
+    "alert": {
+        "signature": "ET INFO Session Traversal Utilities for NAT (STUN Binding Request On Non-Standard Low Port)",
+        "category": "Misc activity",
+        "timestamp": "2025-07-02T02:22:30.850Z"
+    },
+    "connection": {
+        "identity": {
+            "source_ip": "192.168.10.19",
+            "source_port": 57189,
+            "destination_ip": "104.155.51.226",
+            "destination_port": 443,
+            "traffic_direction": "Egress",
+            "service": "spicy_stun",
+            "transport_protocol": "udp"
+        },
+        "statistics": {
+            "duration_seconds": 0.001
+        },
+        "analysis": {
+            "overall_assessment": "Informational: Standard connection recorded.",
+            "connection_state_desc": "Connection established and fully closed",
+            "flow_ratio": {
+                "upload_bytes": 56,
+                "download_bytes": 200,
+                "ratio": 0.3
+            }
+        }
+    }
+}

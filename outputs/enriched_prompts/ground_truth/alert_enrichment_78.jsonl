@@ -1,0 +1,30 @@
+{
+    "alert": {
+        "signature": "ET DNS Query for .to TLD",
+        "category": "Potentially Bad Traffic",
+        "timestamp": "2025-05-25T08:28:04.842Z"
+    },
+    "connection": {
+        "identity": {
+            "source_ip": "192.168.10.14",
+            "source_port": 54897,
+            "destination_ip": "192.168.10.3",
+            "destination_port": 53,
+            "traffic_direction": "Lateral",
+            "service": "dns",
+            "transport_protocol": "udp"
+        },
+        "statistics": {
+            "duration_seconds": 0.0
+        },
+        "analysis": {
+            "overall_assessment": "Informational: Standard connection recorded.",
+            "connection_state_desc": "Connection established and fully closed",
+            "flow_ratio": {
+                "upload_bytes": 66,
+                "download_bytes": 130,
+                "ratio": 0.5
+            }
+        }
+    }
+}

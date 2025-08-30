@@ -1,0 +1,30 @@
+{
+    "alert": {
+        "signature": "ET INFO Session Traversal Utilities for NAT (STUN Binding Request On Non-Standard High Port)",
+        "category": "Misc activity",
+        "timestamp": "2025-05-25T09:32:04.059Z"
+    },
+    "connection": {
+        "identity": {
+            "source_ip": "192.168.10.16",
+            "source_port": 44112,
+            "destination_ip": "159.203.79.231",
+            "destination_port": 6001,
+            "traffic_direction": "Egress",
+            "service": "spicy_stun",
+            "transport_protocol": "udp"
+        },
+        "statistics": {
+            "duration_seconds": 0.0003
+        },
+        "analysis": {
+            "overall_assessment": "Suspicious: Connection failed with state 'S0', which may indicate scanning.",
+            "connection_state_desc": "Connection attempt, no reply",
+            "flow_ratio": {
+                "upload_bytes": 100,
+                "download_bytes": 0,
+                "ratio": "N/A"
+            }
+        }
+    }
+}

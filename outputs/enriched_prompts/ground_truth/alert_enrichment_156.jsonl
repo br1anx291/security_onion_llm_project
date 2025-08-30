@@ -1,0 +1,30 @@
+{
+    "alert": {
+        "signature": "ET INFO Abused Hosting Domain in DNS Lookup (azurewebsites .net)",
+        "category": "Misc activity",
+        "timestamp": "2025-07-02T02:27:21.545Z"
+    },
+    "connection": {
+        "identity": {
+            "source_ip": "192.168.10.9",
+            "source_port": 51222,
+            "destination_ip": "192.168.10.3",
+            "destination_port": 53,
+            "traffic_direction": "Lateral",
+            "service": "dns",
+            "transport_protocol": "udp"
+        },
+        "statistics": {
+            "duration_seconds": 0.0021
+        },
+        "analysis": {
+            "overall_assessment": "Informational: Standard connection recorded.",
+            "connection_state_desc": "Connection established and fully closed",
+            "flow_ratio": {
+                "upload_bytes": 80,
+                "download_bytes": 200,
+                "ratio": 0.4
+            }
+        }
+    }
+}

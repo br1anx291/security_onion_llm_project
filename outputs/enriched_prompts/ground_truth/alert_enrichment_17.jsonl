@@ -1,0 +1,7 @@
+{
+    "alert": {
+        "signature": "ET DNS Query to a *.top domain - Likely Hostile",
+        "category": "Potentially Bad Traffic",
+        "timestamp": "2025-06-05T11:56:49.877Z"
+    }
+}

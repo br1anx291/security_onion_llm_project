@@ -1,0 +1,7 @@
+{
+    "alert": {
+        "signature": "ET SCAN Suspicious inbound to mySQL port 3306",
+        "category": "Potentially Bad Traffic",
+        "timestamp": "2025-05-25T09:57:41.071Z"
+    }
+}

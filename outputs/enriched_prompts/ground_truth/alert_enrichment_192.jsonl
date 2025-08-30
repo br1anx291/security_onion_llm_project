@@ -7,23 +7,23 @@
     "connection": {
         "identity": {
             "source_ip": "192.168.10.5",
-            "source_port": "62104",
+            "source_port": 62104,
             "destination_ip": "192.168.10.3",
-            "destination_port": "53",
+            "destination_port": 53,
             "traffic_direction": "Lateral",
             "service": "dns",
             "transport_protocol": "udp"
         },
         "statistics": {
-            "duration_sec": 0.005,
-            "sent_bytes": 82,
-            "received_bytes": 832
+            "duration_seconds": 0.005
         },
         "analysis": {
-            "connection_state": "Normal Connection (SF)",
-            "flow_analysis": {
-                "direction": "download",
-                "ratio": 10
+            "overall_assessment": "Informational: Standard connection recorded.",
+            "connection_state_desc": "Connection established and fully closed",
+            "flow_ratio": {
+                "upload_bytes": 82,
+                "download_bytes": 832,
+                "ratio": 0.1
             }
         }
     },
@@ -31,11 +31,11 @@
         "low": {
             "dns": {
                 "analysis": {
-                    "overall_assessment": "Benign Anomaly Likely: Low-confidence anomalies were observed (e.g., low TTL or monitored TLDs), but no strong threat patterns were detected.",
+                    "overall_assessment": "Suspicious: Low-confidence anomalies observed (e.g., low TTL, monitored TLDs).",
                     "observed_query_pattern": "Normal",
                     "observed_integrity": "Normal (0% failure rate)",
                     "observed_tld_risk": "Normal",
-                    "observed_ttl_behavior": "Low (Value: 16s)"
+                    "observed_ttl_behavior": "Low (16s)"
                 },
                 "evidence": {
                     "connection_context": {
@@ -46,9 +46,9 @@
                         {
                             "type": "AttributeFinding",
                             "source": "answer_record",
-                            "content": 16,
+                            "content": "16",
                             "reasons": [
-                                "Low TTL (16 < 60)"
+                                "Low TTL (16s)"
                             ]
                         }
                     ]

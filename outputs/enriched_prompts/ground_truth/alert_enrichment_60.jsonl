@@ -1,0 +1,64 @@
+{
+    "alert": {
+        "signature": "ET MALWARE Spoofed MSIE 7 User-Agent Likely Ponmocup",
+        "category": "A Network Trojan was detected",
+        "timestamp": "2025-05-25T09:27:51.258Z"
+    },
+    "connection": {
+        "identity": {
+            "source_ip": "172.16.0.1",
+            "source_port": 43136,
+            "destination_ip": "192.168.10.50",
+            "destination_port": 80,
+            "traffic_direction": "Lateral",
+            "service": "http",
+            "transport_protocol": "tcp"
+        },
+        "statistics": {
+            "duration_seconds": 1.728
+        },
+        "analysis": {
+            "overall_assessment": "Suspicious: Connection failed with state 'S0', which may indicate scanning.",
+            "connection_state_desc": "Connection attempt, no reply",
+            "flow_ratio": {
+                "upload_bytes": 308,
+                "download_bytes": 0,
+                "ratio": "N/A"
+            }
+        }
+    },
+    "evidence": {
+        "reference": {
+            "http": {
+                "analysis": {
+                    "overall_assessment": "Suspicious Anomaly: Session involves a direct-to-IP connection.",
+                    "observed_user_agent_properties": [
+                        "Normal"
+                    ],
+                    "observed_destination": "Direct-to-IP (205.174.165.68)",
+                    "observed_content_patterns": [
+                        "None"
+                    ],
+                    "observed_file_transfers": {
+                        "uploads": "None",
+                        "downloads": "None"
+                    }
+                },
+                "evidence": {
+                    "connection_context": {
+                        "methods_used": [
+                            "GET"
+                        ],
+                        "user_agent_string": "Opera/9.80 (Windows NT 5.2; U; ru) Presto/2.5.22 Version/10.51"
+                    }
+                },
+                "statistics": {
+                    "total_requests": 1,
+                    "request_bytes": 0,
+                    "response_bytes": 0,
+                    "client_error_ratio": 0.0
+                }
+            }
+        }
+    }
+}

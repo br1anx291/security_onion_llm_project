@@ -1,0 +1,51 @@
+{
+    "alert": {
+        "signature": "ET INFO TLS Handshake Failure",
+        "category": "Potentially Bad Traffic",
+        "timestamp": "2025-05-25T09:32:20.474Z"
+    },
+    "connection": {
+        "identity": {
+            "source_ip": "192.168.10.25",
+            "source_port": 53837,
+            "destination_ip": "151.101.129.128",
+            "destination_port": 443,
+            "traffic_direction": "Egress",
+            "service": "ssl",
+            "transport_protocol": "tcp"
+        },
+        "statistics": {
+            "duration_seconds": 0.0021
+        },
+        "analysis": {
+            "overall_assessment": "Informational: Standard connection recorded.",
+            "connection_state_desc": "Connection established and fully closed",
+            "flow_ratio": {
+                "upload_bytes": 86,
+                "download_bytes": 7,
+                "ratio": 12.3
+            }
+        }
+    },
+    "evidence": {
+        "low": {
+            "ssl": {
+                "analysis": {
+                    "overall_assessment": "Benign: No significant threat indicators found.",
+                    "handshake_status": "Failed"
+                },
+                "statistics": {
+                    "connection_duration_sec": 0.0
+                },
+                "evidence": {
+                    "ja3_details": [
+                        {
+                            "hash": "3b4576cd0f38df2e795797cf09de8432",
+                            "threat_name": null
+                        }
+                    ]
+                }
+            }
+        }
+    }
+}

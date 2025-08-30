@@ -1,0 +1,107 @@
+{
+    "alert": {
+        "signature": "ET INFO HTTP Request to a *.top domain",
+        "category": "Potentially Bad Traffic",
+        "timestamp": "2025-06-05T11:56:49.991Z"
+    },
+    "connection": {
+        "identity": {
+            "source_ip": "192.168.10.17",
+            "source_port": 51554,
+            "destination_ip": "89.30.102.108",
+            "destination_port": 80,
+            "traffic_direction": "Egress",
+            "service": "http",
+            "transport_protocol": "tcp"
+        },
+        "statistics": {
+            "duration_seconds": 0.0003
+        },
+        "analysis": {
+            "overall_assessment": "Informational: Standard connection recorded.",
+            "connection_state_desc": "Connection established and fully closed",
+            "flow_ratio": {
+                "upload_bytes": 472,
+                "download_bytes": 663,
+                "ratio": 0.7
+            }
+        }
+    },
+    "evidence": {
+        "reference": {
+            "http": {
+                "analysis": {
+                    "overall_assessment": "Benign: No significant threat indicators found.",
+                    "observed_user_agent_properties": [
+                        "Outdated Browser Signature"
+                    ],
+                    "observed_destination": "Domain Name",
+                    "observed_content_patterns": [
+                        "None"
+                    ],
+                    "observed_file_transfers": {
+                        "uploads": "None",
+                        "downloads": "1 files (Benign)"
+                    }
+                },
+                "evidence": {
+                    "connection_context": {
+                        "methods_used": [
+                            "GET"
+                        ],
+                        "user_agent_string": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:31.0) Gecko/20100101 Firefox/31.0"
+                    },
+                    "findings": [
+                        {
+                            "type": "FileTransfer",
+                            "direction": "download",
+                            "fuid": "FW70mE2ijtn0Qmkhv8",
+                            "filenames": [],
+                            "mime_types": [
+                                "image/gif"
+                            ]
+                        }
+                    ]
+                },
+                "statistics": {
+                    "total_requests": 1,
+                    "request_bytes": 0,
+                    "response_bytes": 43,
+                    "client_error_ratio": 0.0
+                }
+            },
+            "files": {
+                "analysis": {
+                    "session_risk_summary": "No suspicious file activity detected",
+                    "highest_threat_level": "Informational",
+                    "evasion_techniques_detected": false,
+                    "suspicious_content_summary": "0 file(s) flagged with Medium or higher severity."
+                },
+                "statistics": {
+                    "total_files_analyzed": 1,
+                    "suspicious_files_count": 0,
+                    "total_bytes_transferred_kb": 0.04
+                },
+                "evidence": {
+                    "findings": [
+                        {
+                            "type": "FileAnalysisFinding",
+                            "fuid": "FW70mE2ijtn0Qmkhv8",
+                            "filename": null,
+                            "direction": "Download",
+                            "severity": "Informational",
+                            "risk_score": 5,
+                            "size_bytes": 43,
+                            "reasons": [],
+                            "file_type_reported": "image/gif",
+                            "hashes": {
+                                "md5": "325472601571f31e1bf00674c368d335",
+                                "sha1": "2daeaa8b5f19f0bc209d976c02bd6acb51b00b0a"
+                            }
+                        }
+                    ]
+                }
+            }
+        }
+    }
+}

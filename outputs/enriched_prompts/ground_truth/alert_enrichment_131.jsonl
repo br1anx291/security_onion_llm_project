@@ -1,0 +1,105 @@
+{
+    "alert": {
+        "signature": "ET DNS Query for .cc TLD",
+        "category": "Potentially Bad Traffic",
+        "timestamp": "2025-06-05T11:55:24.583Z"
+    },
+    "connection": {
+        "identity": {
+            "source_ip": "192.168.10.3",
+            "source_port": 62242,
+            "destination_ip": "192.168.10.1",
+            "destination_port": 53,
+            "traffic_direction": "Lateral",
+            "service": "dns",
+            "transport_protocol": "udp"
+        },
+        "statistics": {
+            "duration_seconds": 47.9684
+        },
+        "analysis": {
+            "overall_assessment": "Informational: Standard connection recorded.",
+            "connection_state_desc": "Connection established and fully closed",
+            "flow_ratio": {
+                "upload_bytes": 641,
+                "download_bytes": 1650,
+                "ratio": 0.4
+            }
+        }
+    },
+    "evidence": {
+        "critical": {
+            "dns": {
+                "analysis": {
+                    "overall_assessment": "Potential Threat: Activity exhibits DGA-like queries.",
+                    "observed_query_pattern": "High Entropy (DGA-like)",
+                    "observed_integrity": "Normal (9% failure rate)",
+                    "observed_tld_risk": "Normal",
+                    "observed_ttl_behavior": "Low (17s)"
+                },
+                "evidence": {
+                    "connection_context": {
+                        "source_ip": "192.168.10.3",
+                        "destination_dns_server": "192.168.10.1"
+                    },
+                    "findings": [
+                        {
+                            "type": "AttributeFinding",
+                            "source": "answer_record",
+                            "content": "17",
+                            "reasons": [
+                                "Low TTL (17s)"
+                            ]
+                        },
+                        {
+                            "type": "AttributeFinding",
+                            "source": "query_length",
+                            "content": "pipeline-edge-prod-24-1300278808.us-west-2.elb.amazonaws.com",
+                            "reasons": [
+                                "Long Query (60 > 50)"
+                            ]
+                        },
+                        {
+                            "type": "AttributeFinding",
+                            "source": "query_subdomain",
+                            "content": "pipeline-edge-prod-24-1300278808.us-west-2.elb.amazonaws.com",
+                            "reasons": [
+                                "High Shannon Entropy (4.13)"
+                            ]
+                        },
+                        {
+                            "type": "AttributeFinding",
+                            "source": "query_length",
+                            "content": "dxedge-prod-lb-946522505.us-east-1.elb.amazonaws.com",
+                            "reasons": [
+                                "Long Query (52 > 50)"
+                            ]
+                        },
+                        {
+                            "type": "AttributeFinding",
+                            "source": "query_subdomain",
+                            "content": "dxedge-prod-lb-946522505.us-east-1.elb.amazonaws.com",
+                            "reasons": [
+                                "High Shannon Entropy (4.13)"
+                            ]
+                        },
+                        {
+                            "type": "AttributeFinding",
+                            "source": "query_subdomain",
+                            "content": "tracking-prod-us-east-1-public.mgnt.cc",
+                            "reasons": [
+                                "High Shannon Entropy (4.00)"
+                            ]
+                        }
+                    ]
+                },
+                "statistics": {
+                    "total_queries": 11,
+                    "distinct_queries": 11,
+                    "failed_queries_ratio": 0.09,
+                    "distinct_answers": 44
+                }
+            }
+        }
+    }
+}

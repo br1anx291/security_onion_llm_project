@@ -1,0 +1,29 @@
+{
+    "alert": {
+        "signature": "GPL EXPLOIT Microsoft cmd.exe banner",
+        "category": "Successful Administrator Privilege Gain",
+        "timestamp": "2025-05-25T06:37:10.153Z"
+    },
+    "connection": {
+        "identity": {
+            "source_ip": "192.168.10.8",
+            "source_port": 1260,
+            "destination_ip": "205.174.165.73",
+            "destination_port": 444,
+            "traffic_direction": "Egress",
+            "transport_protocol": "tcp"
+        },
+        "statistics": {
+            "duration_seconds": 48.0357
+        },
+        "analysis": {
+            "overall_assessment": "Informational: Standard connection recorded.",
+            "connection_state_desc": "Connection closed by server (RST)",
+            "flow_ratio": {
+                "upload_bytes": 126142,
+                "download_bytes": 282,
+                "ratio": 447.3
+            }
+        }
+    }
+}

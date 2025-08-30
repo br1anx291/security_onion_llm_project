@@ -1,0 +1,30 @@
+{
+    "alert": {
+        "signature": "GPL NETBIOS SMB IPC$ unicode share access",
+        "category": "Generic Protocol Command Decode",
+        "timestamp": "2025-07-02T02:27:21.835Z"
+    },
+    "connection": {
+        "identity": {
+            "source_ip": "192.168.10.25",
+            "source_port": 51133,
+            "destination_ip": "192.168.10.19",
+            "destination_port": 139,
+            "traffic_direction": "Lateral",
+            "service": "dce_rpc,smb,gssapi",
+            "transport_protocol": "tcp"
+        },
+        "statistics": {
+            "duration_seconds": 0.0039
+        },
+        "analysis": {
+            "overall_assessment": "Informational: Standard connection recorded.",
+            "connection_state_desc": "Connection established and fully closed",
+            "flow_ratio": {
+                "upload_bytes": 1244,
+                "download_bytes": 1642,
+                "ratio": 0.8
+            }
+        }
+    }
+}

@@ -1,0 +1,179 @@
+{
+    "alert": {
+        "signature": "ET INFO HTTP Request to a *.tw domain",
+        "category": "Potentially Bad Traffic",
+        "timestamp": "2025-07-02T02:27:44.549Z"
+    },
+    "connection": {
+        "identity": {
+            "source_ip": "192.168.10.9",
+            "source_port": 7751,
+            "destination_ip": "60.199.140.65",
+            "destination_port": 80,
+            "traffic_direction": "Egress",
+            "service": "http",
+            "transport_protocol": "tcp"
+        },
+        "statistics": {
+            "duration_seconds": 10.8877
+        },
+        "analysis": {
+            "overall_assessment": "Informational: Standard connection recorded.",
+            "connection_state_desc": "Connection established and fully closed",
+            "flow_ratio": {
+                "upload_bytes": 1144,
+                "download_bytes": 15824,
+                "ratio": 0.1
+            }
+        }
+    },
+    "evidence": {
+        "reference": {
+            "http": {
+                "analysis": {
+                    "overall_assessment": "Benign: No significant threat indicators found.",
+                    "observed_user_agent_properties": [
+                        "Normal"
+                    ],
+                    "observed_destination": "Domain Name",
+                    "observed_content_patterns": [
+                        "None"
+                    ],
+                    "observed_file_transfers": {
+                        "uploads": "None",
+                        "downloads": "4 files (Benign)"
+                    }
+                },
+                "evidence": {
+                    "connection_context": {
+                        "methods_used": [
+                            "GET"
+                        ],
+                        "user_agent_string": "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:54.0) Gecko/20100101 Firefox/54.0"
+                    },
+                    "findings": [
+                        {
+                            "type": "FileTransfer",
+                            "direction": "download",
+                            "fuid": "Fu4Lqd1eoGqqDGdUQ6",
+                            "filenames": [],
+                            "mime_types": [
+                                "image/gif"
+                            ]
+                        },
+                        {
+                            "type": "FileTransfer",
+                            "direction": "download",
+                            "fuid": "FKK4qY2NfaYpQKL6bc",
+                            "filenames": [],
+                            "mime_types": [
+                                "image/gif"
+                            ]
+                        },
+                        {
+                            "type": "FileTransfer",
+                            "direction": "download",
+                            "fuid": "FDjRIA2OWffDFjaTa3",
+                            "filenames": [],
+                            "mime_types": [
+                                "image/jpeg"
+                            ]
+                        },
+                        {
+                            "type": "FileTransfer",
+                            "direction": "download",
+                            "fuid": "FtQYHF129PZeJ0szUi",
+                            "filenames": [],
+                            "mime_types": [
+                                "image/x-icon"
+                            ]
+                        }
+                    ]
+                },
+                "statistics": {
+                    "total_requests": 4,
+                    "request_bytes": 0,
+                    "response_bytes": 14763,
+                    "client_error_ratio": 0.0
+                }
+            },
+            "files": {
+                "analysis": {
+                    "session_risk_summary": "No suspicious file activity detected",
+                    "highest_threat_level": "Informational",
+                    "evasion_techniques_detected": false,
+                    "suspicious_content_summary": "0 file(s) flagged with Medium or higher severity."
+                },
+                "statistics": {
+                    "total_files_analyzed": 4,
+                    "suspicious_files_count": 0,
+                    "total_bytes_transferred_kb": 14.42
+                },
+                "evidence": {
+                    "findings": [
+                        {
+                            "type": "FileAnalysisFinding",
+                            "fuid": "Fu4Lqd1eoGqqDGdUQ6",
+                            "filename": null,
+                            "direction": "Download",
+                            "severity": "Informational",
+                            "risk_score": 5,
+                            "size_bytes": 9798,
+                            "reasons": [],
+                            "file_type_reported": "image/gif",
+                            "hashes": {
+                                "md5": "a58ada7ba521c22870942abbb23ce30b",
+                                "sha1": "f0a817c0cfd42508249ba4b98d0f53f0ab697c5b"
+                            }
+                        },
+                        {
+                            "type": "FileAnalysisFinding",
+                            "fuid": "FKK4qY2NfaYpQKL6bc",
+                            "filename": null,
+                            "direction": "Download",
+                            "severity": "Informational",
+                            "risk_score": 5,
+                            "size_bytes": 1513,
+                            "reasons": [],
+                            "file_type_reported": "image/gif",
+                            "hashes": {
+                                "md5": "756f1f3e7e9e0b97610a412a19033da5",
+                                "sha1": "aa124c86b2493034b3f0eb1b421a704d8cd3b787"
+                            }
+                        },
+                        {
+                            "type": "FileAnalysisFinding",
+                            "fuid": "FDjRIA2OWffDFjaTa3",
+                            "filename": null,
+                            "direction": "Download",
+                            "severity": "Informational",
+                            "risk_score": 5,
+                            "size_bytes": 2302,
+                            "reasons": [],
+                            "file_type_reported": "image/jpeg",
+                            "hashes": {
+                                "md5": "3f53e127d784db8fd910b57063bf10ae",
+                                "sha1": "63755a080722e06ecefaeb0c855104521f8d397d"
+                            }
+                        },
+                        {
+                            "type": "FileAnalysisFinding",
+                            "fuid": "FtQYHF129PZeJ0szUi",
+                            "filename": null,
+                            "direction": "Download",
+                            "severity": "Informational",
+                            "risk_score": 5,
+                            "size_bytes": 1150,
+                            "reasons": [],
+                            "file_type_reported": "image/x-icon",
+                            "hashes": {
+                                "md5": "cff8baebf972a4dd19f1bd4e624beb1f",
+                                "sha1": "0c34f1f15ccb539df824e08a7886ab0e2aa0de7f"
+                            }
+                        }
+                    ]
+                }
+            }
+        }
+    }
+}

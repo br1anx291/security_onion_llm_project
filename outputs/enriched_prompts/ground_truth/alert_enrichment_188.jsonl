@@ -7,43 +7,59 @@
     "connection": {
         "identity": {
             "source_ip": "172.16.0.1",
-            "source_port": "35614",
+            "source_port": 35614,
             "destination_ip": "192.168.10.50",
-            "destination_port": "80",
+            "destination_port": 80,
             "traffic_direction": "Lateral",
             "service": "http",
             "transport_protocol": "tcp"
         },
         "statistics": {
-            "duration_sec": 2.2376,
-            "sent_bytes": 524,
-            "received_bytes": 1983
+            "duration_seconds": 2.2376
         },
         "analysis": {
-            "connection_state": "Normal Connection (SF)",
-            "flow_analysis": {
-                "direction": "Symmetrical"
+            "overall_assessment": "Informational: Standard connection recorded.",
+            "connection_state_desc": "Connection established and fully closed",
+            "flow_ratio": {
+                "upload_bytes": 524,
+                "download_bytes": 1983,
+                "ratio": 0.3
             }
         }
     },
     "evidence": {
-        "high": {
+        "reference": {
             "http": {
                 "analysis": {
-                    "user_agent_category": "Normal Browser",
-                    "destination_analysis": "Direct-to-IP Connection",
-                    "content_risk": "No Suspicious Content",
-                    "file_transfer_risk": "Benign Upload Detected"
+                    "overall_assessment": "Suspicious Anomaly: Session involves a direct-to-IP connection.",
+                    "observed_user_agent_properties": [
+                        "Normal"
+                    ],
+                    "observed_destination": "Direct-to-IP (205.174.165.68)",
+                    "observed_content_patterns": [
+                        "None"
+                    ],
+                    "observed_file_transfers": {
+                        "uploads": "1 files (Benign)",
+                        "downloads": "None"
+                    }
                 },
                 "evidence": {
                     "connection_context": {
                         "methods_used": [
                             "FAKEVERB"
                         ],
-                        "user_agent_string": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/33.0.1750.152 Safari/537.36Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_2) AppleWebKit/537.75.14 (KHTML, like Gecko) Version/7.0.3 Safari/537.75.14",
-                        "destination_ip": "205.174.165.68"
+                        "user_agent_string": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/33.0.1750.152 Safari/537.36Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_2) AppleWebKit/537.75.14 (KHTML, like Gecko) Version/7.0.3 Safari/537.75.14"
                     },
-                    "findings": []
+                    "findings": [
+                        {
+                            "type": "FileTransfer",
+                            "direction": "upload",
+                            "fuid": "FtuR6HEzV9KjNm6El",
+                            "filenames": [],
+                            "mime_types": []
+                        }
+                    ]
                 },
                 "statistics": {
                     "total_requests": 1,
@@ -51,15 +67,13 @@
                     "response_bytes": 0,
                     "client_error_ratio": 0.0
                 }
-            }
-        },
-        "reference": {
+            },
             "files": {
                 "analysis": {
                     "session_risk_summary": "No suspicious file activity detected",
                     "highest_threat_level": "Informational",
-                    "evasion_techniques_detected": "No",
-                    "suspicious_content_summary": "No suspicious content identified."
+                    "evasion_techniques_detected": false,
+                    "suspicious_content_summary": "0 file(s) flagged with Medium or higher severity."
                 },
                 "statistics": {
                     "total_files_analyzed": 1,

@@ -1,0 +1,29 @@
+{
+    "alert": {
+        "signature": "ET SCAN Behavioral Unusual Port 1434 traffic Potential Scan or Infection",
+        "category": "Misc activity",
+        "timestamp": "2025-05-25T09:57:26.545Z"
+    },
+    "connection": {
+        "identity": {
+            "source_ip": "172.16.0.1",
+            "source_port": 35613,
+            "destination_ip": "192.168.10.50",
+            "destination_port": 1434,
+            "traffic_direction": "Lateral",
+            "transport_protocol": "tcp"
+        },
+        "statistics": {
+            "duration_seconds": 0.0
+        },
+        "analysis": {
+            "overall_assessment": "Suspicious: Connection failed with state 'REJ', which may indicate scanning.",
+            "connection_state_desc": "Connection rejected by server",
+            "flow_ratio": {
+                "upload_bytes": 0,
+                "download_bytes": 0,
+                "ratio": "N/A"
+            }
+        }
+    }
+}

@@ -1,0 +1,54 @@
+{
+    "alert": {
+        "signature": "ET INFO Suspicious Domain (polyfill .io) in TLS SNI",
+        "category": "Potentially Bad Traffic",
+        "timestamp": "2025-05-25T09:30:25.901Z"
+    },
+    "connection": {
+        "identity": {
+            "source_ip": "192.168.10.17",
+            "source_port": 50565,
+            "destination_ip": "151.101.34.109",
+            "destination_port": 443,
+            "traffic_direction": "Egress",
+            "service": "ssl",
+            "transport_protocol": "tcp"
+        },
+        "statistics": {
+            "duration_seconds": 1.0105
+        },
+        "analysis": {
+            "overall_assessment": "Informational: Standard connection recorded.",
+            "connection_state_desc": "Connection established and fully closed",
+            "flow_ratio": {
+                "upload_bytes": 706,
+                "download_bytes": 26410,
+                "ratio": 0.0
+            }
+        }
+    },
+    "evidence": {
+        "low": {
+            "ssl": {
+                "analysis": {
+                    "overall_assessment": "Benign: No significant threat indicators found.",
+                    "handshake_status": "Failed"
+                },
+                "statistics": {
+                    "connection_duration_sec": 0.0
+                },
+                "evidence": {
+                    "server_names": [
+                        "polyfill.io"
+                    ],
+                    "ja3_details": [
+                        {
+                            "hash": "ce694315cbb81ce95e6ae4ae8cbafde6",
+                            "threat_name": null
+                        }
+                    ]
+                }
+            }
+        }
+    }
+}

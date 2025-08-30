@@ -1,0 +1,73 @@
+{
+    "alert": {
+        "signature": "ET DNS Query to a *.pw domain - Likely Hostile",
+        "category": "Potentially Bad Traffic",
+        "timestamp": "2025-05-25T09:03:55.737Z"
+    },
+    "connection": {
+        "identity": {
+            "source_ip": "192.168.10.9",
+            "source_port": 61969,
+            "destination_ip": "192.168.10.3",
+            "destination_port": 53,
+            "traffic_direction": "Lateral",
+            "service": "dns",
+            "transport_protocol": "udp"
+        },
+        "statistics": {
+            "duration_seconds": 0.0002
+        },
+        "analysis": {
+            "overall_assessment": "Informational: Standard connection recorded.",
+            "connection_state_desc": "Connection established and fully closed",
+            "flow_ratio": {
+                "upload_bytes": 86,
+                "download_bytes": 118,
+                "ratio": 0.7
+            }
+        }
+    },
+    "evidence": {
+        "reference": {
+            "dns": {
+                "analysis": {
+                    "overall_assessment": "Suspicious: Low-confidence anomalies observed (e.g., low TTL, monitored TLDs).",
+                    "observed_query_pattern": "Normal",
+                    "observed_integrity": "Normal (0% failure rate)",
+                    "observed_tld_risk": "Suspicious",
+                    "observed_ttl_behavior": "Normal"
+                },
+                "evidence": {
+                    "connection_context": {
+                        "source_ip": "192.168.10.9",
+                        "destination_dns_server": "192.168.10.3"
+                    },
+                    "findings": [
+                        {
+                            "type": "AttributeFinding",
+                            "source": "query_tld",
+                            "content": "dc11-c1-61-156.fe.core.pw",
+                            "reasons": [
+                                "Suspicious TLD (.pw)"
+                            ]
+                        },
+                        {
+                            "type": "AttributeFinding",
+                            "source": "query_tld",
+                            "content": "dc11-c1-61-156.fe.core.pw",
+                            "reasons": [
+                                "Suspicious TLD (.pw)"
+                            ]
+                        }
+                    ]
+                },
+                "statistics": {
+                    "total_queries": 2,
+                    "distinct_queries": 1,
+                    "failed_queries_ratio": 0.0,
+                    "distinct_answers": 1
+                }
+            }
+        }
+    }
+}

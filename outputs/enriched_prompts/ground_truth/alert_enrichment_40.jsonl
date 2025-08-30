@@ -1,0 +1,74 @@
+{
+    "alert": {
+        "signature": "ET WEB_SERVER Possible MySQL SQLi Attempt Information Schema Access",
+        "category": "Web Application Attack",
+        "timestamp": "2025-05-25T06:33:28.106Z"
+    },
+    "connection": {
+        "identity": {
+            "source_ip": "172.16.0.1",
+            "source_port": 36202,
+            "destination_ip": "192.168.10.50",
+            "destination_port": 80,
+            "traffic_direction": "Lateral",
+            "service": "http",
+            "transport_protocol": "tcp"
+        },
+        "statistics": {
+            "duration_seconds": 0.0247
+        },
+        "analysis": {
+            "overall_assessment": "Informational: Standard connection recorded.",
+            "connection_state_desc": "Connection established and fully closed",
+            "flow_ratio": {
+                "upload_bytes": 600,
+                "download_bytes": 4149,
+                "ratio": 0.1
+            }
+        }
+    },
+    "evidence": {
+        "reference": {
+            "http": {
+                "analysis": {
+                    "overall_assessment": "High Confidence Threat: Session contains indicators of SQL Injection patterns.",
+                    "observed_user_agent_properties": [
+                        "Normal"
+                    ],
+                    "observed_destination": "Direct-to-IP (205.174.165.68)",
+                    "observed_content_patterns": [
+                        "Classic SQLi"
+                    ],
+                    "observed_file_transfers": {
+                        "uploads": "None",
+                        "downloads": "None"
+                    }
+                },
+                "evidence": {
+                    "connection_context": {
+                        "methods_used": [
+                            "GET"
+                        ],
+                        "user_agent_string": "Mozilla/5.0 (X11; Linux x86_64; rv:45.0) Gecko/20100101 Firefox/45.0"
+                    },
+                    "findings": [
+                        {
+                            "type": "ContentFinding",
+                            "content": "/dv/vulnerabilities/sqli/?id=1'+and+1=1+union+select+null,+table_name+from+information_schema.tables#&Submit=Submit",
+                            "source": "URI",
+                            "reasons": [
+                                "Classic SQLi"
+                            ]
+                        }
+                    ]
+                },
+                "statistics": {
+                    "total_requests": 1,
+                    "request_bytes": 0,
+                    "response_bytes": 0,
+                    "client_error_ratio": 0.0
+                }
+            }
+        }
+    }
+}

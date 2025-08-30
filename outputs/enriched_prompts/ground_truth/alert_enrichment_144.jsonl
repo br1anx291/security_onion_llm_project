@@ -1,0 +1,7 @@
+{
+    "alert": {
+        "signature": "ET INFO Dropbox.com Offsite File Backup in Use",
+        "category": "Potential Corporate Privacy Violation",
+        "timestamp": "2025-07-02T02:26:48.106Z"
+    }
+}

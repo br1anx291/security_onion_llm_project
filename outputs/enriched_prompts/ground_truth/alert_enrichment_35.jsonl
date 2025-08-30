@@ -1,0 +1,89 @@
+{
+    "alert": {
+        "signature": "ET INFO Observed DNS Query to .biz TLD",
+        "category": "Potentially Bad Traffic",
+        "timestamp": "2025-05-25T09:25:58.025Z"
+    },
+    "connection": {
+        "identity": {
+            "source_ip": "192.168.10.3",
+            "source_port": 62098,
+            "destination_ip": "192.168.10.1",
+            "destination_port": 53,
+            "traffic_direction": "Lateral",
+            "service": "dns",
+            "transport_protocol": "udp"
+        },
+        "statistics": {
+            "duration_seconds": 18.0467
+        },
+        "analysis": {
+            "overall_assessment": "Informational: Standard connection recorded.",
+            "connection_state_desc": "Connection established and fully closed",
+            "flow_ratio": {
+                "upload_bytes": 372,
+                "download_bytes": 1012,
+                "ratio": 0.4
+            }
+        }
+    },
+    "evidence": {
+        "critical": {
+            "dns": {
+                "analysis": {
+                    "overall_assessment": "Potential Threat: Activity exhibits DGA-like queries.",
+                    "observed_query_pattern": "High Entropy (DGA-like)",
+                    "observed_integrity": "Normal (0% failure rate)",
+                    "observed_tld_risk": "Normal",
+                    "observed_ttl_behavior": "Low (19s)"
+                },
+                "evidence": {
+                    "connection_context": {
+                        "source_ip": "192.168.10.3",
+                        "destination_dns_server": "192.168.10.1"
+                    },
+                    "findings": [
+                        {
+                            "type": "AttributeFinding",
+                            "source": "query_subdomain",
+                            "content": "prod.contextweb.map.fastlylb.net",
+                            "reasons": [
+                                "High Shannon Entropy (3.62)"
+                            ]
+                        },
+                        {
+                            "type": "AttributeFinding",
+                            "source": "answer_record",
+                            "content": "19",
+                            "reasons": [
+                                "Low TTL (19s)"
+                            ]
+                        },
+                        {
+                            "type": "AttributeFinding",
+                            "source": "query_length",
+                            "content": "optimatic-vast-ssp-1642999625.us-east-1.elb.amazonaws.com",
+                            "reasons": [
+                                "Long Query (57 > 50)"
+                            ]
+                        },
+                        {
+                            "type": "AttributeFinding",
+                            "source": "query_subdomain",
+                            "content": "optimatic-vast-ssp-1642999625.us-east-1.elb.amazonaws.com",
+                            "reasons": [
+                                "High Shannon Entropy (4.03)"
+                            ]
+                        }
+                    ]
+                },
+                "statistics": {
+                    "total_queries": 7,
+                    "distinct_queries": 7,
+                    "failed_queries_ratio": 0.0,
+                    "distinct_answers": 33
+                }
+            }
+        }
+    }
+}

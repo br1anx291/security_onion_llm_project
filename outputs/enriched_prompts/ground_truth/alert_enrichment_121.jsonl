@@ -1,0 +1,107 @@
+{
+    "alert": {
+        "signature": "ET USER_AGENTS Microsoft Device Metadata Retrieval Client User-Agent",
+        "category": "Misc activity",
+        "timestamp": "2025-05-25T09:21:12.874Z"
+    },
+    "connection": {
+        "identity": {
+            "source_ip": "192.168.10.14",
+            "source_port": 49620,
+            "destination_ip": "23.194.182.93",
+            "destination_port": 80,
+            "traffic_direction": "Egress",
+            "service": "http",
+            "transport_protocol": "tcp"
+        },
+        "statistics": {
+            "duration_seconds": 0.0151
+        },
+        "analysis": {
+            "overall_assessment": "Informational: Standard connection recorded.",
+            "connection_state_desc": "Connection established and fully closed",
+            "flow_ratio": {
+                "upload_bytes": 1588,
+                "download_bytes": 196,
+                "ratio": 8.1
+            }
+        }
+    },
+    "evidence": {
+        "reference": {
+            "http": {
+                "analysis": {
+                    "overall_assessment": "Benign: No significant threat indicators found.",
+                    "observed_user_agent_properties": [
+                        "Normal"
+                    ],
+                    "observed_destination": "Domain Name",
+                    "observed_content_patterns": [
+                        "None"
+                    ],
+                    "observed_file_transfers": {
+                        "uploads": "1 files (Benign)",
+                        "downloads": "None"
+                    }
+                },
+                "evidence": {
+                    "connection_context": {
+                        "methods_used": [
+                            "POST"
+                        ],
+                        "user_agent_string": "MICROSOFT_DEVICE_METADATA_RETRIEVAL_CLIENT"
+                    },
+                    "findings": [
+                        {
+                            "type": "FileTransfer",
+                            "direction": "upload",
+                            "fuid": "FIZa633TqFzVXWwE1j",
+                            "filenames": [],
+                            "mime_types": [
+                                "application/xml"
+                            ]
+                        }
+                    ]
+                },
+                "statistics": {
+                    "total_requests": 1,
+                    "request_bytes": 1242,
+                    "response_bytes": 0,
+                    "client_error_ratio": 0.0
+                }
+            },
+            "files": {
+                "analysis": {
+                    "session_risk_summary": "No suspicious file activity detected",
+                    "highest_threat_level": "Informational",
+                    "evasion_techniques_detected": false,
+                    "suspicious_content_summary": "0 file(s) flagged with Medium or higher severity."
+                },
+                "statistics": {
+                    "total_files_analyzed": 1,
+                    "suspicious_files_count": 0,
+                    "total_bytes_transferred_kb": 1.21
+                },
+                "evidence": {
+                    "findings": [
+                        {
+                            "type": "FileAnalysisFinding",
+                            "fuid": "FIZa633TqFzVXWwE1j",
+                            "filename": null,
+                            "direction": "Upload",
+                            "severity": "Informational",
+                            "risk_score": 5,
+                            "size_bytes": 1242,
+                            "reasons": [],
+                            "file_type_reported": "application/xml",
+                            "hashes": {
+                                "md5": "5909fa280ff2ea848ca9039c6a9d333b",
+                                "sha1": "578b2e73b99af08cb9e4d92187342e46f960ea78"
+                            }
+                        }
+                    ]
+                }
+            }
+        }
+    }
+}

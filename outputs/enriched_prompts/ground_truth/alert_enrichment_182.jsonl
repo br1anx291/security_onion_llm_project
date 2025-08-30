@@ -7,23 +7,23 @@
     "connection": {
         "identity": {
             "source_ip": "192.168.10.19",
-            "source_port": "36959",
+            "source_port": 36959,
             "destination_ip": "91.189.88.149",
-            "destination_port": "80",
+            "destination_port": 80,
             "traffic_direction": "Egress",
             "service": "http",
             "transport_protocol": "tcp"
         },
         "statistics": {
-            "duration_sec": 0.2516,
-            "sent_bytes": 11478,
-            "received_bytes": 2802874
+            "duration_seconds": 0.2516
         },
         "analysis": {
-            "connection_state": "Normal Connection (SF)",
-            "flow_analysis": {
-                "direction": "download",
-                "ratio": 244
+            "overall_assessment": "Informational: Standard connection recorded.",
+            "connection_state_desc": "Connection established and fully closed",
+            "flow_ratio": {
+                "upload_bytes": 11478,
+                "download_bytes": 2802874,
+                "ratio": 0.0
             }
         }
     },
@@ -31,10 +31,18 @@
         "reference": {
             "http": {
                 "analysis": {
-                    "user_agent_category": "Normal Browser",
-                    "destination_analysis": "Domain Name Connection",
-                    "content_risk": "No Suspicious Content",
-                    "file_transfer_risk": "Benign Download Detected"
+                    "overall_assessment": "Benign: No significant threat indicators found.",
+                    "observed_user_agent_properties": [
+                        "Normal"
+                    ],
+                    "observed_destination": "Domain Name",
+                    "observed_content_patterns": [
+                        "None"
+                    ],
+                    "observed_file_transfers": {
+                        "uploads": "None",
+                        "downloads": "2 files (Benign)"
+                    }
                 },
                 "evidence": {
                     "connection_context": {
@@ -43,7 +51,24 @@
                         ],
                         "user_agent_string": "Debian APT-HTTP/1.3 (1.0.1ubuntu2)"
                     },
-                    "findings": []
+                    "findings": [
+                        {
+                            "type": "FileTransfer",
+                            "direction": "download",
+                            "fuid": "FzykPz5jvWWQ0adal",
+                            "filenames": [],
+                            "mime_types": [
+                                "text/html"
+                            ]
+                        },
+                        {
+                            "type": "FileTransfer",
+                            "direction": "download",
+                            "fuid": "FkfcaY27hMJ7M9GA9b",
+                            "filenames": [],
+                            "mime_types": []
+                        }
+                    ]
                 },
                 "statistics": {
                     "total_requests": 53,
@@ -56,8 +81,8 @@
                 "analysis": {
                     "session_risk_summary": "No suspicious file activity detected",
                     "highest_threat_level": "Informational",
-                    "evasion_techniques_detected": "No",
-                    "suspicious_content_summary": "No suspicious content identified."
+                    "evasion_techniques_detected": false,
+                    "suspicious_content_summary": "0 file(s) flagged with Medium or higher severity."
                 },
                 "statistics": {
                     "total_files_analyzed": 2,
@@ -75,11 +100,11 @@
                             "risk_score": 5,
                             "size_bytes": 314,
                             "reasons": [],
+                            "file_type_reported": "text/html",
                             "hashes": {
                                 "md5": "fb1bdeb3a1e7cc356ff6e1c82819f617",
                                 "sha1": "bfda124feaeead6474cf35325dfdc9e526d98dae"
-                            },
-                            "file_type_reported": "text/html"
+                            }
                         },
                         {
                             "type": "FileAnalysisFinding",
