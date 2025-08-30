@@ -1,98 +1,97 @@
-# FILE: collectors/conn_collector_revised.py
+# FILE: collectors/conn_collector.py
 
 import json
-from ipaddress import ip_address, ip_network
-from typing import List, Dict, Any
+from ipaddress import ip_address
+from typing import Any, Dict, List
 from .base_collector import BaseCollector
 
 class ConnCollector(BaseCollector):
-    
-    # --- THAY ĐỔI 1: Chuyển các mô tả sang dạng quan sát khách quan ---
-    CONN_STATE_OBSERVATIONS = {
-        'S0': 'Connection Attempt, No Reply',
-        'S1': 'Handshake Started, Closed by Client Before Completion',
-        'S2': 'Handshake Started, Closed by Server Before Completion',
-        'S3': 'Handshake Started, No Final ACK from Client',
-        'REJ': 'Connection Rejected by Server',
-        'SF': 'Connection Established and Fully Closed',
-        'RSTO': 'Connection Closed by Client (RST)',
-        'RSTR': 'Connection Closed by Server (RST)',
+    """Collects and summarizes Zeek `conn.log` data."""
+
+    # Descriptions for Zeek's connection states.
+    CONN_STATE_DESCRIPTIONS = {
+        'S0': 'Connection attempt, no reply',
+        'S1': 'Handshake started, closed by client before completion',
+        'S2': 'Handshake started, closed by server before completion',
+        'S3': 'Handshake started, no final ACK from client',
+        'REJ': 'Connection rejected by server',
+        'SF': 'Connection established and fully closed',
+        'RSTO': 'Connection closed by client (RST)',
+        'RSTR': 'Connection closed by server (RST)',
     }
     
-    # --- THAY ĐỔI 2: Thêm các dải mạng riêng đã biết để kiểm tra hướng traffic ---
-    PRIVATE_IP_RANGES = [
-        ip_network('10.0.0.0/8'),
-        ip_network('172.16.0.0/12'),
-        ip_network('192.168.0.0/16'),
-        ip_network('127.0.0.0/8'),
-        ip_network('169.254.0.0/16'),
-    ]
-
     @property
-    def collector_name(self) -> str: return "conn"
+    def collector_name(self) -> str:
+        return "conn"
 
-    # --- THAY ĐỔI 3: Hàm kiểm tra IP riêng tư, đáng tin cậy hơn ---
     def _is_private_ip(self, ip_str: str) -> bool:
-        if not ip_str: return False
+        """Checks if a given string is a private IP address."""
+        if not ip_str:
+            return False
         try:
-            ip = ip_address(ip_str)
-            return ip.is_private
+            return ip_address(ip_str).is_private
         except ValueError:
             return False
 
-    def collect(self, log_lines: List[str]) -> Dict[str, Any] | None:
-        if not log_lines: return None
-        try:
-            # Chỉ cần phân tích bản ghi cuối cùng của phiên kết nối
-            last_log_entry = json.loads(log_lines[-1])
-        except (json.JSONDecodeError, IndexError):
-            return None
-
-        # --- PHẦN 1: IDENTITY VÀ LOGIC TRAFFIC_DIRECTION MỚI ---
-        source_ip = last_log_entry.get('id.orig_h')
-        dest_ip = last_log_entry.get('id.resp_h')
-        
-        # Logic traffic_direction mới, không phụ thuộc vào cấu hình Zeek
+    def _get_traffic_direction(self, source_ip: str | None, dest_ip: str | None) -> str:
+        """Determines traffic direction based on IP privacy."""
         is_source_private = self._is_private_ip(source_ip)
         is_dest_private = self._is_private_ip(dest_ip)
 
-        if is_source_private and not is_dest_private: direction = "Egress"       # Nội bộ -> Internet
-        elif not is_source_private and is_dest_private: direction = "Ingress"      # Internet -> Nội bộ
-        elif is_source_private and is_dest_private: direction = "Lateral"        # Nội bộ -> Nội bộ
-        else: direction = "Internet-to-Internet" # Internet -> Internet (ví dụ proxy)
-        
-        identity = {
-            "source_ip": source_ip, "source_port": last_log_entry.get('id.orig_p'),
-            "destination_ip": dest_ip, "destination_port": last_log_entry.get('id.resp_p'),
-            "traffic_direction": direction,
-            "service": last_log_entry.get('service'),
-            "transport_protocol": last_log_entry.get('proto'),
-        }
+        if is_source_private and not is_dest_private: return "Egress"
+        if not is_source_private and is_dest_private: return "Ingress"
+        if is_source_private and is_dest_private: return "Lateral"
+        return "Internet-to-Internet"
 
-        # --- PHẦN 2: XÂY DỰNG KHỐI ANALYSIS KHÁCH QUAN HƠN ---
-        conn_state = last_log_entry.get('conn_state')
-        orig_bytes = last_log_entry.get('orig_bytes', 0)
-        resp_bytes = last_log_entry.get('resp_bytes', 0)
+    def collect(self, log_lines: List[str]) -> Dict[str, Any] | None:
+        """Processes the last conn log entry to summarize the connection."""
+        if not log_lines:
+            return None
+
+        try:
+            log = json.loads(log_lines[-1])
+        except (json.JSONDecodeError, IndexError):
+            return None
         
-        # Đưa ra đánh giá tổng thể dựa trên các bằng chứng
+        # --- 1. Build Identity Conditionally ---
+        identity = {}
+        if source_ip := log.get('id.orig_h'): identity['source_ip'] = source_ip
+        if source_port := log.get('id.orig_p'): identity['source_port'] = source_port
+        if dest_ip := log.get('id.resp_h'): identity['destination_ip'] = dest_ip
+        if dest_port := log.get('id.resp_p'): identity['destination_port'] = dest_port
+        
+        identity['traffic_direction'] = self._get_traffic_direction(log.get('id.orig_h'), log.get('id.resp_h'))
+        
+        if service := log.get('service'): identity['service'] = service
+        if proto := log.get('proto'): identity['transport_protocol'] = proto
+
+        # --- 2. Analysis ---
+        conn_state = log.get('conn_state')
         assessment = "Informational: Standard connection recorded."
         if conn_state in ('S0', 'S1', 'S2', 'S3', 'REJ'):
-            assessment = f"Suspicious Anomaly: Connection failed to establish with state '{conn_state}', which can be indicative of scanning or probing activity."
+            assessment = f"Suspicious: Connection failed with state '{conn_state}', which may indicate scanning."
         
         analysis = {
             "overall_assessment": assessment,
-            "observed_connection_state": self.CONN_STATE_OBSERVATIONS.get(conn_state, f"Unknown State ({conn_state})"),
-            "observed_flow_ratio": {
-                "upload_bytes": orig_bytes,
-                "download_bytes": resp_bytes,
-                "ratio": round(orig_bytes / resp_bytes, 1) if resp_bytes > 0 else "N/A"
+            "connection_state_desc": self.CONN_STATE_DESCRIPTIONS.get(conn_state, f"Unknown State ({conn_state})"),
+            "flow_ratio": {
+                "upload_bytes": log.get('orig_bytes', 0),
+                "download_bytes": log.get('resp_bytes', 0),
+                "ratio": round(log.get('orig_bytes', 0) / log.get('resp_bytes'), 1) if log.get('resp_bytes', 0) > 0 else "N/A"
             }
         }
         
-        statistics = { "duration_sec": round(last_log_entry.get('duration', 0.0), 4) }
+        # --- 3. Statistics ---
+        statistics = {
+            "duration_seconds": round(log.get('duration', 0.0), 4)
+        }
 
-        return {
-            "identity": identity,
+        # --- 4. Final Output ---
+        final_output = {
             "analysis": analysis,
             "statistics": statistics
         }
+        if identity:
+            final_output["identity"] = identity
+        
+        return final_output

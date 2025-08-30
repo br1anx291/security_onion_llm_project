@@ -5,15 +5,12 @@ from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 import paramiko
 
-# ======================= CẤU HÌNH =======================
-# --- Thông tin Remote Server ---
-REMOTE_HOST = "192.168.26.101"
-REMOTE_PORT = 22
-REMOTE_USER = "soc_admin"
-# Nên dùng SSH key để không cần nhập password. 
-# Nếu dùng password, hãy bỏ comment dòng dưới và điền password.
-REMOTE_PASSWORD = "your_password" 
-REMOTE_KEY_PATH = "/root/.ssh/id_ed25519.pub" # Ví dụ: C:/Users/YourUser/.ssh/id_rsa
+from config import (
+    REMOTE_USER,
+    REMOTE_HOST,
+    REMOTE_PORT,
+    REMOTE_KEY_PATH,
+)
 
 # --- Đường dẫn file ---
 # File JSONL ở máy local mà bạn muốn theo dõi
@@ -22,11 +19,6 @@ LOCAL_FILE_PATH = f"../outputs/final_analysis/realtime/{name_alert}_analysis.jso
 # File trên remote server mà bạn muốn ghi nối vào
 REMOTE_FILE_PATH = "/opt/so/user_logs/llm_findings.jsonl"
 # =========================================================
-
-# Cấu hình logging
-logging.basicConfig(level=logging.INFO,
-                    format='%(asctime)s - %(message)s',
-                    datefmt='%Y-%m-%d %H:%M:%S')
 
 # Cấu hình logging
 logging.basicConfig(level=logging.INFO,

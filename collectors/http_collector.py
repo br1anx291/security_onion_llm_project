@@ -1,40 +1,18 @@
+# FILE: collectors/http_collector.py
+
 import json
 import re
 import os
 from typing import List, Dict, Any
 from urllib.parse import unquote_plus
-
-# Hàm giải mã đệ quy (giữ nguyên)
-def decode_recursively(encoded_str: str) -> str:
-    if not isinstance(encoded_str, str):
-        return ""
-    decoded_str = encoded_str
-    while True:
-        try:
-            unquoted = unquote_plus(decoded_str)
-            if unquoted == decoded_str:
-                return unquoted.lower()
-            decoded_str = unquoted
-        except Exception:
-            return decoded_str.lower()
-
-# Lớp BaseCollector (giữ nguyên)
-class BaseCollector:
-    def __init__(self, zeek_logs_dir: str = None):
-        self.zeek_logs_dir = zeek_logs_dir
-    @property
-    def collector_name(self) -> str:
-        raise NotImplementedError
-    def collect(self, log_lines: List[str]) -> Dict[str, Any] | None:
-        raise NotImplementedError
-
-### ===================================================================
-### === BẮT ĐẦU PHIÊN BẢN HTTPCOLLECTOR ĐÃ VIẾT LẠI HOÀN TOÀN ===
-### ===================================================================
+from .base_collector import BaseCollector
 
 class HttpCollector(BaseCollector):
-
-    # Các hằng số (giữ nguyên từ phiên bản cải tiến trước)
+    """
+    Collects and analyzes Zeek http.log data to identify suspicious
+    patterns, file transfers, and potential web attacks.
+    """
+    # --- Constants for Analysis ---
     ANOMALOUS_UA_SUBSTRINGS = {'svchost.exe'}
     SCRIPTING_AGENTS = {'python', 'java', 'curl', 'wget', 'powershell', 'go-http-client', 'bits'}
     OUTDATED_BROWSER_UA_SUBSTRINGS = {'msie 6', 'msie 7', 'msie 8', 'firefox/1', 'firefox/2', 'firefox/3'}
@@ -59,177 +37,228 @@ class HttpCollector(BaseCollector):
         "Img/Svg Payload": re.compile(r"<img|<svg", re.IGNORECASE)
     }
 
+    # Aggregation constants
+    AGGREGATION_THRESHOLD = 3
+    EXAMPLE_LIMIT = 3
+
+    def __init__(self, zeek_logs_dir: str):
+        super().__init__(zeek_logs_dir)
+        # Pre-compile all patterns for efficiency.
+        self.ALL_PATTERNS = {
+            **self.SENSITIVE_URI_PATTERNS,
+            **self.SQLI_PATTERNS,
+            **self.XSS_PATTERNS
+        }
+
     @property
     def collector_name(self) -> str:
         return "http"
 
+    # --- Private Helper Methods ---
+
+    @staticmethod
+    def _decode_recursively(encoded_str: str) -> str:
+        """Recursively URL-decodes a string until it's stable."""
+        if not isinstance(encoded_str, str):
+            return ""
+        decoded_str = encoded_str
+        # Limit iterations to prevent infinite loops on malformed input.
+        for _ in range(10):
+            try:
+                unquoted = unquote_plus(decoded_str)
+                if unquoted == decoded_str:
+                    return unquoted.lower()
+                decoded_str = unquoted
+            except Exception:
+                return decoded_str.lower()
+        return decoded_str.lower()
+
     def _assess_file_risk(self, file_dict: Dict) -> str:
-        """
-        Hàm nội bộ để đánh giá rủi ro của một tập hợp file (upload hoặc download).
-        Trả về 'Suspicious' hoặc 'Benign'.
-        """
-        all_filenames = {fn for details in file_dict.values() for fn in details["filenames"]}
-        all_mimes = {mime for details in file_dict.values() for mime in details["mime_types"]}
+        """Assesses risk of a file collection (uploads/downloads)."""
+        all_filenames = {fn for details in file_dict.values() for fn in details.get("filenames", [])}
+        all_mimes = {mime for details in file_dict.values() for mime in details.get("mime_types", [])}
         
         if any(os.path.splitext(fn)[1].lower() in self.SUSPICIOUS_EXTENSIONS for fn in all_filenames):
             return "Suspicious"
         if any(mime in self.SUSPICIOUS_MIME_TYPES for mime in all_mimes):
             return "Suspicious"
-            
         return "Benign"
 
-# <<< BẮT ĐẦU CODE MỚI CHO HÀM 'collect' >>>
+    def _analyze_content(self, log: Dict, grouped_findings: Dict):
+        """Analyzes URI and request body for suspicious patterns."""
+        content_to_analyze = {
+            'uri': log.get("uri", ""),
+            'body': log.get("request_body", "")
+        }
 
-    def collect(self, log_lines: List[str]) -> Dict[str, Any] | None:
-        if not log_lines: return None
+        for source, original_content in content_to_analyze.items():
+            if not original_content:
+                continue
+            
+            decoded_content = self._decode_recursively(original_content)
+            reasons = set()
 
-        # --- PHẦN 1: Thu thập và gom nhóm (Logic giữ nguyên như lần trước) ---
-        total_requests, client_error_count = 0, 0
-        total_req_body, total_resp_body = 0, 0
-        uids, methods = set(), set()
-        user_agent, direct_ip_host = None, None
+            # Check for directory traversal separately as it's not a regex pattern
+            if source == 'uri' and ('../' in decoded_content or '..\\' in decoded_content):
+                reasons.add("Potential Directory Traversal")
+
+            for reason, pattern in self.ALL_PATTERNS.items():
+                if pattern.search(decoded_content):
+                    reasons.add(reason)
+
+            if reasons:
+                reasons_key = tuple(sorted(list(reasons)))
+                if reasons_key not in grouped_findings:
+                    grouped_findings[reasons_key] = {"count": 0, "examples": [], "sources": set()}
+                
+                group = grouped_findings[reasons_key]
+                group["count"] += 1
+                group["sources"].add(source.upper())
+                if len(group["examples"]) < self.EXAMPLE_LIMIT:
+                    group["examples"].append(original_content[:256])
+
+    def _extract_files(self, log: Dict, direction: str, file_container: Dict):
+        """Helper to extract uploaded or downloaded file information."""
+        prefix = "orig" if direction == "upload" else "resp"
+        if fuids := log.get(f"{prefix}_fuids"):
+            filenames = log.get(f"{prefix}_filenames", [])
+            mime_types = log.get(f"{prefix}_mime_types", [])
+            for i, fuid in enumerate(fuids):
+                if fuid not in file_container:
+                    file_container[fuid] = {"filenames": set(), "mime_types": set()}
+                if i < len(filenames):
+                    file_container[fuid]["filenames"].add(filenames[i])
+                if i < len(mime_types):
+                    file_container[fuid]["mime_types"].add(mime_types[i])
+
+    def _build_final_findings(self, grouped_findings: Dict, uploaded_files: Dict, downloaded_files: Dict) -> List[Dict]:
+        """Aggregates and formats all findings from the session."""
         findings = []
-        uploaded_files, downloaded_files = {}, {}
-        grouped_content_findings = {}
-        AGGREGATION_THRESHOLD = 3
-        EXAMPLE_LIMIT = 3
-
-        for line in log_lines:
-            try:
-                log_entry = json.loads(line)
-                total_requests += 1
-                if not user_agent and (ua := log_entry.get("user_agent")): user_agent = ua
-                if not direct_ip_host and (host := log_entry.get("host", "")) and re.match(r"^\d{1,3}(\.\d{1,3}){3}(:\d+)?$", host):
-                    direct_ip_host = host
-                uids.add(log_entry.get("uid"))
-                if method := log_entry.get("method"): methods.add(method)
-                total_req_body += log_entry.get("request_body_len", 0)
-                total_resp_body += log_entry.get("response_body_len", 0)
-                content_to_analyze = {}
-                if uri := log_entry.get("uri"): content_to_analyze['uri'] = uri
-                if req_body := log_entry.get("request_body"): content_to_analyze['body'] = req_body
-                for source, original_content in content_to_analyze.items():
-                    decoded_content = decode_recursively(original_content)
-                    if not decoded_content: continue
-                    reasons = set()
-                    if source == 'uri' and ('../' in decoded_content or '..\\' in decoded_content):
-                        reasons.add("Potential Directory Traversal")
-                    all_patterns = {**self.SENSITIVE_URI_PATTERNS, **self.SQLI_PATTERNS, **self.XSS_PATTERNS}
-                    for reason, pattern in all_patterns.items():
-                        if pattern.search(decoded_content):
-                            reasons.add(reason)
-                    if reasons:
-                        reasons_key = tuple(sorted(list(reasons)))
-                        if reasons_key not in grouped_content_findings:
-                            grouped_content_findings[reasons_key] = {"count": 0, "examples": [], "sources": set()}
-                        group = grouped_content_findings[reasons_key]
-                        group["count"] += 1
-                        group["sources"].add(source.upper())
-                        if len(group["examples"]) < EXAMPLE_LIMIT:
-                            group["examples"].append(original_content[:256])
-                if orig_fuids := log_entry.get("orig_fuids"):
-                    for i, fuid in enumerate(orig_fuids):
-                        if fuid not in uploaded_files: uploaded_files[fuid] = {"filenames": set(), "mime_types": set()}
-                        if (fns := log_entry.get("orig_filenames")) and i < len(fns): uploaded_files[fuid]["filenames"].add(fns[i])
-                        if (mimes := log_entry.get("orig_mime_types")) and i < len(mimes): uploaded_files[fuid]["mime_types"].add(mimes[i])
-                if resp_fuids := log_entry.get("resp_fuids"):
-                    for i, fuid in enumerate(resp_fuids):
-                        if fuid not in downloaded_files: downloaded_files[fuid] = {"filenames": set(), "mime_types": set()}
-                        if (fns := log_entry.get("resp_filenames")) and i < len(fns): downloaded_files[fuid]["filenames"].add(fns[i])
-                        if (mimes := log_entry.get("resp_mime_types")) and i < len(mimes): downloaded_files[fuid]["mime_types"].add(mimes[i])
-                if 400 <= log_entry.get('status_code', 0) < 500: client_error_count += 1
-            except (json.JSONDecodeError, KeyError): continue
-
-        # --- PHẦN 2: Xử lý và tạo findings cuối cùng (Logic giữ nguyên) ---
-        for reasons_key, group in grouped_content_findings.items():
-            if group["count"] > AGGREGATION_THRESHOLD:
-                findings.append({"type": "AggregatedContentFinding", "source": "/".join(sorted(list(group["sources"]))), "reasons": list(reasons_key), "count": group["count"], "examples": group["examples"]})
+        # Process content findings
+        for reasons_key, group in grouped_findings.items():
+            common_data = {"source": "/".join(sorted(list(group["sources"]))), "reasons": list(reasons_key)}
+            if group["count"] > self.AGGREGATION_THRESHOLD:
+                findings.append({"type": "AggregatedContentFinding", "count": group["count"], "examples": group["examples"], **common_data})
             else:
                 for example in group["examples"]:
-                    findings.append({"type": "Content Finding", "source": "/".join(sorted(list(group["sources"]))), "content": example, "reasons": list(reasons_key)})
-        for fuid, details in uploaded_files.items():
-            for filename in details.get("filenames", {"N/A"}):
-                for mime_type in details.get("mime_types", {"N/A"}):
-                    findings.append({"type": "File Finding", "direction": "upload", "fuid": fuid, "filename": filename, "mime_type": mime_type})
-        for fuid, details in downloaded_files.items():
-            for filename in details.get("filenames", {"N/A"}):
-                for mime_type in details.get("mime_types", {"N/A"}):
-                    findings.append({"type": "File Finding", "direction": "download", "fuid": fuid, "filename": filename, "mime_type": mime_type})
+                    findings.append({"type": "ContentFinding", "content": example, **common_data})
+        
+        # Process file findings
+        for direction, container in [("upload", uploaded_files), ("download", downloaded_files)]:
+            for fuid, details in container.items():
+                findings.append({
+                    "type": "FileTransfer", "direction": direction, "fuid": fuid,
+                    "filenames": sorted(list(details["filenames"])), "mime_types": sorted(list(details["mime_types"]))
+                })
+        return findings
 
-        # ===================================================================
-        # === THAY ĐỔI 3: Nâng cấp logic xây dựng output cuối cùng ===
-        # ===================================================================
-
-        # 3.1. Thu thập các quan sát khách quan
-        # Thay vì các chuỗi kết luận, chúng ta tạo ra các danh sách quan sát
+    def _build_analysis_section(self, user_agent: str, direct_ip_host: str, findings: List, uploaded_files: Dict, downloaded_files: Dict) -> Dict:
+        """Builds the final 'analysis' dictionary with an overall assessment."""
+        # 1. Gather objective observations
         ua_lower = user_agent.lower() if user_agent else ""
-        observed_ua_properties = []
-        if any((s in ua_lower) for s in self.ANOMALOUS_UA_SUBSTRINGS): observed_ua_properties.append("Anomalous Pattern")
-        if any((s in ua_lower) for s in self.SCRIPTING_AGENTS): observed_ua_properties.append("Scripting/Tool Signature")
-        if any((s in ua_lower) for s in self.OUTDATED_BROWSER_UA_SUBSTRINGS): observed_ua_properties.append("Outdated Browser Signature")
+        observed_ua_properties = [prop for prop, substrings in {
+            "Anomalous Pattern": self.ANOMALOUS_UA_SUBSTRINGS,
+            "Scripting/Tool Signature": self.SCRIPTING_AGENTS,
+            "Outdated Browser Signature": self.OUTDATED_BROWSER_UA_SUBSTRINGS
+        }.items() if any(s in ua_lower for s in substrings)]
 
-        # Đếm số lượng các loại finding khác nhau
-        content_finding_reasons = set()
-        for f in findings:
-            if f['type'] in ['Content Finding', 'AggregatedContentFinding']:
-                content_finding_reasons.update(f['reasons'])
+        content_reasons = {reason for f in findings if f['type'] in ['ContentFinding', 'AggregatedContentFinding'] for reason in f['reasons']}
+        upload_risk = self._assess_file_risk(uploaded_files)
+        download_risk = self._assess_file_risk(downloaded_files)
 
-        has_suspicious_upload = self._assess_file_risk(uploaded_files) == "Suspicious"
-        has_suspicious_download = self._assess_file_risk(downloaded_files) == "Suspicious"
-
-        # 3.2. Xây dựng câu đánh giá tổng thể (overall_assessment)
-        assessment = "Likely Benign: No significant threat indicators found in the HTTP session."
+        # 2. Determine threat level and build assessment sentence
         high_confidence_threats = []
+        if "Anomalous Pattern" in observed_ua_properties: high_confidence_threats.append("an anomalous user agent")
+        if upload_risk == "Suspicious": high_confidence_threats.append("suspicious file uploads")
+        if "Classic SQLi" in content_reasons or "Time-based Blind" in content_reasons: high_confidence_threats.append("SQL Injection patterns")
+        if "Script Tag" in content_reasons or "HTML Event Handler" in content_reasons: high_confidence_threats.append("Cross-Site Scripting (XSS) patterns")
+        
         medium_confidence_anomalies = []
-
-        # Xác định các mối đe dọa cao
-        if "Anomalous/Malformed" in observed_ua_properties: high_confidence_threats.append("a malformed user agent")
-        if has_suspicious_upload: high_confidence_threats.append("suspicious file uploads")
-        if "Classic SQLi" in content_finding_reasons or "Time-based Blind" in content_finding_reasons: high_confidence_threats.append("patterns resembling SQL Injection")
-        if "Script Tag" in content_finding_reasons or "HTML Event Handler" in content_finding_reasons: high_confidence_threats.append("patterns resembling Cross-Site Scripting (XSS)")
-
-        # Xác định các bất thường trung bình
-        if has_suspicious_download: medium_confidence_anomalies.append("suspicious file downloads")
+        if download_risk == "Suspicious": medium_confidence_anomalies.append("suspicious file downloads")
         if direct_ip_host: medium_confidence_anomalies.append("a direct-to-IP connection")
         if "Scripting/Tool Signature" in observed_ua_properties: medium_confidence_anomalies.append("a scripting tool user agent")
-        if "Potential Directory Traversal" in content_finding_reasons: medium_confidence_anomalies.append("potential directory traversal attempts")
-
-
+        if "Potential Directory Traversal" in content_reasons: medium_confidence_anomalies.append("directory traversal attempts")
+        
+        assessment = "Benign: No significant threat indicators found."
         if high_confidence_threats:
-            assessment = f"High Confidence Threat: Session contains strong indicators of malicious activity, including {', '.join(high_confidence_threats)}."
+            assessment = f"High Confidence Threat: Session contains indicators of {', '.join(high_confidence_threats)}."
         elif medium_confidence_anomalies:
-            assessment = f"Suspicious Anomaly: Session involves anomalies like {', '.join(medium_confidence_anomalies)}. Further investigation is recommended."
+            assessment = f"Suspicious Anomaly: Session involves {', '.join(medium_confidence_anomalies)}."
 
-        # 3.3. Tạo khối analysis mới
-        analysis = {
+        # 3. Construct the final analysis block
+        return {
             "overall_assessment": assessment,
-            "observed_user_agent_properties": observed_ua_properties if observed_ua_properties else ["Normal Browser"],
+            "observed_user_agent_properties": observed_ua_properties or ["Normal"],
             "observed_destination": f"Direct-to-IP ({direct_ip_host})" if direct_ip_host else "Domain Name",
-            "observed_content_patterns": sorted(list(content_finding_reasons)) if content_finding_reasons else ["None"],
+            "observed_content_patterns": sorted(list(content_reasons)) or ["None"],
             "observed_file_transfers": {
-                "uploads": f"{len(uploaded_files)} files ({'Suspicious' if has_suspicious_upload else 'Benign'})" if uploaded_files else "None",
-                "downloads": f"{len(downloaded_files)} files ({'Suspicious' if has_suspicious_download else 'Benign'})" if downloaded_files else "None"
+                "uploads": f"{len(uploaded_files)} files ({upload_risk})" if uploaded_files else "None",
+                "downloads": f"{len(downloaded_files)} files ({download_risk})" if downloaded_files else "None"
             }
         }
-        # # Chỉ thêm findings_summary nếu nó có nội dung
-        # if findings_summary:
-        #     analysis['findings_summary'] = findings_summary
 
-        # 3.2. Xây dựng phần `evidence` (giữ nguyên)
-        # Phần này không đổi, bạn có thể copy từ code cũ
-        _, agent_matched_keyword = "Unknown", None
-        if user_agent and (kw := next((s for s in self.SCRIPTING_AGENTS if s in user_agent.lower()), None)):
-            agent_matched_keyword = kw
-        connection_context = {"methods_used": sorted(list(methods))}
-        if user_agent: connection_context["user_agent_string"] = user_agent
-        if agent_matched_keyword: connection_context["agent_matched_keyword"] = agent_matched_keyword
-        if direct_ip_host: connection_context["destination_ip"] = direct_ip_host
-        evidence = {
-            "connection_context": connection_context,
-            "findings": findings
+    # --- Main Collect Method ---
+
+    def collect(self, log_lines: List[str]) -> Dict[str, Any] | None:
+        """
+        Orchestrates the collection and analysis of HTTP log data.
+        """
+        if not log_lines:
+            return None
+
+        # 1. Initialize containers for the session data.
+        total_requests, client_error_count = 0, 0
+        total_req_body, total_resp_body = 0, 0
+        user_agent, direct_ip_host = None, ""
+        methods = set()
+        uploaded_files, downloaded_files = {}, {}
+        grouped_content_findings = {}
+
+        # 2. Process each log entry to populate containers.
+        for line in log_lines:
+            try:
+                log = json.loads(line)
+                total_requests += 1
+                methods.add(log.get("method"))
+                total_req_body += log.get("request_body_len", 0)
+                total_resp_body += log.get("response_body_len", 0)
+                if 400 <= log.get('status_code', 0) < 500: client_error_count += 1
+                
+                if not user_agent: user_agent = log.get("user_agent")
+                if not direct_ip_host and (host := log.get("host", "")) and re.match(r"^\d{1,3}(\.\d{1,3}){3}(:\d+)?$", host):
+                    direct_ip_host = host
+                
+                self._analyze_content(log, grouped_content_findings)
+                self._extract_files(log, "upload", uploaded_files)
+                self._extract_files(log, "download", downloaded_files)
+
+            except (json.JSONDecodeError, KeyError):
+                continue
+
+        # 3. Build the final report sections from the collected data.
+        final_findings = self._build_final_findings(grouped_content_findings, uploaded_files, downloaded_files)
+        
+        analysis = self._build_analysis_section(user_agent, direct_ip_host, final_findings, uploaded_files, downloaded_files)
+        
+        # --- MODIFICATION START: Build evidence conditionally for a cleaner output ---
+
+        # Only add connection context keys if they have a value.
+        connection_context = {
+            "methods_used": sorted(list(methods))
         }
+        if user_agent:
+            connection_context["user_agent_string"] = user_agent
+        
+        # The main evidence dictionary.
+        evidence = {
+            "connection_context": connection_context
+        }
+        # Only add the findings key if the list is not empty.
+        if final_findings:
+            evidence["findings"] = final_findings
 
-        # 3.3. Xây dựng phần `statistics` (giữ nguyên)
+        # --- MODIFICATION END ---
+        
         statistics = {
             "total_requests": total_requests,
             "request_bytes": total_req_body,
@@ -239,11 +268,6 @@ class HttpCollector(BaseCollector):
         
         return {
             "analysis": analysis, 
-            "evidence": evidence,
-            "statistics": statistics, 
+            "evidence": evidence, # Use the new, conditionally-built evidence dict
+            "statistics": statistics
         }
-
-# <<< KẾT THÚC CODE MỚI CHO HÀM 'collect' >>>``
-### ===================================================================
-### === KẾT THÚC PHIÊN BẢN HTTPCOLLECTOR ĐÃ VIẾT LẠI HOÀN TOÀN ===
-### ===================================================================

@@ -1,223 +1,172 @@
+# FILE: collectors/ssl_collector.py
+
 import json
 import logging
-from typing import List, Dict, Any, Set
+from typing import List, Dict, Any
 
 import yaml
 import tldextract
+from .base_collector import BaseCollector
 
-# Cấu hình logging cơ bản
+# Basic logging configuration
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
-# Giả định BaseCollector tồn tại
-class BaseCollector:
-    def __init__(self, zeek_logs_dir: str = None):
-        self.zeek_logs_dir = zeek_logs_dir
-    @property
-    def collector_name(self) -> str:
-        raise NotImplementedError
-    def collect(self, log_lines: List[str]) -> Dict[str, Any] | None:
-        raise NotImplementedError
-
 class SslCollector(BaseCollector):
-    
+    """
+    Analyzes Zeek ssl.log data for certificate issues, weak encryption,
+    and threat intelligence matches (JA3/JA3S).
+    """
+
     def __init__(self, zeek_logs_dir: str = None, config_path: str = './collectors/ssl_pattern.yaml'):
         super().__init__(zeek_logs_dir)
         try:
             with open(config_path, 'r') as f:
                 self.config = yaml.safe_load(f)
         except (IOError, yaml.YAMLError) as e:
-            logging.error(f"FATAL: Không thể tải tệp cấu hình '{config_path}': {e}")
+            logging.error(f"FATAL: Could not load configuration file '{config_path}': {e}")
             raise
-    # ... (các hàm khác giữ nguyên) ...
+
     @property
     def collector_name(self) -> str:
         return "ssl"
 
-    def _clean_output(self, data: Any) -> Any:
-        if isinstance(data, dict):
-            cleaned_data = {key: self._clean_output(value) for key, value in data.items()}
-            return {key: value for key, value in cleaned_data.items() if value is not None and value != [] and value != {}}
-        if isinstance(data, list):
-            return [self._clean_output(item) for item in data if item is not None]
-        return data
+    # --- Private Helper Methods ---
 
     def _get_sni_reputation(self, server_name: str) -> str:
+        """Determines the reputation of a server name based on keywords and trusted lists."""
+        # This helper function is already well-structured. No changes needed.
         if not server_name: return "Unknown"
         extracted = tldextract.extract(server_name)
         registered_domain = f"{extracted.domain}.{extracted.suffix}"
-        if registered_domain in self.config['reputation']['trusted_domains']:
-            return self.config['reputation']['trusted_domains'][registered_domain]
+        
+        reputation_config = self.config.get('reputation', {})
+        if registered_domain in reputation_config.get('trusted_domains', {}):
+            return reputation_config['trusted_domains'][registered_domain]
+        
         domain_parts = set(server_name.lower().split('.')) | set(server_name.lower().split('-'))
-        if not set(self.config['reputation']['adware_keywords']).isdisjoint(domain_parts): return "Adware/Tracker"
-        if not set(self.config['reputation']['benign_keywords']).isdisjoint(domain_parts): return "Likely Benign Infrastructure"
-        return "Unknown Reputation"
-    def collect(self, log_lines: List[str]) -> Dict[str, Any] | None:
-        if not log_lines: return None
-
-        # --- PHẦN 1: Thu thập bằng chứng thô ---
-        # (Logic thu thập vẫn giữ nguyên)
-        uids, ja3_hashes, ja3s_hashes, versions, ciphers = set(), set(), set(), set(), set()
-        server_names, cert_chain_fps = set(), set()
-        certificate_issues, all_validation_statuses = set(), set()
-        weak_protocols_found, weak_ciphers_found = set(), set()
-        total_duration = 0.0
-        handshake_established = False
-
-        for line in log_lines:
-            try:
-                log_entry = json.loads(line)
-                
-                uids.add(log_entry.get("uid"))
-                if sn := log_entry.get("server_name"): server_names.add(sn)
-                if j3 := log_entry.get("ja3"): ja3_hashes.add(j3)
-                if j3s := log_entry.get("ja3s"): ja3s_hashes.add(j3s)
-                if v := log_entry.get("version"): versions.add(v)
-                if c := log_entry.get("cipher"): ciphers.add(c)
-                if cfps := log_entry.get("cert_chain_fps"): cert_chain_fps.update(cfps)
-
-                if log_entry.get('established', False): handshake_established = True
-                total_duration += log_entry.get('duration', 0.0)
-
-                if (v := log_entry.get('version')) and v in self.config['security']['weak_protocols']:
-                    weak_protocols_found.add(v)
-                if (c := log_entry.get('cipher')) and c in self.config['security']['weak_ciphers']:
-                    weak_ciphers_found.add(c)
-                
-                if status := log_entry.get('validation_status', ''):
-                    all_validation_statuses.add(status)
-                    status_lower = status.lower()
-                    if "self-signed" in status_lower: certificate_issues.add("Self-Signed Certificate")
-                    if "unable to get local issuer" in status_lower: certificate_issues.add("Untrusted Chain")
-                    if "has expired" in status_lower: certificate_issues.add("Expired Certificate")
-
-            except (json.JSONDecodeError, KeyError) as e:
-                logging.warning(f"Lỗi xử lý SSL log: {e}. Bỏ qua dòng log này.")
-                continue
-
-
-        if not (server_names or ja3_hashes): return None
-
-        # # --- PHẦN 2: Phân tích và tạo các tín hiệu ---
-        # # (Logic phân tích vẫn giữ nguyên)
-        # main_server_name = next(iter(server_names), None)
-        # server_reputation = self._get_sni_reputation(main_server_name)
-
-        # certificate_status = "Invalid" if certificate_issues else "Trusted"
-        # encryption_strength = "Weak" if weak_protocols_found or weak_ciphers_found else "Strong"
-
-        # ja3_matches = {h: self.config['threat_intel']['known_malicious_ja3'].get(h) for h in ja3_hashes}
-        # ja3s_matches = {h: self.config['threat_intel']['known_malicious_ja3s'].get(h) for h in ja3s_hashes}
-        
-        # threat_intel_analysis = {
-        #     "ja3_match": any(ja3_matches.values()),
-        #     "ja3s_match": any(ja3s_matches.values())
-        # }
-
-        # # --- PHẦN 3: Xây dựng output cuối cùng ---
-        # analysis = {
-        #     "server_reputation": server_reputation,
-        #     "certificate_status": certificate_status,
-        #     "encryption_strength": encryption_strength,
-        #     "threat_intel_match": threat_intel_analysis,
-        #     "handshake_status": "Successful" if handshake_established else "Failed"
-        # }
-
-        # statistics = {
-        #     "connection_duration_sec": round(total_duration, 4)
-        # }
-        
-        # ### <<< THAY ĐỔI LỚN: Tinh gọn lại khối evidence
-        # evidence = {
-        #     "server_names": sorted(list(server_names)),
-        #     "tls_versions_used": sorted(list(versions)),
-        #     "ciphers_used": sorted(list(ciphers)),
-        #     "certificate_issues": sorted(list(certificate_issues)),
-        #     "certificate_chain_fingerprints": sorted(list(cert_chain_fps)),
+        if not set(reputation_config.get('adware_keywords', [])).isdisjoint(domain_parts):
+            return "Adware/Tracker"
+        if not set(reputation_config.get('benign_keywords', [])).isdisjoint(domain_parts):
+            return "Likely Benign Infrastructure"
             
-        #     # Cấu trúc mới, được làm giàu cho JA3/JA3S
-        #     "ja3_details": [
-        #         {"hash": h, "threat_name": ja3_matches.get(h)} for h in sorted(list(ja3_hashes))
-        #     ],
-        #     "ja3s_details": [
-        #         {"hash": h, "threat_name": ja3s_matches.get(h)} for h in sorted(list(ja3s_hashes))
-        #     ]
-        # }
-        
-        # final_output = {
-        #     "analysis": analysis,
-        #     "statistics": statistics,
-        #     "evidence": evidence
-        # }
-        
-        # return self._clean_output(final_output)
-        # --- PHẦN 2: Tối ưu hóa Phân tích & Tạo tín hiệu ---
+        return "Unknown Reputation"
 
-        # Thay vì các chuỗi kết luận, chúng ta tạo ra các danh sách quan sát
-        observed_cert_issues = sorted(list(certificate_issues))
-        observed_weak_protocols = sorted(list(weak_protocols_found))
-        observed_weak_ciphers = sorted(list(weak_ciphers_found))
+    def _process_log_entry(self, log: Dict, state: Dict):
+        """Processes a single log entry and updates the session state."""
+        state['uids'].add(log.get("uid"))
+        if sn := log.get("server_name"): state['server_names'].add(sn)
+        if j3 := log.get("ja3"): state['ja3_hashes'].add(j3)
+        if j3s := log.get("ja3s"): state['ja3s_hashes'].add(j3s)
+        if v := log.get("version"): state['versions'].add(v)
+        if c := log.get("cipher"): state['ciphers'].add(c)
+        if cfps := log.get("cert_chain_fps"): state['cert_chain_fps'].update(cfps)
 
-        # Giữ lại logic Threat Intel vì nó khá rõ ràng
-        ja3_matches = {h: self.config['threat_intel']['known_malicious_ja3'].get(h) for h in ja3_hashes}
-        ja3s_matches = {h: self.config['threat_intel']['known_malicious_ja3s'].get(h) for h in ja3s_hashes}
+        if log.get('established', False): state['handshake_established'] = True
+        state['total_duration'] += log.get('duration', 0.0)
+
+        # Check for weak security configurations
+        security_config = self.config.get('security', {})
+        if (v := log.get('version')) in security_config.get('weak_protocols', []):
+            state['weak_protocols_found'].add(v)
+        if (c := log.get('cipher')) in security_config.get('weak_ciphers', []):
+            state['weak_ciphers_found'].add(c)
+        
+        # Check for certificate validation issues
+        if status := log.get('validation_status', ''):
+            status_lower = status.lower()
+            if "self-signed" in status_lower: state['certificate_issues'].add("Self-Signed Certificate")
+            if "unable to get local issuer" in status_lower: state['certificate_issues'].add("Untrusted Chain")
+            if "has expired" in status_lower: state['certificate_issues'].add("Expired Certificate")
+
+    def _build_analysis_section(self, state: Dict) -> Dict:
+        """Builds the 'analysis' dictionary and the overall assessment."""
+        # 1. Perform threat intel lookups
+        threat_intel_config = self.config.get('threat_intel', {})
+        ja3_matches = {h: threat_intel_config.get('known_malicious_ja3', {}).get(h) for h in state['ja3_hashes']}
+        ja3s_matches = {h: threat_intel_config.get('known_malicious_ja3s', {}).get(h) for h in state['ja3s_hashes']}
         ja3_threat_name = next((name for name in ja3_matches.values() if name), None)
         ja3s_threat_name = next((name for name in ja3s_matches.values() if name), None)
 
-        # --- PHẦN 3: Xây dựng output cuối cùng với "overall_assessment" ---
-
-        # 1. Tạo câu đánh giá tổng thể (overall_assessment)
-        assessment = "Likely Benign: No significant threat indicators found in the TLS session."
+        # 2. Build the overall assessment sentence
+        assessment = "Benign: No significant threat indicators found."
         high_confidence_threats = []
-
-        if ja3_threat_name:
-            high_confidence_threats.append(f"a JA3 hash matching '{ja3_threat_name}'")
-        if ja3s_threat_name:
-            high_confidence_threats.append(f"a JA3S hash matching '{ja3s_threat_name}'")
-
+        if ja3_threat_name: high_confidence_threats.append(f"a JA3 hash matching '{ja3_threat_name}'")
+        if ja3s_threat_name: high_confidence_threats.append(f"a JA3S hash matching '{ja3s_threat_name}'")
+        
         medium_confidence_anomalies = []
-        if "Self-Signed Certificate" in observed_cert_issues:
-            medium_confidence_anomalies.append("a self-signed certificate")
-        if "Untrusted Chain" in observed_cert_issues:
-            medium_confidence_anomalies.append("an untrusted certificate chain")
+        if "Self-Signed Certificate" in state['certificate_issues']: medium_confidence_anomalies.append("a self-signed certificate")
+        if "Untrusted Chain" in state['certificate_issues']: medium_confidence_anomalies.append("an untrusted certificate chain")
 
         if high_confidence_threats:
-            assessment = f"High Confidence Threat: Session contains strong indicators of malware, including {', '.join(high_confidence_threats)}."
+            assessment = f"High Confidence Threat: Session contains malware indicators, including {', '.join(high_confidence_threats)}."
         elif medium_confidence_anomalies:
-            assessment = f"Suspicious Anomaly: Session involves anomalies like {', '.join(medium_confidence_anomalies)}, which could be malicious or misconfigured internal services. Further investigation is recommended."
-        elif observed_weak_protocols or observed_weak_ciphers:
-            assessment = "Informational: The session used weak encryption. This is a policy violation but not a direct indicator of a threat."
+            assessment = f"Suspicious: Session involves anomalies like {', '.join(medium_confidence_anomalies)}."
+        elif state['weak_protocols_found'] or state['weak_ciphers_found']:
+            assessment = "Informational: Session used weak encryption, indicating a policy violation."
 
-        # 2. Tạo khối analysis mới
-        analysis = {
-            "overall_assessment": assessment,
-            "observed_certificate_issues": observed_cert_issues,
-            "observed_weak_protocols": observed_weak_protocols,
-            "observed_weak_ciphers": observed_weak_ciphers,
-            "handshake_status": "Successful" if handshake_established else "Failed"
+        # 3. Construct the final analysis block (conditionally)
+        analysis = {"overall_assessment": assessment}
+        if state['certificate_issues']: analysis["observed_certificate_issues"] = sorted(list(state['certificate_issues']))
+        if state['weak_protocols_found']: analysis["observed_weak_protocols"] = sorted(list(state['weak_protocols_found']))
+        if state['weak_ciphers_found']: analysis["observed_weak_ciphers"] = sorted(list(state['weak_ciphers_found']))
+        analysis["handshake_status"] = "Successful" if state['handshake_established'] else "Failed"
+        
+        return analysis
+
+    # --- Main Collect Method ---
+    def collect(self, log_lines: List[str]) -> Dict[str, Any] | None:
+        """Orchestrates the collection and analysis of SSL/TLS log data."""
+        if not log_lines:
+            return None
+
+        # 1. Initialize a state dictionary to hold all session data.
+        state = {
+            'uids': set(), 'ja3_hashes': set(), 'ja3s_hashes': set(), 'versions': set(), 'ciphers': set(),
+            'server_names': set(), 'cert_chain_fps': set(), 'certificate_issues': set(),
+            'weak_protocols_found': set(), 'weak_ciphers_found': set(),
+            'total_duration': 0.0, 'handshake_established': False
         }
 
-        # statistics và evidence giữ nguyên cấu trúc cũ của bạn vì nó đã khá tốt
-        statistics = {
-            "connection_duration_sec": round(total_duration, 4)
-        }
+        # 2. Process each log entry to populate the state.
+        for line in log_lines:
+            try:
+                log = json.loads(line)
+                self._process_log_entry(log, state)
+            except (json.JSONDecodeError, KeyError) as e:
+                logging.warning(f"Error processing SSL log line: {e}. Skipping.")
+                continue
+        
+        # Early exit if there's no meaningful data to analyze.
+        if not state['server_names'] and not state['ja3_hashes']:
+            return None
 
-        evidence = {
-            "server_names": sorted(list(server_names)),
-            "tls_versions_used": sorted(list(versions)),
-            "ciphers_used": sorted(list(ciphers)),
-            "certificate_chain_fingerprints": sorted(list(cert_chain_fps)),
-            "ja3_details": [
-                {"hash": h, "threat_name": ja3_matches.get(h)} for h in sorted(list(ja3_hashes))
-            ],
-            "ja3s_details": [
-                {"hash": h, "threat_name": ja3s_matches.get(h)} for h in sorted(list(ja3s_hashes))
+        # 3. Build the final report sections.
+        analysis = self._build_analysis_section(state)
+        
+        # 4. Build evidence and statistics conditionally to ensure clean output.
+        threat_intel_config = self.config.get('threat_intel', {})
+        evidence = {}
+        if state['server_names']: evidence["server_names"] = sorted(list(state['server_names']))
+        if state['versions']: evidence["tls_versions_used"] = sorted(list(state['versions']))
+        if state['ciphers']: evidence["ciphers_used"] = sorted(list(state['ciphers']))
+        if state['cert_chain_fps']: evidence["certificate_chain_fingerprints"] = sorted(list(state['cert_chain_fps']))
+        if state['ja3_hashes']:
+            evidence["ja3_details"] = [
+                {"hash": h, "threat_name": threat_intel_config.get('known_malicious_ja3', {}).get(h)}
+                for h in sorted(list(state['ja3_hashes']))
             ]
-        }
+        if state['ja3s_hashes']:
+            evidence["ja3s_details"] = [
+                {"hash": h, "threat_name": threat_intel_config.get('known_malicious_ja3s', {}).get(h)}
+                for h in sorted(list(state['ja3s_hashes']))
+            ]
 
+        # 5. Assemble the final, clean output.
         final_output = {
             "analysis": analysis,
-            "statistics": statistics,
-            "evidence": evidence
+            "statistics": {"connection_duration_sec": round(state['total_duration'], 4)}
         }
-
-        return self._clean_output(final_output)
+        if evidence:
+            final_output["evidence"] = evidence
+        
+        return final_output

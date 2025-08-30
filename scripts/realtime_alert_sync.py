@@ -49,19 +49,6 @@ def connect_elasticsearch():
         logging.error(f"Elasticsearch connection error: {e}")
         return None
 
-# def retrieve_alerts(es, severity, start_time_str, end_time_str):
-#     try:
-#         search_context = Search(using=es, index='*logs-*') \
-#             .query("query_string", query="event.module:suricata") \
-#             .filter("terms", **{"rule.severity": severity}) \
-#             .filter('range', **{'@timestamp': {'gte': start_time_str, 'lte': end_time_str}}) \
-#             .sort('@timestamp')
-#         alerts_list = [d.to_dict() for d in search_context.scan()]
-#         return pd.DataFrame(alerts_list) if alerts_list else pd.DataFrame()
-#     except Exception as e:
-#         logging.error(f"Error retrieving alerts: {e}")
-#         return pd.DataFrame()
-# HÀM RETRIEVE_ALERTS PHIÊN BẢN HOÀN THIỆN (CÓ LÀM PHẲNG DỮ LIỆU)
 def retrieve_alerts(es, severity_list, start_time_str, end_time_str):
     """
     Truy vấn và "làm phẳng" dữ liệu alert để các cột lồng nhau 

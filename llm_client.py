@@ -8,8 +8,9 @@ import requests
 import re
 import socket
 from json_repair import repair_json
+
 SYSTEM_PROMPT = """
-# PERSONA, # CRITICAL RULE, # KNOWLEDGE BASE, # TASK & OUTPUT FORMAT ## 1.CORE TASK ##2. OUTPUT SCHEMA
+# PERSONA
 You are a Senior SOC Analyst. Your analysis must be precise, logical and decisive , based on the provided signals and knowledge base.
 
 # CRITICAL RULE
@@ -178,7 +179,7 @@ Analyze the provided CONTEXT. Your response MUST be a SINGLE, FLAWLESS, and **PE
       "synthesize_reasoning": "string" // Step 4 * Synthesize all evidence into a chronological narrative. Explain how the event likely occurred from start to finish.
     },
     "conclusion": {
-      "classification": "string", // Based on the above analysis. CLASSIFY. Your answer MUST be one of the following two options only: True Positive or False Positive. NO EXPLANATION. DO NOT ADD ANY OTHER WORDS.
+      "classification": "string", // Based on the above analysis. CLASSIFY. Your answer MUST be one of the following two options only: "True Positive" or "False Positive". NO EXPLANATION. DO NOT ADD ANY OTHER WORDS.
       "confidence_score": "number", // Provide a confidence score from 0.0 (very uncertain) to 1.0 (very certain).
       "reasoning_summary": "string" // Provide a brief, one-sentence summary of your final conclusion.
     }
@@ -204,7 +205,7 @@ USER_PROMPT = """
 # Chuyển thành True để gọi API qua ngrok (public), False để gọi API trong mạng nội bộ (local)
 USE_REMOTE = True
 # --* Cấu hình cho môi trường REMOTE (Ngrok) ---
-remote_url = 'https://eb7f46532797.ngrok-free.app/'
+remote_url = 'https://860c638b6a82.ngrok-free.app/'
 REMOTE_API_URL = f"{remote_url}v1/chat/completions"
 REMOTE_MODEL_NAME = "meta-llama-3-8b-instruct"
 
@@ -222,7 +223,7 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s * %(levelname)s * %(
 class LLMClient:
     def __init__(self):
         """
-        Khởi tạo LLMClient và thiết lập cấu hình API dựa trên cờ USE_REMOTE.
+        Initializes the LLMClient and sets the API configuration based on the USE_REMOTE flag.
         """
         if USE_REMOTE:
             self.api_url = REMOTE_API_URL
@@ -245,8 +246,8 @@ class LLMClient:
 
     def _query_llm_api(self, user_prompt: str) -> Dict | None:
         """
-        Gửi yêu cầu đến API LLM (local hoặc remote) và trả về kết quả.
-        Hàm này được dùng cho cả hai chế độ.
+        Sends a request to the LLM API (local or remote) and returns the result.
+        This function is used for both modes.
         """
         headers = {"Content-Type": "application/json"}
         payload = {
@@ -284,20 +285,20 @@ class LLMClient:
         
     def extract_json(self, message_content: str) -> dict | None:
         """
-        Trích xuất JSON từ một chuỗi, ưu tiên tìm trong khối mã markdown.
-        **Nâng cấp:** Nếu JSON là một danh sách, hàm sẽ tự động lấy phần tử cuối cùng.
+        Extracts JSON from a string, prioritizing markdown code blocks.
+        **Upgrade:** If the JSON is a list, the function will automatically get the last element.
         """
         json_string = None
         try:
-            # Mẫu regex để tìm khối mã JSON (có hoặc không có chữ "json")
+            # Get the JSON content (can be an object or an array)
             match = re.search(r"```(json)?\s*([\[{].*?[\]}])\s*```", message_content, re.DOTALL)
             
             if match:
-                # Lấy nội dung JSON (có thể là object hoặc array)
+                # Get the JSON content (can be an object or an array)
                 json_string = match.group(2)
             else:
-                # Nếu không tìm thấy khối mã, tìm JSON đầu tiên và cuối cùng
-                # Cải tiến để tìm cả array `[` và object `{`
+                # If no code block is found, find the first and last JSON characters
+                # Improved to find both arrays `[` and objects `{`
                 first_char_pos = min(
                     (pos for pos in (message_content.find('{'), message_content.find('[')) if pos != -1),
                     default=-1
@@ -309,7 +310,6 @@ class LLMClient:
                     return None
                 json_string = message_content[first_char_pos : last_char_pos + 1]
 
-            # Cố gắng parse chuỗi JSON đã trích xuất
             parsed_data = json.loads(json_string)
 
         except json.JSONDecodeError as e:

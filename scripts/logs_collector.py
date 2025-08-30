@@ -1,6 +1,5 @@
 import os
 import logging
-import getpass
 import paramiko
 import re
 import subprocess
@@ -8,7 +7,15 @@ import gzip
 import time 
 from concurrent.futures import ThreadPoolExecutor, as_completed
 # Thay đổi import để lấy config từ thư mục hiện tại
-from config import remote_host, remote_username, remote_zeek_log_path, local_zeek_log_path, local_zeek_zip_path, local_zeek_unzip_path,remote_zeek_spool_path
+from config import (
+    REMOTE_HOST, 
+    REMOTE_USERNAME, 
+    REMOTE_ZEEK_LOG_PATH, 
+    LOCAL_ZEEK_LOG_PATH, 
+    LOCAL_ZEEK_ZIP_PATH, 
+    LOCAL_ZEEK_UNZIP_PATH, 
+    REMOTE_ZEEK_SPOOL_PATH
+)
 
 # Các hàm setup logging, create_ssh_sftp, download_file, list_zeek_log_folders giữ nguyên
 # setup logging
@@ -16,13 +23,12 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(me
 
 def create_ssh_sftp():
     try:
-        ssh_target = f"{remote_username}@{remote_host}"
+        ssh_target = f"{REMOTE_USERNAME}@{REMOTE_HOST}"
         logging.info(f"Establishing SSH + SFTP session to {ssh_target}...")
-        # password = getpass.getpass(prompt=f"Enter password for {ssh_target}: ")
 
         ssh = paramiko.SSHClient()
         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        ssh.connect(remote_host, username=remote_username)
+        ssh.connect(REMOTE_HOST, username=REMOTE_USERNAME)
         sftp = ssh.open_sftp()
 
         logging.info("SSH + SFTP session established successfully.")
@@ -53,10 +59,10 @@ def list_zeek_log_folders(sftp, remote_root):
 def fetch_logs_from_folder(folder_name, ssh, sftp):
     logging.info(f"🔍 Fetching logs from entry: {folder_name}...")
     
-    local_folder_path = os.path.join(local_zeek_zip_path, folder_name)
+    local_folder_path = os.path.join(LOCAL_ZEEK_ZIP_PATH, folder_name)
     os.makedirs(local_folder_path, exist_ok=True)
     
-    remote_folder_path = f"{remote_zeek_log_path}/{folder_name}/"
+    remote_folder_path = f"{REMOTE_ZEEK_SPOOL_PATH}/{folder_name}/"
     files_to_check_suffix = ".log.gz"
     downloaded_files = []
     # =========================================================
@@ -103,11 +109,11 @@ def fetch_logs_from_current(ssh=None, sftp=None):
     Đồng bộ tất cả các file .log từ spool (/nsm/zeek/spool/logger/)
     về thư mục local, chỉ lấy file .log bằng rsync.
     """
-    local_current_path = os.path.join(local_zeek_unzip_path, "current")
+    local_current_path = os.path.join(LOCAL_ZEEK_UNZIP_PATH, "current")
     os.makedirs(local_current_path, exist_ok=True)
-    remote_spool_path = remote_zeek_spool_path.rstrip("/") + "/"
+    remote_spool_path = REMOTE_ZEEK_LOG_PATH.rstrip("/") + "/"
 
-    logging.info(f"🔄 Syncing *.log files from {remote_host}:{remote_spool_path} ...")
+    logging.info(f"🔄 Syncing *.log files from {REMOTE_HOST}:{remote_spool_path} ...")
 
     try:
         rsync_cmd = [
@@ -115,7 +121,7 @@ def fetch_logs_from_current(ssh=None, sftp=None):
             "--include", "*.log",
             "--exclude", "*",
             "-e", "ssh",
-            f"{remote_username}@{remote_host}:{remote_spool_path}",
+            f"{REMOTE_USERNAME}@{REMOTE_HOST}:{remote_spool_path}",
             local_current_path
         ]
 
@@ -141,10 +147,10 @@ def fetch_logs_from_current(ssh=None, sftp=None):
         
 def decompress_logs_only(date_str, downloaded_files):
     # Đường dẫn đến thư mục chứa .gz theo ngày
-    gz_folder = os.path.join(local_zeek_zip_path, date_str)
+    gz_folder = os.path.join(LOCAL_ZEEK_ZIP_PATH, date_str)
 
     # Đường dẫn đến thư mục chứa .log sau giải nén theo ngày
-    log_folder = os.path.join(local_zeek_unzip_path, date_str)
+    log_folder = os.path.join(LOCAL_ZEEK_UNZIP_PATH, date_str)
     os.makedirs(log_folder, exist_ok=True)
 
     for filename in downloaded_files:
@@ -163,33 +169,6 @@ def decompress_logs_only(date_str, downloaded_files):
         except Exception as e:
             logging.error(f"❌ Failed to decompress {filename}: {e}")
 
-# # Hàm main giữ nguyên
-# if __name__ == "__main__":
-#     ssh, sftp = create_ssh_sftp()
-#     if not sftp:
-#         logging.error("Exiting: Could not establish SFTP session.")
-#         exit(1)
-        
-#     os.makedirs(local_zeek_log_path, exist_ok=True)
-
-#     folders_to_check = list_zeek_log_folders(sftp, remote_zeek_log_path)
-#     logging.info(f"Entries to check in '{remote_zeek_log_path}': {folders_to_check}")
-#     for folder_name in folders_to_check:
-#         downloaded_files = fetch_logs_from_folder(folder_name, ssh, sftp)
-#         if downloaded_files:
-#             decompress_logs_only(folder_name, downloaded_files)
-#         else:
-#             logging.info(f"🚫 No new files downloaded for {folder_name}, skipping decompress and convert.")
-
-
-#     logging.info("+++++++++++++++++++++++++++++++++++++")
-#     file_list = sftp.listdir(remote_zeek_spool_path)
-#     logging.info(f"Current Zeek log in spool: {file_list}")
-#     fetch_logs_from_current(ssh, sftp)
-
-#     sftp.close()
-#     ssh.close()
-#     logging.info("✅ Zeek log download pipeline completed.")
 
 def main_realtime():
     """
@@ -206,7 +185,7 @@ def main_realtime():
 
     try:
         logging.info("🚀 Starting real-time Zeek log synchronization...")
-        os.makedirs(local_zeek_log_path, exist_ok=True)
+        os.makedirs(LOCAL_ZEEK_LOG_PATH, exist_ok=True)
 
         while True:
             try:
@@ -217,8 +196,8 @@ def main_realtime():
                 fetch_logs_from_current(ssh, sftp)
 
                 # --- Ưu tiên 2: Kiểm tra và tải các log đã được lưu trữ ---
-                logging.info(f"Checking for new archived logs in '{remote_zeek_log_path}'...")
-                folders_to_check = list_zeek_log_folders(sftp, remote_zeek_log_path)
+                logging.info(f"Checking for new archived logs in '{REMOTE_ZEEK_SPOOL_PATH}'...")
+                folders_to_check = list_zeek_log_folders(sftp, REMOTE_ZEEK_SPOOL_PATH)
                 if not folders_to_check:
                     logging.info("No daily log folders found to check.")
                 else:

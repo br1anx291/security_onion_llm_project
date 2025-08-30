@@ -1,33 +1,29 @@
 {
     "alert": {
-        "signature": "ET SCAN Suspicious inbound to Oracle SQL port 1521",
+        "signature": "ET DNS Query for .su TLD (Soviet Union) Often Malware Related",
         "category": "Potentially Bad Traffic",
-        "timestamp": "2025-08-15T18:45:06.671Z"
+        "timestamp": "2025-07-02T02:23:24.446Z"
     },
     "connection": {
         "identity": {
-            "source_ip": "192.168.110.131",
-            "source_port": "61622",
-            "destination_ip": "192.168.110.132",
-            "destination_port": "1521",
+            "source_ip": "192.168.10.19",
+            "source_port": 36429,
+            "destination_ip": "192.168.10.3",
+            "destination_port": 53,
             "traffic_direction": "Lateral",
-            "service": null,
-            "transport_protocol": "tcp"
+            "service": "dns",
+            "transport_protocol": "udp"
         },
         "statistics": {
-            "duration_sec": 0.0002,
-            "sent_bytes": 0,
-            "received_bytes": 0
+            "duration_seconds": 0.0002
         },
         "analysis": {
-            "connection_state": "Connection Rejected (REJ)",
-            "history_analysis": {
-                "label": "Unrecognized Pattern",
-                "summary": "Requires manual review: 'Sr'.",
-                "severity": "Informational"
-            },
-            "flow_analysis": {
-                "direction": "Symmetrical"
+            "overall_assessment": "Informational: Standard connection recorded.",
+            "connection_state_desc": "Connection established and fully closed",
+            "flow_ratio": {
+                "upload_bytes": 50,
+                "download_bytes": 82,
+                "ratio": 0.6
             }
         }
     }

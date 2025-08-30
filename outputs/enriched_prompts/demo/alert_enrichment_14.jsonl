@@ -1,7 +1,0 @@
-{
-    "alert": {
-        "signature": "ET HUNTING Whoami Command Inbound On High Port",
-        "category": "Misc activity",
-        "timestamp": "2025-08-15T18:51:04.265Z"
-    }
-}

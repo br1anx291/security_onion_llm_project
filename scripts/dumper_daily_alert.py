@@ -1,25 +1,27 @@
-from config import *
-from elasticsearch import Elasticsearch
-from elasticsearch_dsl import Search
-from collections import defaultdict
-from concurrent.futures import ThreadPoolExecutor, as_completed
-from datetime import datetime, date, timedelta
-import urllib3
+import logging
 import subprocess
 import time
-import json
-import logging
-import paramiko
-import scp
-import socket
-import os
-import gzip
-import re
-import hashlib
-import getpass
+import urllib3
+
 import pandas as pd
-import numpy as np
-import pickle
+import time
+from datetime import datetime, date, timedelta
+from elasticsearch import Elasticsearch
+from elasticsearch_dsl import Search
+
+
+# Local application/library specific imports
+from config import (
+    SSH_TUNNEL_LOCAL_PORT,
+    SSH_TUNNEL_REMOTE_PORT,
+    REMOTE_USERNAME,
+    REMOTE_HOST,
+    ELASTIC_HOST,
+    ELASTIC_USER,
+    ELASTIC_PASS,
+    ALERT_SEVERITY,
+)
+
 # Setup logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 
@@ -27,9 +29,9 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(me
 # Establish an SSH tunnel to Security Onion for Elasticsearch access
 def start_ssh_tunnel():
     try:
-        local_port = ssh_tunnel_local_port
-        remote_port = ssh_tunnel_remote_port
-        ssh_target = f"{remote_username}@{remote_host}"
+        local_port = SSH_TUNNEL_LOCAL_PORT
+        remote_port = SSH_TUNNEL_REMOTE_PORT 
+        ssh_target = f"{REMOTE_USERNAME}@{REMOTE_HOST}"
 
         logging.info(f"Starting SSH tunnel: localhost:{local_port} -> {ssh_target}:{remote_port}")
 
@@ -49,9 +51,9 @@ def start_ssh_tunnel():
 def connect_elasticsearch():
     try:
         es = Elasticsearch(
-            [elastic_host],
+            [ELASTIC_HOST],
             ca_certs=False, verify_certs=False,
-            basic_auth=(elastic_user, elastic_pass)
+            basic_auth=(ELASTIC_USER, ELASTIC_PASS)
         )
         if es.ping():
             urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
@@ -102,10 +104,7 @@ def retrieve_alerts_by_day(es, severity, target_date: date):
             logging.warning(f"Failed to retrieve alerts for {target_date}.")
             return None
         else:
-            # # Sử dụng .scan() để lấy tất cả kết quả khớp
-            # alerts_df = pd.DataFrame((d.to_dict() for d in search_context.scan()))
-            # logging.info(f"Retrieved {len(alerts_df)} alerts for {target_date.strftime('%Y-%m-%d')}.")
-            # return alerts_df
+
             raw_alerts_list = [d.to_dict() for d in search_context.scan()]
             logging.info(f"Retrieved {len(raw_alerts_list)} alerts for {target_date.strftime('%Y-%m-%d')}.")
             return raw_alerts_list
@@ -113,66 +112,7 @@ def retrieve_alerts_by_day(es, severity, target_date: date):
     except Exception as e:
         logging.error(f"Error retrieving alerts for {target_date}: {e}")
         return None
-
-
-# # Flatten nested dictionaries inside alert fields for better data manipulation
-# def normalize_alerts(alerts_df):
-#     if alerts_df is None or alerts_df.empty:
-#         print("⚠️ No alerts to normalize.")
-#         return alerts_df
-
-#     dict_cols = [col for col in alerts_df.columns if isinstance(alerts_df[col].iloc[0], dict)]
-
-#     for col in dict_cols:
-#         try:
-#             flattened = pd.json_normalize(alerts_df[col])
-#             flattened.columns = [f"{col}.{subcol}" for subcol in flattened.columns]
-#             alerts_df = alerts_df.drop(columns=[col]).join(flattened)
-#         except Exception as e:
-#             print(f"⚠️ Could not normalize column '{col}': {e}")
-
-#     return alerts_df
-
-
-# # Select important fields from alert logs for further enrichment and analysis
-# def select_columns(alerts_df):
-#     """
-#     Lọc ra các trường quan trọng từ log Suricata để enrich và phân tích.
-#     """
-#     columns = [
-#         # Timestamp and identifiers
-#         "@timestamp", "log.id.uid", "message",
-
-#         # Network information
-#         "source.ip", "source.port", "destination.ip", "destination.port",
-#         "network.transport", "network.community_id",
-
-#         # Suricata rule information
-#         "rule.name", "rule.category",
-#         "rule.signature", "rule.signature_id",
-
-
-#         # Rule metadata (MITRE, malware, severity)
-#         "rule.metadata.mitre_tactic_id", "rule.metadata.mitre_technique_id",
-#         "rule.metadata.mitre_tactic_name", "rule.metadata.mitre_technique_name",
-#         "rule.metadata.signature_severity", "rule.metadata.malware_family",
-
-#         # Event metadata
-#         "event.severity", "event.module", "event.dataset", "event.category",
-#     ]
-
-#     if alerts_df is not None:
-#         existing_columns = [col for col in columns if col in alerts_df.columns]
-#         missing_columns = set(columns) - set(existing_columns)
-#         if missing_columns:
-#             print(f"⚠️ Missing columns (not in alert data): {missing_columns}")
-#         return alerts_df[existing_columns]
-#     else:
-#         print("⚠️ alerts_df is None — No data available.")
-#         return None
-
-
-# Export filtered and structured alert data to a CSV file
+    
 def export_to_csv(df, path):
     try:
         df.to_csv(path, index=False)
@@ -202,7 +142,7 @@ def export_to_json(df, path):
         
 def export_to_pickle(df, path):
     try:
-        # 'wb' nghĩa là "write bytes" - ghi ở chế độ byte, bắt buộc cho pickle
+
         with open(path, 'wb') as f:
             pickle.dump(df, f)
         logging.info(f"DataFrame object successfully saved to {path}")
@@ -216,17 +156,7 @@ if __name__ == "__main__":
 
     if es:
         today = date(2025, 7, 2)
-        alerts_df = retrieve_alerts_by_day(es, alert_severity, today)
-
-        # if alerts_df is None or alerts_df.empty:
-        #     logging.warning("No alerts retrieved from Elasticsearch. Exiting.")
-        # else:
-        #     # Tạo tên file động theo ngày
-        #     # output_path = f"../so_alerts/nested_alerts_ids2017_thur.pkl"
-        #     # export_to_pickle(alerts_df, output_path)
-        #     print("✅ Dữ liệu Alert đã lấy về thành công. In ra màn hình:")
-        #     print("--------------------------------------------------")
-        #     print(alerts_df) # <--- THÊM DÒNG NÀY ĐỂ IN DATAFRAME\
+        alerts_df = retrieve_alerts_by_day(es, ALERT_SEVERITY, today)
         if alerts_df:
             logging.info(f"Đã lấy về {len(alerts_df)} cảnh báo. Hiển thị dữ liệu thô phức tạp:")
             print("==========================================================")

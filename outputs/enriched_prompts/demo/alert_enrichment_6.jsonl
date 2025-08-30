@@ -1,33 +1,78 @@
 {
     "alert": {
-        "signature": "ET INFO Possible Kali Linux hostname in DHCP Request Packet",
-        "category": "Potential Corporate Privacy Violation",
-        "timestamp": "2025-08-15T18:45:21.289Z"
+        "signature": "ET WEB_SERVER Script tag in URI Possible Cross Site Scripting Attempt",
+        "category": "Web Application Attack",
+        "timestamp": "2025-07-02T02:33:56.584Z"
     },
     "connection": {
         "identity": {
-            "source_ip": "192.168.110.131",
-            "source_port": "68",
-            "destination_ip": "192.168.110.254",
-            "destination_port": "67",
+            "source_ip": "172.16.0.1",
+            "source_port": 54956,
+            "destination_ip": "192.168.10.50",
+            "destination_port": 80,
             "traffic_direction": "Lateral",
-            "service": "dhcp",
-            "transport_protocol": "udp"
+            "service": "http",
+            "transport_protocol": "tcp"
         },
         "statistics": {
-            "duration_sec": 0.0004,
-            "sent_bytes": 282,
-            "received_bytes": 300
+            "duration_seconds": 0.7695
         },
         "analysis": {
-            "connection_state": "Normal Connection (SF)",
-            "history_analysis": {
-                "label": "Unrecognized Pattern",
-                "summary": "Requires manual review: 'Dd'.",
-                "severity": "Informational"
-            },
-            "flow_analysis": {
-                "direction": "Symmetrical"
+            "overall_assessment": "Informational: Standard connection recorded.",
+            "connection_state_desc": "Connection established and fully closed",
+            "flow_ratio": {
+                "upload_bytes": 48783,
+                "download_bytes": 183587,
+                "ratio": 0.3
+            }
+        }
+    },
+    "evidence": {
+        "reference": {
+            "http": {
+                "analysis": {
+                    "overall_assessment": "High Confidence Threat: Session contains indicators of Cross-Site Scripting (XSS) patterns.",
+                    "observed_user_agent_properties": [
+                        "Normal"
+                    ],
+                    "observed_destination": "Direct-to-IP (205.174.165.68)",
+                    "observed_content_patterns": [
+                        "Script Tag"
+                    ],
+                    "observed_file_transfers": {
+                        "uploads": "None",
+                        "downloads": "None"
+                    }
+                },
+                "evidence": {
+                    "connection_context": {
+                        "methods_used": [
+                            "GET"
+                        ],
+                        "user_agent_string": "Mozilla/5.0 (X11; Linux x86_64; rv:45.0) Gecko/20100101 Firefox/45.0"
+                    },
+                    "findings": [
+                        {
+                            "type": "AggregatedContentFinding",
+                            "count": 50,
+                            "examples": [
+                                "/dv/vulnerabilities/xss_r/?name=<script>console.log('UVJI7EHJAZ1R3IRGVHVQH0J94Q12BF1159IT1ZE2EDQD48YF0A');console.log(document.cookie);</script>",
+                                "/dv/vulnerabilities/xss_r/?name=<script>console.log('V6FC42ZM2Z0YGTVI6ZO2T0IZB7MQQ871VJCCLSQYKPXEYZR0IL');console.log(document.cookie);</script>",
+                                "/dv/vulnerabilities/xss_r/?name=<script>console.log('UZ2LI5QG7XYE3OVXGR3S7UF5KYAS5DGV587VH2FS0U61X726NO');console.log(document.cookie);</script>"
+                            ],
+                            "source": "URI",
+                            "reasons": [
+                                "Script Tag"
+                            ]
+                        }
+                    ]
+                },
+                "statistics": {
+                    "total_requests": 101,
+                    "request_bytes": 0,
+                    "response_bytes": 0,
+                    "client_error_ratio": 0.0
+                }
             }
         }
     }

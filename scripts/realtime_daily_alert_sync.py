@@ -1,27 +1,36 @@
-from config import *
 from elasticsearch import Elasticsearch
 from elasticsearch_dsl import Search
 from datetime import datetime, timezone
 import urllib3
 import subprocess
 import time
-import json
 import logging
 import os
-import hashlib
 import pandas as pd
 import numpy as np
 import pytz
 
+from config import (
+    REMOTE_HOST, 
+    REMOTE_USERNAME,
+    SSH_TUNNEL_LOCAL_PORT,
+    SSH_TUNNEL_REMOTE_PORT, 
+    ELASTIC_HOST, 
+    ELASTIC_USER, 
+    ELASTIC_PASS, 
+    ALERT_OUTPUT_PATH,
+    ALERT_SEVERITY
+)
+
+
 # Setup logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
-
 # --- CÁC HÀM GỐC GIỮ NGUYÊN ---
 def start_ssh_tunnel():
     try:
-        local_port = ssh_tunnel_local_port
-        remote_port = ssh_tunnel_remote_port
-        ssh_target = f"{remote_username}@{remote_host}"
+        local_port = SSH_TUNNEL_LOCAL_PORT
+        remote_port = SSH_TUNNEL_REMOTE_PORT
+        ssh_target = f"{REMOTE_USERNAME}@{REMOTE_HOST}"
         logging.info(f"Starting SSH tunnel: localhost:{local_port} -> {ssh_target}:{remote_port}")
         subprocess.Popen(['ssh', '-N', '-L', f'{local_port}:localhost:{remote_port}', ssh_target])
         time.sleep(5)
@@ -31,7 +40,7 @@ def start_ssh_tunnel():
 
 def connect_elasticsearch():
     try:
-        es = Elasticsearch([elastic_host], ca_certs=False, verify_certs=False, basic_auth=(elastic_user, elastic_pass))
+        es = Elasticsearch([ELASTIC_HOST], ca_certs=False, verify_certs=False, basic_auth=(ELASTIC_USER, ELASTIC_PASS))
         if es.ping():
             urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
             logging.info("Connected to Elasticsearch.")
@@ -109,8 +118,8 @@ if __name__ == "__main__":
             
             # 1. Xác định tên file log cho ngày hôm nay
             today_str = now_local.strftime('%Y-%m-%d')
-            output_dir = os.path.dirname(alert_output_path)
-            base_filename = os.path.basename(alert_output_path).rsplit('.', 1)[0]
+            output_dir = os.path.dirname(ALERT_OUTPUT_PATH)
+            base_filename = os.path.basename(ALERT_OUTPUT_PATH).rsplit('.', 1)[0]
             daily_log_path = os.path.join(output_dir, f"{base_filename}-{today_str}.jsonl")
             
             if not os.path.exists(output_dir):
@@ -137,7 +146,7 @@ if __name__ == "__main__":
             # 3. Lấy các cảnh báo mới
             # Hàm retrieve_alerts sử dụng 'gte' (lớn hơn hoặc bằng), nên có thể sẽ lấy lại alert cuối cùng của lần trước.
             # Điều này không sao, chúng ta sẽ xử lý ở bước sau.
-            new_alerts_df = retrieve_alerts(es, alert_severity, start_time=start_time_iso, end_time=end_time_iso)
+            new_alerts_df = retrieve_alerts(es, ALERT_SEVERITY, start_time=start_time_iso, end_time=end_time_iso)
 
             if new_alerts_df is not None:
                 # Bỏ qua alert đầu tiên nếu nó trùng với alert cuối cùng của lần trước
