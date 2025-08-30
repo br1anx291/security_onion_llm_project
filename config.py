@@ -1,0 +1,4 @@
+# Zeek 
+ZEEK_LOGS_DIR = "./so_logs/log/"
+CONN_LOG_TIME_WINDOW_SECONDS = 660 
+MAX_WORKERS = 10
