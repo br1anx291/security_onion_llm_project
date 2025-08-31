@@ -49,10 +49,12 @@ def download_file(sftp, remote_path, local_path):
 # Hàm liệt kê các ngày trong folder Zeek
 def list_zeek_log_folders(sftp, remote_root):
     try:
+        
         folders = sftp.listdir(remote_root)
         return [f for f in folders if re.match(r"\d{4}-\d{2}-\d{2}", f)]
+                # Lọc theo định dạng ngày tháng
     except Exception as e:
-        logging.error(f"Failed to list Zeek root folder: {e}")
+        logging.error(f"Failed to list Zeek root folder: {remote_root}")
         return []
 
 # Hàm kéo Zeek logs từ các ngày
@@ -62,7 +64,7 @@ def fetch_logs_from_folder(folder_name, ssh, sftp):
     local_folder_path = os.path.join(LOCAL_ZEEK_ZIP_PATH, folder_name)
     os.makedirs(local_folder_path, exist_ok=True)
     
-    remote_folder_path = f"{REMOTE_ZEEK_SPOOL_PATH}/{folder_name}/"
+    remote_folder_path = f"{REMOTE_ZEEK_LOG_PATH}/{folder_name}/"
     files_to_check_suffix = ".log.gz"
     downloaded_files = []
     # =========================================================
@@ -111,7 +113,7 @@ def fetch_logs_from_current(ssh=None, sftp=None):
     """
     local_current_path = os.path.join(LOCAL_ZEEK_UNZIP_PATH, "current")
     os.makedirs(local_current_path, exist_ok=True)
-    remote_spool_path = REMOTE_ZEEK_LOG_PATH.rstrip("/") + "/"
+    remote_spool_path = REMOTE_ZEEK_SPOOL_PATH.rstrip("/") + "/"
 
     logging.info(f"🔄 Syncing *.log files from {REMOTE_HOST}:{remote_spool_path} ...")
 
@@ -189,15 +191,16 @@ def main_realtime():
 
         while True:
             try:
-                logging.info(" ciclo de sincronização iniciado...") # Bắt đầu chu kỳ đồng bộ mới
+                logging.info("Synchronization cycle started......") # Bắt đầu chu kỳ đồng bộ mới
                 
                 # --- Ưu tiên 1: Đồng bộ log "nóng" từ spool ngay lập tức ---
                 logging.info("Synchronizing current logs from spool (rsync)...")
                 fetch_logs_from_current(ssh, sftp)
 
                 # --- Ưu tiên 2: Kiểm tra và tải các log đã được lưu trữ ---
-                logging.info(f"Checking for new archived logs in '{REMOTE_ZEEK_SPOOL_PATH}'...")
-                folders_to_check = list_zeek_log_folders(sftp, REMOTE_ZEEK_SPOOL_PATH)
+                logging.info(f"Checking for new archived logs in '{REMOTE_ZEEK_LOG_PATH}'...")
+                folders_to_check = list_zeek_log_folders(sftp, REMOTE_ZEEK_LOG_PATH)
+                # print(f"✅ [DEBUG] Vòng lặp chính sẽ xử lý các thư mục sau: {folders_to_check}\n")
                 if not folders_to_check:
                     logging.info("No daily log folders found to check.")
                 else:

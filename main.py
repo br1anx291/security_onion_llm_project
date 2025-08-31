@@ -20,25 +20,28 @@ logging.basicConfig(level=logging.INFO, format=LOG_FORMAT)
 
 # 2. General Settings
 MAX_WORKERS = 10
-TEST_MODE = True
+TEST_MODE = False
 
 # --- ONLY CHANGE THIS VARIABLE TO SWITCH MODES ---
 # Valid values: 'realtime', 'demo', 'ground_truth'
-MODE = 'ground_truth'
+MODE = 'realtime'
 # ----------------------------------------------------
 
 # Determine the alert filename based on the selected MODE
 if MODE == 'realtime':
     # Get the current date, e.g., 'alerts-2025-08-30'
     name_alert = f'alerts-{time.strftime("%Y-%m-%d")}'
+    ALERTS_FILE_PATH = f"./so_alerts/{name_alert}.jsonl"
+    ENRICHED_PROMPTS_DIR = f"./outputs/enriched_prompts/{MODE}"
+    FINAL_ANALYSIS_OUTPUT_PATH = f"./outputs/final_analysis/{MODE}/{MODE}_analysis.jsonl"
 else:
     # For 'demo' or 'ground_truth', use the mode name itself
     name_alert = MODE
 
 # Dynamically build the required paths based on MODE and name_alert
-ALERTS_FILE_PATH = f"./so_alerts/{name_alert}.jsonl"
-ENRICHED_PROMPTS_DIR = f"./outputs/enriched_prompts/{MODE}"
-FINAL_ANALYSIS_OUTPUT_PATH = f"./outputs/final_analysis/{MODE}/{name_alert}_analysis.jsonl"
+    ALERTS_FILE_PATH = f"./so_alerts/{name_alert}.jsonl"
+    ENRICHED_PROMPTS_DIR = f"./outputs/enriched_prompts/{MODE}"
+    FINAL_ANALYSIS_OUTPUT_PATH = f"./outputs/final_analysis/{MODE}/{name_alert}_analysis.jsonl"
 
 # (Optional) Print the configured paths for verification
 print(f"✨ Running in MODE: {MODE.upper()}")

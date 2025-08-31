@@ -6,7 +6,7 @@ from watchdog.events import FileSystemEventHandler
 import paramiko
 
 from config import (
-    REMOTE_USER,
+    REMOTE_USERNAME,
     REMOTE_HOST,
     REMOTE_PORT,
     REMOTE_KEY_PATH,
@@ -33,10 +33,10 @@ def create_ssh_client():
     try:
         client = paramiko.SSHClient()
         client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        logging.info(f"Đang kết nối tới {REMOTE_USER}@{REMOTE_HOST}...")
+        logging.info(f"Đang kết nối tới {REMOTE_USERNAME}@{REMOTE_HOST}...")
         
         if os.path.exists(REMOTE_KEY_PATH):
-            client.connect(REMOTE_HOST, port=REMOTE_PORT, username=REMOTE_USER, key_filename=REMOTE_KEY_PATH)
+            client.connect(REMOTE_HOST, port=REMOTE_PORT, username=REMOTE_USERNAME, key_filename=REMOTE_KEY_PATH)
         else:
             logging.error(f"Lỗi: Không tìm thấy SSH key tại '{REMOTE_KEY_PATH}'.")
             return None
@@ -48,27 +48,34 @@ def create_ssh_client():
         return None
 
 def append_to_remote_file(ssh_client, content):
-    """Sử dụng SSH để ghi nối nội dung vào file trên remote server."""
+    """Sử dụng SFTP để ghi nối nội dung vào file trên remote server một cách an toàn."""
     if not content:
-        # Bỏ log này để không bị spam khi file thay đổi nhưng không có content mới
-        # logging.info("Không có nội dung mới để ghi.")
         return
 
-    logging.info(f"Sẵn sàng ghi nối {len(content.splitlines())} dòng mới vào remote file...")
+    logging.info(f"Sẵn sàng ghi nối {len(content.splitlines())} dòng mới vào remote file qua SFTP...")
+    sftp = None
+    remote_file = None
     try:
-        command = f"cat >> {REMOTE_FILE_PATH}"
-        stdin, stdout, stderr = ssh_client.exec_command(command)
-        stdin.write(content)
-        stdin.flush()
-        stdin.close()
+        # 1. Mở một phiên SFTP client từ SSH client đã có
+        sftp = ssh_client.open_sftp()
         
-        error = stderr.read().decode()
-        if error:
-            logging.error(f"Lỗi khi ghi file trên remote: {error}")
-        else:
-            logging.info("✅ Ghi nối thành công!")
+        # 2. Mở file trên remote server với chế độ 'a' (append - ghi nối)
+        # Nếu file chưa tồn tại, nó sẽ được tạo ra.
+        remote_file = sftp.open(REMOTE_FILE_PATH, 'a')
+        
+        # 3. Ghi nội dung vào file
+        remote_file.write(content)
+        
+        logging.info("✅ Ghi nối thành công qua SFTP!")
+        
     except Exception as e:
-        logging.error(f"❌ Đã xảy ra lỗi trong quá trình ghi file từ xa: {e}")
+        logging.error(f"❌ Đã xảy ra lỗi trong quá trình ghi file qua SFTP: {e}")
+    finally:
+        # 4. Đảm bảo đóng file và session SFTP để giải phóng tài nguyên
+        if remote_file:
+            remote_file.close()
+        if sftp:
+            sftp.close()
 
 # *** LOGIC NÂNG CẤP NẰM Ở ĐÂY ***
 def sync_content(ssh_client):

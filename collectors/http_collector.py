@@ -36,7 +36,18 @@ class HttpCollector(BaseCollector):
         "HTML Event Handler": re.compile(r"onerror\s*=|onload\s*=|onmouseover\s*=", re.IGNORECASE),
         "Img/Svg Payload": re.compile(r"<img|<svg", re.IGNORECASE)
     }
-
+    WEBSHELL_PATTERNS = {
+        # Pattern này sẽ tìm các lệnh đáng ngờ là GIÁ TRỊ của một tham số bất kỳ
+        "Web Shell Command in Parameter": re.compile(
+            r'=\s*(whoami|uname|id|ls|cat\s|system\s*\(|exec\s*\(|passthru\s*\()', # <-- SỬA LẠI: Tìm các lệnh nằm SAU dấu bằng
+            re.IGNORECASE
+        ),
+           # Pattern này sẽ tìm tên file có chứa các từ khóa đáng ngờ
+        "Suspicious Script in Uploads": re.compile(
+            r'/uploads?/.*(shell|c99|r57|webadmin|admin|root| backdoor)\.php', # <-- SỬA LẠI: Tìm file có chứa chữ 'shell', không cần chính xác
+            re.IGNORECASE
+        )
+    }
     # Aggregation constants
     AGGREGATION_THRESHOLD = 3
     EXAMPLE_LIMIT = 3
@@ -47,7 +58,8 @@ class HttpCollector(BaseCollector):
         self.ALL_PATTERNS = {
             **self.SENSITIVE_URI_PATTERNS,
             **self.SQLI_PATTERNS,
-            **self.XSS_PATTERNS
+            **self.XSS_PATTERNS,
+            **self.WEBSHELL_PATTERNS 
         }
 
     @property
@@ -132,9 +144,9 @@ class HttpCollector(BaseCollector):
                     file_container[fuid]["mime_types"].add(mime_types[i])
 
     def _build_final_findings(self, grouped_findings: Dict, uploaded_files: Dict, downloaded_files: Dict) -> List[Dict]:
-        """Aggregates and formats all findings from the session."""
+        """Aggregates and formats all findings from the session, including aggregated file transfers."""
         findings = []
-        # Process content findings
+        # --- Bước 1: Xử lý content findings (giữ nguyên) ---
         for reasons_key, group in grouped_findings.items():
             common_data = {"source": "/".join(sorted(list(group["sources"]))), "reasons": list(reasons_key)}
             if group["count"] > self.AGGREGATION_THRESHOLD:
@@ -143,13 +155,25 @@ class HttpCollector(BaseCollector):
                 for example in group["examples"]:
                     findings.append({"type": "ContentFinding", "content": example, **common_data})
         
-        # Process file findings
+        # --- Bước 2: Xử lý file findings theo logic gom nhóm MỚI ---
         for direction, container in [("upload", uploaded_files), ("download", downloaded_files)]:
-            for fuid, details in container.items():
-                findings.append({
-                    "type": "FileTransfer", "direction": direction, "fuid": fuid,
-                    "filenames": sorted(list(details["filenames"])), "mime_types": sorted(list(details["mime_types"]))
-                })
+            if not container:
+                continue
+
+            # Thu thập tất cả filenames và mime_types từ TẤT CẢ các file trong nhóm
+            all_filenames = {fn for details in container.values() for fn in details.get("filenames", []) if fn}
+            all_mimes = {mime for details in container.values() for mime in details.get("mime_types", []) if mime}
+            
+            # Tạo một finding tổng hợp duy nhất cho hướng này (upload hoặc download)
+            aggregated_finding = {
+                "type": "AggregatedFileTransfer",
+                "direction": direction,
+                "count": len(container), # Đếm số file duy nhất (dựa trên fuid)
+                "filenames": sorted(list(all_filenames))[:self.EXAMPLE_LIMIT] if all_filenames else ["No valid filenames recorded"],
+                "mime_types": sorted(list(all_mimes))
+            }
+            findings.append(aggregated_finding)
+            
         return findings
 
     def _build_analysis_section(self, user_agent: str, direct_ip_host: str, findings: List, uploaded_files: Dict, downloaded_files: Dict) -> Dict:

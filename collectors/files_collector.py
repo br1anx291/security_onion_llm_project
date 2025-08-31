@@ -99,61 +99,129 @@ class FilesCollector(BaseCollector):
             
         return file_finding
 
-    def _build_final_output(self, findings: List, total_bytes: int) -> Dict:
-        """Aggregates results and builds the final collector output dictionary."""
-        suspicious_files = [f for f in findings if f['severity'] != "Informational"]
-        suspicious_count = len(suspicious_files)
-        
-        # Determine highest severity and if evasion was detected
-        highest_severity = "Informational"
-        evasion_detected = False
-        if suspicious_files:
-            highest_severity = max(suspicious_files, key=lambda f: self.SEVERITY_LEVELS[f['severity']])['severity']
-            if any("MIME_MISMATCH" in f['reasons'] or "HIGH_ENTROPY" in f['reasons'] for f in suspicious_files):
-                evasion_detected = True
+    # --- Main Collect Method ---
+    def collect(self, log_lines: List[str]) -> Dict[str, Any] | None:
+        """Orchestrates the analysis and AGGREGATION of a stream of file log entries."""
+        if not log_lines:
+            return None
 
-        # Build analysis section
+        # <<< THAY ĐỔI BẮT ĐẦU: Logic gom nhóm thay vì tạo danh sách phẳng >>>
+        
+        # Dictionary để gom nhóm các findings dựa trên lý do (reasons)
+        grouped_findings: Dict[Tuple[str, ...], Dict] = {}
+        total_bytes_seen = 0
+        EXAMPLE_LIMIT = 5 # Giới hạn số lượng ví dụ filename cho mỗi nhóm
+
+        for line in log_lines:
+            try:
+                log = json.loads(line)
+                # Phân tích từng file để lấy ra finding ban đầu
+                individual_finding = self._process_log_entry(log)
+                
+                if not individual_finding:
+                    continue
+                
+                total_bytes_seen += individual_finding.get("size_bytes", 0)
+
+                # Tạo một key duy nhất dựa trên các lý do phát hiện được
+                reasons = tuple(sorted(individual_finding["reasons"]))
+                if not reasons:
+                    reasons = ("BENIGN",) # Nhóm các file lành tính lại với nhau
+
+                # Nếu nhóm này chưa tồn tại, hãy khởi tạo nó
+                if reasons not in grouped_findings:
+                    grouped_findings[reasons] = {
+                        "count": 0,
+                        "total_size_bytes": 0,
+                        "severities": [],
+                        "risk_scores": [],
+                        "example_filenames": set(),
+                        "directions": set()
+                    }
+
+                # Cập nhật thông tin cho nhóm
+                group = grouped_findings[reasons]
+                group["count"] += 1
+                group["total_size_bytes"] += individual_finding["size_bytes"]
+                group["severities"].append(individual_finding["severity"])
+                group["risk_scores"].append(individual_finding["risk_score"])
+                group["directions"].add(individual_finding["direction"])
+                
+                # Chỉ thêm một vài ví dụ filename để output không bị dài
+                if len(group["example_filenames"]) < EXAMPLE_LIMIT and individual_finding["filename"]:
+                    group["example_filenames"].add(individual_finding["filename"])
+
+            except (json.JSONDecodeError, KeyError) as e:
+                logging.warning(f"Skipping malformed file log line. Error: {e}")
+                continue
+        
+        if not grouped_findings:
+            return None
+
+        return self._build_aggregated_output(grouped_findings, total_bytes_seen)
+
+    # <<< THAY ĐỔI LỚN: Viết lại hoàn toàn hàm build output để xử lý dữ liệu đã gom nhóm >>>
+    def _build_aggregated_output(self, grouped_findings: Dict, total_bytes: int) -> Dict:
+        """Aggregates results from grouped findings and builds the final collector output."""
+        
+        aggregated_findings = []
+        highest_session_severity = "Informational"
+        session_evasion_detected = False
+        total_suspicious_files = 0
+
+        for reasons, group_data in grouped_findings.items():
+            if reasons == ("BENIGN",):
+                continue
+
+            group_highest_severity = max(group_data["severities"], key=lambda s: self.SEVERITY_LEVELS[s])
+            
+            # <<< CẢI TIẾN LOGIC FILENAME BẮT ĐẦU >>>
+            
+            # 1. Lọc ra tất cả các filename có giá trị (không phải None)
+            valid_filenames = sorted([fn for fn in group_data["example_filenames"] if fn])
+            
+            # 2. Nếu sau khi lọc không còn filename nào, sử dụng một thông báo ngắn gọn
+            if not valid_filenames:
+                display_filenames = ["No valid filenames recorded"]
+            else:
+                display_filenames = valid_filenames
+
+            # <<< CẢI TIẾN LOGIC FILENAME KẾT THÚC >>>
+
+            agg_finding = {
+                "type": "AggregatedFileFinding",
+                "count": group_data["count"],
+                "reasons": list(reasons),
+                "severity": group_highest_severity,
+                "avg_risk_score": round(sum(group_data["risk_scores"]) / group_data["count"]),
+                "directions": sorted(list(group_data["directions"])),
+                "total_size_bytes": group_data["total_size_bytes"],
+                "example_filenames": display_filenames # Sử dụng danh sách đã được xử lý
+            }
+            aggregated_findings.append(agg_finding)
+
+            total_suspicious_files += group_data["count"]
+            if self.SEVERITY_LEVELS[group_highest_severity] > self.SEVERITY_LEVELS[highest_session_severity]:
+                highest_session_severity = group_highest_severity
+            if "MIME_MISMATCH" in reasons or "HIGH_ENTROPY" in reasons:
+                session_evasion_detected = True
+
+        # ... (Phần còn lại của hàm giữ nguyên) ...
         analysis = {
-            "session_risk_summary": "Suspicious file activity detected" if suspicious_count > 0 else "No suspicious file activity detected",
-            "highest_threat_level": highest_severity,
-            "evasion_techniques_detected": evasion_detected,
-            "suspicious_content_summary": f"{suspicious_count} file(s) flagged with Medium or higher severity."
+            "session_risk_summary": f"Suspicious file activity detected ({total_suspicious_files} files)" if total_suspicious_files > 0 else "No suspicious file activity detected",
+            "highest_threat_level": highest_session_severity,
+            "evasion_techniques_detected": session_evasion_detected
         }
         
-        # Build statistics section
         statistics = {
-            "total_files_analyzed": len(findings),
-            "suspicious_files_count": suspicious_count,
+            "total_files_analyzed": sum(g['count'] for g in grouped_findings.values()),
+            "suspicious_files_count": total_suspicious_files,
+            "suspicious_groups_count": len(aggregated_findings),
             "total_bytes_transferred_kb": round(total_bytes / 1024, 2)
         }
 
         return {
             "analysis": analysis,
             "statistics": statistics,
-            "evidence": {"findings": findings}
+            "evidence": {"findings": aggregated_findings}
         }
-
-    # --- Main Collect Method ---
-    def collect(self, log_lines: List[str]) -> Dict[str, Any] | None:
-        """Orchestrates the analysis of a stream of file log entries."""
-        if not log_lines:
-            return None
-
-        findings = []
-        total_bytes_seen = 0
-
-        for line in log_lines:
-            try:
-                log = json.loads(line)
-                finding = self._process_log_entry(log)
-                if finding:
-                    findings.append(finding)
-                    total_bytes_seen += finding.get("size_bytes", 0)
-            except (json.JSONDecodeError, KeyError) as e:
-                logging.warning(f"Skipping malformed file log line. Error: {e}")
-                continue
-        
-        if not findings:
-            return None
-
-        return self._build_final_output(findings, total_bytes_seen)
