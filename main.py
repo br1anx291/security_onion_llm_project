@@ -63,7 +63,7 @@ def get_next_alert_index(directory: str) -> int:
     e.g., if 'alert_enrichment_5.jsonl' is the highest, returns 6.
     """
     if not os.path.isdir(directory):
-        return 1 # Start from 1 if the directory doesn't exist.
+        return 1 
 
     max_index = 0
     prefix = 'alert_enrichment_'
@@ -77,7 +77,6 @@ def get_next_alert_index(directory: str) -> int:
                 if index > max_index:
                     max_index = index
             except ValueError:
-                # Ignore files with non-integer indices.
                 continue
                 
     return max_index + 1
@@ -114,7 +113,7 @@ def process_and_write_alert(
         except IOError as e:
             logging.error(f"Worker #{index}: Failed to save prompt file. Error: {e}")
         
-        prompt_as_json_string = json.dumps(enriched_prompt) # Không cần indent khi gửi cho LLM
+        prompt_as_json_string = json.dumps(enriched_prompt) 
         
          # Get LLM analysis.
         llm_analysis_result  = None
@@ -201,7 +200,7 @@ def main():
              ThreadPoolExecutor(max_workers=MAX_WORKERS, thread_name_prefix='Worker') as executor:
             
             logging.info("Log file opened, seeking to end to monitor for new alerts...")
-            input_file.seek(0, 2)  # Move to the end of the file.
+            input_file.seek(0, 2) 
             
             alert_counter = get_next_alert_index(ENRICHED_PROMPTS_DIR)
             

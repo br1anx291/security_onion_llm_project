@@ -15,7 +15,7 @@ An automated alert triage system that uses LLMs to analyze and classify security
     * [Installation](#installation)
     * [Configuration](#configuration)
 * [Usage](#-usage)
-
+* [Demo](#-demo)
 ---
 
 ## 🧐 About
@@ -146,3 +146,7 @@ Follow these instructions to get a copy of the project up and running on your lo
 4.  **Monitor Alerts**
 
     Use the dashboard interface to monitor incoming alerts, view enriched context, and see the LLM's analysis in real-time.
+
+## 👁️ Demo  
+
+> 🎥 [Click để xem bản demo](https://drive.google.com/file/d/1xAk7FiyEp3_8gRovNPe0rnZ5C2pYLWTn/view?usp=sharing)
