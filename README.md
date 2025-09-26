@@ -6,16 +6,16 @@ An automated alert triage system that uses LLMs to analyze and classify security
 
 ## 📋 Table of Contents
 
-* [About](#about)
-* [Architecture](#architecture)
+* [About](#-about)
+* [Architecture](#-architecture)
 * [Key Features](#-key-features)
 * [Built With](#️-built-with)
 * [Getting Started](#-getting-started)
     * [Prerequisites](#prerequisites)
     * [Installation](#installation)
     * [Configuration](#configuration)
-* [Usage](#-usage)
-* [Demo](#-demo)
+* [Usage](#usage)
+* [Demo](#demo)
 ---
 
 ## 🧐 About
